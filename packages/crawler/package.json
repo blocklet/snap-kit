@@ -1,5 +1,5 @@
 {
-  "name": "@blocklet/crawler",
+  "name": "@arcblock/crawler",
   "private": true,
   "version": "0.1.0",
   "scripts": {
@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@abtnode/cron": "^1.16.43",
+    "@abtnode/queue": "^1.16.43",
     "@arcblock/did-auth": "^1.19.15",
     "@arcblock/did-auth-storage-nedb": "^1.7.1",
     "@blocklet/puppeteer": "^22.11.3",
@@ -42,6 +43,7 @@
     "axios": "^1.7.9",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "dotenv-flow": "^4.1.0",
     "express": "^4.21.2",
     "express-async-errors": "^3.1.1",

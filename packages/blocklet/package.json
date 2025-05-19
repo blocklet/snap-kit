@@ -63,7 +63,9 @@
     "robots-parser": "^3.0.1",
     "sitemap": "^7.1.2",
     "ufo": "^1.5.4",
-    "url-join": "^4.0.1"
+    "url-join": "^4.0.1",
+    "@arcblock/crawler": "workspace:*",
+    "@arcblock/validator": "^1.20.11"
   },
   "devDependencies": {
     "@blocklet/js-sdk": "^1.16.39",

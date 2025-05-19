@@ -29,8 +29,8 @@ export const initSEOMiddleware = (
 
     // add cached html to req
     req.cachedHtml = cacheData?.content || cacheData || null;
-    // add cached lastmod to req, ISO string to GMT string
-    req.cachedLastmod = cacheData?.lastmod ? new Date(cacheData?.lastmod).toUTCString() : null;
+    // add cached lastModified to req, ISO string to GMT string
+    req.cachedLastmod = cacheData?.lastModified ? new Date(cacheData?.lastModified).toUTCString() : null;
 
     if (req.cachedLastmod) {
       res.setHeader('Last-Modified', req.cachedLastmod);

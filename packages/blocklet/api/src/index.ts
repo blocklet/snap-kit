@@ -34,7 +34,16 @@ if (isProduction) {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use<ErrorRequestHandler>((err, _req, res, _next) => {
-    logger.error(err.stack);
+    logger.error('API Error:', err);
+
+    const statusCode = err.statusCode || (err.name === 'ValidationError' ? 400 : 500);
+    const code = err.code || -1;
+
+    res.status(statusCode).json({
+      code,
+      message: err.message,
+    });
+
     res.status(500).send('Something broke!');
   });
 }

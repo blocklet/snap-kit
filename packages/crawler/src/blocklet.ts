@@ -86,16 +86,14 @@ export const crawlBlocklet = async () => {
         await Promise.all(
           tempLocList.map(async (loc) => {
             try {
-              const { lastmod: cacheLastmod, nextDate } = await useCache.get(getRelativePath(loc));
+              const { lastModified: cacheLastModified } = await useCache.get(getRelativePath(loc));
 
-              // sitemap item lastmod is same as cache lastmod, skip it
-              if (item.lastmod && new Date(cacheLastmod).getTime() === new Date(item.lastmod).getTime()) {
-                skipBlockletLocTotal++;
-                return false;
-              }
-
-              // cache lastmod add cron time  is later than Date.now, skip it
-              if (nextDate && new Date(nextDate).getTime() >= new Date().getTime()) {
+              // sitemap item lastmod is same as cache lastModified, skip it
+              if (
+                item.lastmod &&
+                cacheLastModified &&
+                new Date(cacheLastModified).getTime() === new Date(item.lastmod).getTime()
+              ) {
                 skipBlockletLocTotal++;
                 return false;
               }
