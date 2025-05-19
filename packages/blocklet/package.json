@@ -1,0 +1,106 @@
+{
+  "name": "@blocklet/crawler",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "blocklet dev",
+    "lint": "tsc --noEmit && eslint src api/src --ext .mjs,.js,.jsx,.ts,.tsx",
+    "lint:fix": "npm run lint -- --fix",
+    "start": "cross-env NODE_ENV=development nodemon --exec tsx api/dev.ts -w api",
+    "clean": "node scripts/build-clean.mjs",
+    "bundle": "tsc --noEmit && npm run bundle:client && npm run bundle:api",
+    "bundle:client": "vite build",
+    "bundle:api": "npm run clean && tsc -p tsconfig.api.json && blocklet bundle --compact --create-release",
+    "deploy": "npm run bundle && blocklet deploy .blocklet/bundle",
+    "upload": "npm run bundle && blocklet upload .blocklet/release/blocklet.json",
+    "prepare": "npx simple-git-hooks",
+    "bump-version": "zx --quiet scripts/bump-version.mjs"
+  },
+  "lint-staged": {
+    "*.{mjs,js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint"
+    ],
+    "*.{css,less,scss,json,graphql}": [
+      "prettier --write"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "@abtnode/cron": "^1.16.43",
+    "@arcblock/did-auth": "^1.19.15",
+    "@arcblock/did-auth-storage-nedb": "^1.7.1",
+    "@blocklet/puppeteer": "^22.11.3",
+    "@blocklet/sdk": "^1.16.43",
+    "@ocap/client": "^1.19.15",
+    "@ocap/mcrypto": "^1.19.15",
+    "@ocap/util": "^1.20.11",
+    "@ocap/wallet": "^1.19.15",
+    "axios": "^1.7.9",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv-flow": "^4.1.0",
+    "express": "^4.21.2",
+    "express-async-errors": "^3.1.1",
+    "fs-extra": "^11.2.0",
+    "generic-pool": "^3.9.0",
+    "lodash": "^4.17.21",
+    "lru-cache": "^10.4.3",
+    "p-queue": "6.6.2",
+    "p-wait-for": "^5.0.2",
+    "redis": "^4.7.0",
+    "robots-parser": "^3.0.1",
+    "sitemap": "^7.1.2",
+    "ufo": "^1.5.4",
+    "url-join": "^4.0.1"
+  },
+  "devDependencies": {
+    "@blocklet/js-sdk": "^1.16.39",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/dotenv-flow": "^3.3.3",
+    "@types/express": "^4.17.21",
+    "@types/fs-extra": "^11.0.4",
+    "@types/lodash": "^4.17.16",
+    "@types/node": "^20.17.19",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "bumpp": "^9.11.1",
+    "nodemon": "^3.1.9",
+    "npm-run-all": "^4.1.5",
+    "react": "~18.2.0",
+    "react-dom": "~18.2.0",
+    "react-router-dom": "^6.29.0",
+    "rimraf": "^5.0.10",
+    "tsx": "^4.19.3",
+    "vite": "^5.4.14",
+    "vite-plugin-blocklet": "^0.9.32",
+    "vite-plugin-svgr": "^4.3.0",
+    "zx": "^8.3.2"
+  },
+  "importSort": {
+    ".js, .jsx, .mjs": {
+      "parser": "babylon",
+      "style": "module"
+    },
+    ".ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  }
+}

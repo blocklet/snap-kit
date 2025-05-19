@@ -1,0 +1,145 @@
+# Snapshot 需求和技术文档
+
+## 需求描述
+
+开发一个 Blocklet，提供网页截图和网页源码抓取的 API 服务。
+
+它会在服务器上维护一个队列，通过 puppeteer 异步抓取内容。
+
+## 需求详情
+
+### 1. 新增环境变量：
+
+模块：packages/blocklet
+
+- `QUEUE_CONCURRENCY`: 控制队列并发处理任务的数量，默认值为 2
+- `DATA_DIR`: 截图存储位置，默认值为 `./snapshots`
+- `RETENTION_DAYS`: 保存截图文件的天数，超过此天数的文件将被自动清理，默认值为 180
+- `REDIS_URL`: redis 路径
+
+### 2. 新增爬虫网页截图
+
+模块：packages/crawler
+
+在原有的爬取 HTML 基础上，增加网页截图功能。
+生成的截图保存在 blocklet 数据目录里，根据日期做文件夹分类，方便根据日期清理文件。
+
+```typescript
+import { env } from '@blocklet/sdk/lib/config';
+import path from 'path';
+
+const savePath = path.join(env.dataDir, process.env.DATA_DIR);
+```
+
+当数据目录下的文件超出指定时间后(`RETENTION_DAYS`)，自动进行清理。
+清理时机可以是一个任务完成之后，以及程序启动时，作为异步任务执行。
+
+### 3. 优化队列
+
+模块：packages/crawler
+
+使用 @abtnode/queue 代替原有的 q-queue 队列，以便持久化存储。
+
+使用文档：https://www.npmjs.com/package/@abtnode/queue
+
+### 4. 优化 redis 存储结构：
+
+模块：packages/crawler
+
+```typescript
+{
+    html?: string // html 源码
+    screenshot?: string // 截图文件路径
+    lastModified: string // 最后修改时间
+    updatedAt: string // 此条目更新时间
+}
+```
+
+## 项目结构
+
+该项目是一个 PNPM Monorepo 项目，包含两个 package：
+
+- packages/blocklet: 一个完整的 blocklet
+  - api 对外提供的 API 服务（本次需求实现）
+  - src 前端（无需实现，忽略即可）
+- packages/crawler: 爬虫（已部分实现，本次需求需调整）
+
+## API 设计
+
+### 通用响应结构
+
+```typescript
+interface Response<T> {
+  code: 'ok' | 'error';
+  message?: string;
+  data: T;
+}
+```
+
+### 1. POST /api/crawl
+
+将 url 加入爬虫队列，并在适当时候进行抓取。
+
+**请求参数**
+
+```typescript
+interface CrawlRequest {
+  // 网站链接
+  url: string;
+  // 是否爬取
+  html?: boolean;
+  screenshot?: boolean;
+  // 视窗大小设置
+  viewport?: {
+    width: number;
+    height: number;
+  };
+}
+```
+
+**返回参数**
+
+```typescript
+interface CrawlResponse {
+  // 任务 ID
+  id: string;
+}
+```
+
+### 2. GET /api/snapshot
+
+获取指定 url 的快照信息。
+
+**请求参数**
+
+```typescript
+interface SnapshotRequest {
+  // 网站链接
+  url: string;
+}
+```
+
+**返回参数**
+
+```typescript
+interface SnapshotResponse {
+  id: string;
+  url: string;
+  html?: string; // html 内容
+  screenshot?: string; // 截图访问url
+  lastModified: string; // 最后修改时间，ISO 时间
+  // 快照状态
+  // 0: PENDING (排队中)
+  // 1: PROCESSING (处理中)
+  // 2: COMPLETED (已完成)
+  // 3: FAILED (失败)
+  status: number;
+}
+```
+
+## 技术栈：
+
+- 语言: typescript
+- 框架: express
+- 数据库: redis
+- 单元测试: jest

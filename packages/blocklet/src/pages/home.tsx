@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import reactLogo from '../assets/react.svg';
+
 import blockletLogo from '../assets/blocklet.svg';
+import reactLogo from '../assets/react.svg';
 import viteLogo from '../assets/vite.svg';
-import './home.css';
 import api from '../libs/api';
+import './home.css';
 
 function Home() {
   const [count, setCount] = useState(0);
