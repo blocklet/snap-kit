@@ -1,19 +1,14 @@
 import Cron from '@abtnode/cron';
+import config from '@blocklet/sdk/lib/config';
 import debounce from 'lodash/debounce';
 import { joinURL } from 'ufo';
 
 import { crawlUrl } from './crawler';
+import { closeBrowser, getBrowser } from './puppeteer';
 import { useCache } from './store';
-import {
-  closeBrowser,
-  components,
-  env,
-  getBrowser,
-  getComponentInfo,
-  getRelativePath,
-  getSitemapList,
-  logger,
-} from './utils';
+import { getComponentInfo, getRelativePath, getSitemapList } from './utils';
+
+const { components, env, logger } = config;
 
 // record crawl blocklet running
 const crawlBlockletRunningMap = new Map();

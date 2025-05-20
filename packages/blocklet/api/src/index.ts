@@ -1,3 +1,4 @@
+import { ensureBrowserDownloaded } from '@arcblock/crawler/src/puppeteer';
 import fallback from '@blocklet/sdk/lib/middlewares/fallback';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -12,6 +13,12 @@ import routes from './routes';
 dotenv.config();
 
 const { name, version } = require('../../package.json');
+
+ensureBrowserDownloaded({
+  executablePath: process.env.BLOCKLET_EXECUTABLE_PATH!,
+  cacheDir: process.env.BLOCKLET_CACHE_DIR!,
+  appDir: process.env.BLOCKLET_APP_DIR! || process.cwd(),
+});
 
 export const app = express();
 

@@ -19,26 +19,27 @@ files:
   - dist
   - logo.png
   - screenshots
+  - api/hooks/*.ts
 interfaces:
   - type: web
     name: publicUrl
     path: /
-    prefix: "*"
+    prefix: '*'
     port: BLOCKLET_PORT
     protocol: http
-community: ""
-documentation: ""
-homepage: ""
-license: ""
+community: ''
+documentation: ''
+homepage: ''
+license: ''
 payment:
   price: []
   share: []
 timeout:
   start: 60
 requirements:
-  server: ">=1.16.28"
-  os: "*"
-  cpu: "*"
+  server: '>=1.16.28'
+  os: '*'
+  cpu: '*'
 scripts:
   dev: npm run start
 environments: []
