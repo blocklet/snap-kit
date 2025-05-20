@@ -1,11 +1,13 @@
 {
   "name": "@arcblock/crawler",
-  "private": true,
   "version": "0.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "dev": "blocklet dev",
+    "dev": "tsc --watch",
     "lint": "tsc --noEmit && eslint src --ext .mjs,.js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
     "bundle": "tsc"
@@ -36,12 +38,15 @@
     "@abtnode/queue": "^1.16.43",
     "@arcblock/did-auth": "^1.19.15",
     "@arcblock/did-auth-storage-nedb": "^1.7.1",
+    "@blocklet/logger": "^1.16.43",
     "@blocklet/puppeteer": "^22.11.3",
     "@blocklet/sdk": "^1.16.43",
     "@ocap/client": "^1.19.15",
     "@ocap/mcrypto": "^1.19.15",
     "@ocap/util": "^1.20.11",
     "@ocap/wallet": "^1.19.15",
+    "@sequelize/core": "7.0.0-alpha.46",
+    "@sequelize/sqlite3": "7.0.0-alpha.46",
     "axios": "^1.7.9",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -57,7 +62,9 @@
     "p-wait-for": "^5.0.2",
     "redis": "^4.7.0",
     "robots-parser": "^3.0.1",
+    "sequelize": "^6.37.7",
     "sitemap": "^7.1.2",
+    "sqlite3": "^5.1.7",
     "ufo": "^1.5.4",
     "url-join": "^4.0.1"
   },

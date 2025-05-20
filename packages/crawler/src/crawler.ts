@@ -1,166 +1,197 @@
 import createQueue from '@abtnode/queue';
-import { env } from '@blocklet/sdk/lib/config';
+import { randomUUID } from 'crypto';
 import { format } from 'date-fns';
 import fs from 'fs-extra';
 import path from 'path';
 
-import { closeBrowser, initPage } from './puppeteer';
-import { useCache } from './store';
-import { getRelativePath, isAcceptCrawler, logger } from './utils';
+import { useCache } from './cache';
+import { config, logger } from './config';
+import { Snapshot } from './db/snapshot';
+import { initPage } from './puppeteer';
+import { isAcceptCrawler } from './utils';
 
-// 创建按日期分类的目录
-async function createDateDirectory() {
-  const today = new Date();
-  const dateStr = format(today, 'yyyy-MM-dd');
-  const dataDir = path.join(env.dataDir, process.env.DATA_DIR || '');
-  const dateDir = path.join(dataDir, dateStr);
+let crawlQueue;
 
-  await fs.ensureDir(dateDir);
+export function createCrawlQueue() {
+  crawlQueue = createQueue({
+    file: path.join(config.dataDir, 'crawler-queue.db'),
+    concurrency: 1,
+    onJob: async (job) => {
+      logger.info('start crawling job:', job);
 
-  return { dateDir, dateStr };
-}
+      const { id, url, includeScreenshot, includeHtml, width, height, saveToRedis } = job;
 
-// 清理过期文件
-export const cleanFiles = async () => {
-  try {
-    const dataDir = path.join(env.dataDir, process.env.DATA_DIR || '');
-    if (!fs.existsSync(dataDir)) {
-      return;
-    }
-
-    const retentionDays = Number(process.env.RETENTION_DAYS || 180);
-    const now = new Date();
-    const retentionMs = retentionDays * 24 * 60 * 60 * 1000;
-    const cutoffDate = new Date(now.getTime() - retentionMs);
-
-    logger.info(`Cleaning up files older than ${retentionDays} days (before ${format(cutoffDate, 'yyyy-MM-dd')})`);
-
-    // 读取数据目录中的所有子目录（按日期分类）
-    const dateDirs = await fs.readdir(dataDir);
-
-    for (const dateDir of dateDirs) {
-      try {
-        // 检查目录名是否为日期格式（yyyy-MM-dd）
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dateDir)) {
-          const dirDate = new Date(dateDir);
-
-          // 如果目录日期早于截止日期，则删除该目录
-          if (dirDate < cutoffDate) {
-            const dirPath = path.join(dataDir, dateDir);
-            logger.info(`Removing old directory: ${dirPath}`);
-            await fs.remove(dirPath);
-          }
-        }
-      } catch (error) {
-        logger.error(`Error processing directory ${dateDir}:`, error);
-      }
-    }
-
-    logger.info('File cleanup completed');
-  } catch (error) {
-    logger.error('Error during file cleanup:', error);
-  }
-};
-
-// 创建持久化队列
-export const crawlQueue = createQueue({
-  file: path.join(env.dataDir, 'crawler-queue.db'),
-  concurrency: Number(process.env.QUEUE_CONCURRENCY || 1),
-  onJob: async (job) => {
-    logger.info('start crawling job:', job);
-
-    const { url, retryCount = 0, index, autoCloseBrowserCount } = job;
-
-    const canCrawl = await isAcceptCrawler(url);
-
-    if (!canCrawl) {
-      return null;
-    }
-
-    // if index reach autoCloseBrowserCount, close browser
-    try {
-      if (index >= autoCloseBrowserCount) {
-        await closeBrowser({
-          trimCache: false,
-        });
-      }
-    } catch (error) {
-      logger.error('failed to close browser when queue index reached autoCloseBrowserCount:', error);
-    }
-
-    try {
-      // get page content later
-      const result = await getPageContent({
-        url,
-        formatPageContent: job.formatPageContent,
-        screenshot: job.screenshot || false,
-        viewport: job.viewport,
-      });
-
-      if (result && (result.html || result.screenshot)) {
-        const lastModifiedValue = job.lastmodMap?.get(url) || new Date().toISOString();
-        // save to cache
-        await setUrlInfoToCache({
+      const canCrawl = await isAcceptCrawler(url);
+      if (!canCrawl) {
+        await Snapshot.upsert({
+          id,
           url,
-          content: result,
-          lastmod: lastModifiedValue,
+          status: 'failed',
+          error: 'The robots.txt does not allow crawling',
+          options: {
+            width,
+            height,
+            includeScreenshot,
+            includeHtml,
+          },
         });
-
-        logger.info(`Crawler[${index}] ${url} success${result.screenshot ? ' with screenshot' : ''}`);
-        return result;
-      }
-
-      if (retryCount < 3) {
-        // 返回错误，让队列重试
-        throw new Error(`Crawler[${index}] ${url} fail, will retry`);
-      } else {
-        logger.info(`Crawler[${index}] ${url} fail reach 3 times, skip it`);
+        logger.error(`failed to crawl ${url}, the robots.txt does not allow crawling`, job);
         return null;
       }
-    } catch (error: any) {
-      logger.info(`Crawler[${index}] ${url} abort by error: ${error?.message || error?.reason || error}`);
-      throw error; // 重新抛出错误，让队列处理重试逻辑
-    }
-  },
-});
 
-const formatHtml = (htmlString: string | null | undefined) => {
-  if (typeof htmlString !== 'string') {
-    return '';
+      // if index reach autoCloseBrowserCount, close browser
+      // try {
+      //   if (index >= autoCloseBrowserCount) {
+      //     await closeBrowser({ trimCache: false });
+      //   }
+      // } catch (error) {
+      //   logger.error('failed to close browser when queue index reached autoCloseBrowserCount:', error);
+      // }
+
+      try {
+        // get page content later
+        const result = await getPageContent({
+          url,
+          includeScreenshot,
+          includeHtml,
+          width,
+          height,
+        });
+
+        if (result && (result.html || result.screenshot)) {
+          // save html and screenshot to data dir
+          const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
+            id,
+            screenshot: result.screenshot,
+            html: result.html,
+          });
+
+          const lastModified = job.lastmodMap?.get(url) || new Date().toISOString();
+          const shortScreenshotPath = screenshotPath?.replace(config.dataDir, '');
+          const shortHTMLPath = htmlPath?.replace(config.dataDir, '');
+
+          // save to db
+          await Snapshot.upsert({
+            id,
+            url,
+            status: 'success',
+            html: shortHTMLPath,
+            screenshot: shortScreenshotPath,
+            lastModified,
+            options: {
+              width,
+              height,
+              includeScreenshot,
+              includeHtml,
+            },
+          });
+
+          // save to redis
+          if (saveToRedis) {
+            useCache.set(url, {
+              html: result.html || '',
+              lastModified,
+            });
+          }
+
+          logger.info(`success to crawl ${url}`, job);
+          return result;
+        }
+      } catch (error) {
+        logger.error(`failed to crawl ${url}`, { error, job });
+
+        await Snapshot.upsert({
+          id,
+          url,
+          status: 'failed',
+          error: error?.message || JSON.stringify(error),
+          options: {
+            width,
+            height,
+            includeScreenshot,
+            includeHtml,
+          },
+        });
+
+        return null;
+      }
+    },
+  });
+}
+
+async function ensureDataDir() {
+  const today = new Date();
+  const dateStr = format(today, 'yyyy-MM-dd');
+  const dir = path.join(config.dataDir, 'data', dateStr);
+
+  await fs.ensureDir(dir);
+
+  return dir;
+}
+
+async function saveSnapshotToLocal({
+  id,
+  screenshot,
+  html,
+}: {
+  id: string;
+  screenshot?: Uint8Array | null;
+  html?: string | null;
+}) {
+  const dataDir = await ensureDataDir();
+
+  let screenshotPath: string | null = null;
+  let htmlPath: string | null = null;
+
+  if (screenshot) {
+    screenshotPath = path.join(dataDir, `${id}.png`);
+    await fs.writeFile(screenshotPath, screenshot);
+  }
+  if (html) {
+    htmlPath = path.join(dataDir, `${id}.html`);
+    await fs.writeFile(htmlPath, html);
   }
 
-  // happen js error
+  return {
+    screenshotPath,
+    htmlPath,
+  };
+}
+
+function formatHtml(htmlString: string) {
   if (htmlString.includes('<h2>Unexpected Application Error!</h2>')) {
     return '';
   }
   return htmlString;
-};
+}
 
 export const getPageContent = async ({
   url,
   formatPageContent,
-  screenshot = false,
-  viewport = { width: 1440, height: 900 },
+  includeScreenshot = true,
+  includeHtml = true,
+  width = 1440,
+  height = 900,
 }: {
   url: string;
-  headers?: Record<string, string>;
   formatPageContent?: Function;
-  screenshot?: boolean;
-  viewport?: { width: number; height: number };
+  includeScreenshot?: boolean;
+  includeHtml?: boolean;
+  width?: number;
+  height?: number;
 }) => {
   const page = await initPage();
 
-  // 设置视窗大小
-  if (viewport && (viewport.width !== 1440 || viewport.height !== 900)) {
-    await page.setViewport(viewport);
+  if (width && height) {
+    await page.setViewport({ width, height });
   }
 
-  let pageContent: string | null = null;
-  let screenshotPath: string | null = null;
+  let html: string | null = null;
+  let screenshot: Uint8Array | null = null;
 
   try {
     const response = await page.goto(url, {
-      timeout: 60 * 1000, // 60s
+      timeout: 60 * 1000,
     });
 
     if (!response) {
@@ -174,114 +205,78 @@ export const getPageContent = async ({
     }
 
     // await for networkidle0
+    // https://pptr.dev/api/puppeteer.page.goforward/#remarks
     await page.waitForNetworkIdle({
-      idleTime: 1 * 1000, // 1s
-    }); // https://pptr.dev/api/puppeteer.page.goforward/#remarks
+      idleTime: 1 * 1000,
+    });
 
-    // 如果需要截图
-    if (screenshot) {
+    // get screenshot
+    if (includeScreenshot) {
       try {
-        // 创建按日期分类的目录
-        const { dateDir } = await createDateDirectory();
-
-        // 生成文件名（使用URL的哈希值作为文件名）
-        const urlHash = Buffer.from(url).toString('base64').replace(/[/+=]/g, '_').substring(0, 40);
-        const filename = `${urlHash}.png`;
-
-        // 保存截图
-        screenshotPath = path.join(dateDir, filename);
-        await page.screenshot({ path: screenshotPath, fullPage: true });
-
-        logger.info(`Screenshot saved to ${screenshotPath}`);
-      } catch (screenshotError) {
-        logger.error('Screenshot error:', screenshotError);
+        screenshot = await page.screenshot();
+      } catch (err) {
+        logger.error('Failed to get screenshot:', err);
       }
     }
 
-    if (formatPageContent) {
-      // may be null
-      pageContent = await formatPageContent({ page, url });
-    } else {
-      pageContent = await page.content();
+    // get html
+    if (includeHtml) {
+      if (formatPageContent) {
+        html = await formatPageContent({ page, url });
+      } else {
+        html = await page.content();
+      }
     }
-  } catch (error: any) {
-    logger.error('Get page content error:', error.message || error);
+  } catch (error) {
+    logger.error('Failed to get page content:', error);
+    throw error;
   } finally {
     await page.close();
   }
 
+  html = formatHtml(html || '');
+
   return {
-    html: formatHtml(pageContent),
-    screenshot: screenshotPath,
+    html,
+    screenshot,
   };
 };
 
-// 删除 getNextCrawlDate 函数，因为它不再被使用
-
-export const getUrlInfoFromCache = async (url: string) => {
-  const cache = await useCache.get(getRelativePath(url));
-  return cache;
-};
-
-export const setUrlInfoToCache = ({
+/**
+ * create crawl job
+ */
+export function createCrawlJob({
   url,
-  content,
-  screenshot,
-  lastmod,
-}: {
-  url: string;
-  content: string | { html: string; screenshot: string | null };
-  screenshot?: string;
-  lastmod?: string;
-}) => {
-  if (!content || !url) {
-    return;
-  }
-
-  const lastModifiedValue = lastmod || new Date().toISOString();
-  const html = typeof content === 'string' ? content : content.html;
-  const screenshotPath = typeof content === 'string' ? screenshot : content.screenshot;
-
-  return useCache.set(getRelativePath(url), {
-    html,
-    screenshot: screenshotPath,
-    lastModified: lastModifiedValue,
-    updatedAt: new Date().toISOString(),
-  });
-};
-
-// crawl urls
-export function crawlUrl({
-  urls,
   lastmodMap,
-  formatPageContent,
+  // formatPageContent,
+  saveToRedis = false,
   screenshot = true,
   html = true,
-  viewport,
-  autoCloseBrowserCount = 50,
+  width = 1440,
+  height = 900,
 }: {
-  urls: string[] | string;
+  url: string[] | string;
   lastmodMap?: Map<string, string>;
-  formatPageContent?: Function;
+  // formatPageContent?: Function;
+  saveToRedis?: boolean;
   screenshot?: boolean;
   html?: boolean;
-  viewport?: { width: number; height: number };
-  autoCloseBrowserCount?: number;
+  width?: number;
+  height?: number;
 }) {
-  if (typeof urls === 'string') {
-    urls = [urls];
-  }
+  const urls = ([] as string[]).concat(url);
 
-  for (const [index, url] of urls.entries()) {
+  for (const url of urls) {
     const task = crawlQueue.push({
+      id: randomUUID(),
       url,
-      index: index + 1,
       html,
       lastmodMap,
-      formatPageContent,
+      // formatPageContent,
       screenshot,
-      viewport,
-      autoCloseBrowserCount,
+      width,
+      height,
+      saveToRedis,
     });
 
     task.on('finished', ({ result }) => {
@@ -294,4 +289,33 @@ export function crawlUrl({
       logger.error(`Task for ${url} failed: ${error.message}`, error);
     });
   }
+}
+
+/**
+ * get snapshot from db or crawl queue
+ */
+export async function getSnapshot(url: string) {
+  const snapshot = await Snapshot.findOne({ where: { url }, order: [['updatedAt', 'DESC']] });
+  if (snapshot) {
+    return snapshot;
+  }
+
+  const job = await new Promise<any>((resolve, reject) => {
+    crawlQueue.store.db.findOne({ url }, (err, job) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(job);
+      }
+    });
+  });
+
+  if (job) {
+    return {
+      id: job.id,
+      status: 'pending',
+    } as Snapshot;
+  }
+
+  return null;
 }

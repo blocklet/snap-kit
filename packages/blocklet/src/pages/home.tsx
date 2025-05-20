@@ -12,7 +12,8 @@ function Home() {
   async function getApiData() {
     const { data } = await api.get('/api/data');
     const { message } = data;
-    alert(`Message from api: ${message}`);
+    // console.log(`Message from api: ${message}`);
+    return message;
   }
 
   return (

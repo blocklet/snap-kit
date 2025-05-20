@@ -1,18 +1,18 @@
-import { useCache } from './store';
-import { getFullUrl, getRelativePath, isAcceptCrawler, isBotUserAgent, isSelfCrawler } from './utils';
+import { useCache } from './cache';
+import { getFullUrl, isAcceptCrawler, isBotUserAgent, isSelfCrawler } from './utils';
 
-export const initSEOMiddleware = (
-  { autoReturnHtml = true, allowCrawler = true } = {} as {
-    autoReturnHtml?: Boolean;
-    allowCrawler?: Boolean | Function;
-  },
-) => {
+export function initSEOMiddleware({
+  autoReturnHtml = true,
+  allowCrawler = true,
+}: {
+  autoReturnHtml?: Boolean;
+  allowCrawler?: Boolean | Function;
+}) {
   return async (req: any, res: any, next: Function) => {
     const isBot = isBotUserAgent(req);
     const isSelf = isSelfCrawler(req);
 
     if (!isBot || isSelf) {
-      // use default logic
       return next();
     }
 
@@ -25,7 +25,7 @@ export const initSEOMiddleware = (
       return next();
     }
 
-    const cacheData = await useCache.get(getRelativePath(fullUrl));
+    const cacheData = await useCache.get(fullUrl);
 
     // add cached html to req
     req.cachedHtml = cacheData?.content || cacheData || null;
@@ -43,4 +43,4 @@ export const initSEOMiddleware = (
     // missing cache
     next();
   };
-};
+}

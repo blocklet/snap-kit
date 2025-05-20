@@ -5,5 +5,5 @@
     "noEmit": false,
     "noEmitOnError": true
   },
-  "include": ["src"]
+  "include": ["src", "third.d.ts"]
 }

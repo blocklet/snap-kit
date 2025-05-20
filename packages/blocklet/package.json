@@ -1,5 +1,5 @@
 {
-  "name": "@blocklet/crawler",
+  "name": "@blocklet/snap-kit",
   "private": true,
   "version": "0.1.0",
   "scripts": {

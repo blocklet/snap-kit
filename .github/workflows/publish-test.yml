@@ -1,0 +1,75 @@
+name: upload-test-store
+
+env:
+  NODE_OPTIONS: '--max_old_space_size=6144'
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_HUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: |
+          pnpm i
+        shell: bash
+
+      - name: Config Git
+        run: |
+          git config --local user.name "bot"
+          git config --local user.email "bot@arcblock.io"
+
+      - name: Publish to NPM
+        run: |
+          npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
+          VERSION=$(cat version | awk '{$1=$1;print}')
+          echo "publish version ${VERSION}"
+          pnpm -r --filter="*" exec -- npm version ${VERSION} --no-git-tag-version
+          pnpm -r publish --no-git-checks
+
+      - name: Upload to Test Store
+        uses: blocklet/action-workflow@v1
+        with:
+          skip-deps: true
+          skip-upload: false
+          skip-deploy: true
+          skip-release: true
+          bundle-command: pnpm bundle
+          working-directory: packages/blocklet
+          store-endpoint: ${{ secrets.STORE_ENDPOINT_TEST }}
+          store-access-token: ${{ secrets.STORE_ACCESS_TOKEN_TEST }}
+          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Upload Mini Store to Prod Store
+        uses: blocklet/action-workflow@v1
+        with:
+          skip-deps: true
+          skip-upload: false
+          skip-deploy: true
+          skip-release: true
+          bundle-command: pnpm bundle
+          working-directory: blocklets/store-kit
+          store-endpoint: ${{ secrets.STORE_ENDPOINT_PROD }}
+          store-access-token: ${{ secrets.STORE_ACCESS_TOKEN_PROD }}
+          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}

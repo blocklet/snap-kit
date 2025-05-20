@@ -6,7 +6,7 @@ import path from 'path';
 
 import env from './env';
 
-export const wallet = getWallet();
+export const wallet: any = getWallet();
 export const authenticator = new WalletAuthenticator();
 export const handlers = new WalletHandler({
   authenticator,

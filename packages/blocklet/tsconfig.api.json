@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "outDir": "api/dist",
+    "noEmit": false,
+    "noEmitOnError": true,
+    "paths": {
+      "@arcblock/crawler": ["../../packages/crawler/src"]
+    }
+  },
+  "include": ["api/*.d.ts", "api/src"]
+}

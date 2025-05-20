@@ -1,10 +1,10 @@
-title: crawler
+title: @blocklet/snap-kit
 description: A Blocklet DAPP blocklet
 keywords:
   - blocklet
   - react
 group: dapp
-did: z2qZzGnvHe11TrJ3RvPxo1vhAoDTTwRe8jwy6
+did: z2qaEE3vhcouzhZVntfX3WbcvtL1uQhjXKr72
 main: api/dist/index.js
 author:
   name: Arcblock
@@ -42,7 +42,19 @@ requirements:
   cpu: '*'
 scripts:
   dev: npm run start
-environments: []
+environments:
+  - name: REDIS_URL
+    description: Please provide redis url
+    required: true
+    default: ''
+    secure: true
+    shared: false
+  - name: PUPPETEER_PATH
+    description: Please provide puppeteer path
+    required: true
+    default: ''
+    secure: false
+    shared: false
 capabilities: {}
 screenshots: []
 components: []

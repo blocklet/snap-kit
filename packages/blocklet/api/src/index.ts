@@ -1,4 +1,5 @@
-import { ensureBrowserDownloaded } from '@arcblock/crawler/src/puppeteer';
+import { initCrawler } from '@arcblock/crawler';
+import { env } from '@blocklet/sdk/lib/config';
 import fallback from '@blocklet/sdk/lib/middlewares/fallback';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -14,10 +15,9 @@ dotenv.config();
 
 const { name, version } = require('../../package.json');
 
-ensureBrowserDownloaded({
-  executablePath: process.env.BLOCKLET_EXECUTABLE_PATH!,
-  cacheDir: process.env.BLOCKLET_CACHE_DIR!,
-  appDir: process.env.BLOCKLET_APP_DIR! || process.cwd(),
+initCrawler({
+  redisUrl: process.env.REDIS_URL,
+  puppeteerPath: process.env.PUPPETEER_PATH,
 });
 
 export const app = express();
@@ -33,6 +33,8 @@ router.use('/api', routes);
 app.use(router);
 
 const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
+
+app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '30d', index: false }));
 
 if (isProduction) {
   const staticDir = path.resolve(process.env.BLOCKLET_APP_DIR!, 'dist');

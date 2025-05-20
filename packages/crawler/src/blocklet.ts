@@ -1,14 +1,13 @@
 import Cron from '@abtnode/cron';
-import config from '@blocklet/sdk/lib/config';
+import { components } from '@blocklet/sdk/lib/config';
 import debounce from 'lodash/debounce';
 import { joinURL } from 'ufo';
 
-import { crawlUrl } from './crawler';
+import { useCache } from './cache';
+import { config, logger } from './config';
+import { createCrawlJob } from './crawler';
 import { closeBrowser, getBrowser } from './puppeteer';
-import { useCache } from './store';
 import { getComponentInfo, getRelativePath, getSitemapList } from './utils';
-
-const { components, env, logger } = config;
 
 // record crawl blocklet running
 const crawlBlockletRunningMap = new Map();
@@ -35,7 +34,7 @@ export const crawlBlocklet = async () => {
     return;
   }
 
-  const { appUrl } = env;
+  const { appUrl } = config;
 
   if (!appUrl) {
     throw new Error('appUrl not found');
@@ -128,47 +127,48 @@ export const crawlBlocklet = async () => {
     // record crawl blocklet running
     crawlBlockletRunningMap.set(did, true);
 
-    await crawlUrl({
+    await createCrawlJob({
       // @ts-ignore
       urls: canUseBlockletLocList,
+      saveToRedis: true,
       lastmodMap,
-      formatPageContent: async ({ page }: { page: any; url: string; lastmod?: string }) => {
-        const pageContent = await page.evaluate(() => {
-          const removeElements = (tagName: string) => {
-            const elements = document.querySelectorAll(tagName);
-            for (let i = elements.length - 1; i >= 0; i--) {
-              try {
-                elements[i]?.parentNode?.removeChild(elements[i] as Node);
-              } catch (error) {
-                // do noting
-              }
-            }
-          };
+      // formatPageContent: async ({ page }: { page: any; url: string; lastmod?: string }) => {
+      //   const pageContent = await page.evaluate(() => {
+      //     const removeElements = (tagName: string) => {
+      //       const elements = document.querySelectorAll(tagName);
+      //       for (let i = elements.length - 1; i >= 0; i--) {
+      //         try {
+      //           elements[i]?.parentNode?.removeChild(elements[i] as Node);
+      //         } catch (error) {
+      //           // do noting
+      //         }
+      //       }
+      //     };
 
-          // remove script, style, link, noscript
-          // removeElements('script');
-          // removeElements('style');
-          // removeElements('link');
-          // removeElements('noscript');
+      //     // remove script, style, link, noscript
+      //     // removeElements('script');
+      //     // removeElements('style');
+      //     // removeElements('link');
+      //     // removeElements('noscript');
 
-          // remove uploader
-          removeElements('[id="uploader-container"]');
-          removeElements('[class^="uppy-"]');
+      //     // remove uploader
+      //     removeElements('[id="uploader-container"]');
+      //     removeElements('[class^="uppy-"]');
 
-          // remove point up component
-          removeElements('[id="point-up-component"]');
+      //     // remove point up component
+      //     removeElements('[id="point-up-component"]');
 
-          // add meta tag to record crawler
-          const meta = document.createElement('meta');
-          meta.name = 'blocklet-crawler';
-          meta.content = 'true';
-          document.head.appendChild(meta);
+      //     // add meta tag to record crawler
+      //     const meta = document.createElement('meta');
+      //     meta.name = 'blocklet-crawler';
+      //     meta.content = 'true';
+      //     document.head.appendChild(meta);
 
-          return document.documentElement.outerHTML;
-        });
+      //     return document.documentElement.outerHTML;
+      //   });
 
-        return pageContent;
-      },
+      //   return pageContent;
+      // },
     });
 
     logger.info(...crawlerLogText('success'));

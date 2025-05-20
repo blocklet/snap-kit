@@ -1,17 +1,19 @@
-import puppeteer, { Browser, Page } from '@blocklet/puppeteer';
-import fs from 'fs-extra';
-import path from 'path';
+import { env } from '@blocklet/sdk/lib/config';
+// import fs from 'fs-extra';
+// import path from 'path';
+import puppeteer, { Browser, Page } from 'puppeteer';
 import { clearInterval, setInterval } from 'timers';
 
-import { useCache } from './store';
-import { CRAWLER_FLAG, logger, sleep } from './utils';
+import { useCache } from './cache';
+import { config, logger } from './config';
+import { CRAWLER_FLAG, sleep } from './utils';
 
-let puppeteerConfig: {
-  cacheDirectory: string;
-  temporaryDirectory: string;
-};
+// let puppeteerConfig: {
+//   cacheDirectory: string;
+//   temporaryDirectory: string;
+// };
 
-const BROWSER_WS_ENDPOINT_KEY = `browserWSEndpoint-${process.env.BLOCKLET_DID || 'unknown'}`;
+const BROWSER_WS_ENDPOINT_KEY = `browserWSEndpoint-${env.appId || 'unknown'}`;
 
 const BrowserStatus = {
   Launching: 'Launching',
@@ -23,53 +25,41 @@ let browserActivatedTimer: NodeJS.Timeout | null;
 
 export { puppeteer };
 
-export async function ensurePuppeteerrc({ cacheDir, appDir }: { cacheDir: string; appDir: string }) {
-  const cacheDirectory = path.join(cacheDir, 'puppeteer', 'cache');
-  const temporaryDirectory = path.join(cacheDir, 'puppeteer', 'tmp');
-  const puppeteerrcPath = path.join(appDir, '.puppeteerrc.js');
+// export async function ensurePuppeteerrc() {
+//   const cacheDirectory = path.join(config.cacheDir, 'puppeteer', 'cache');
+//   const temporaryDirectory = path.join(config.cacheDir, 'puppeteer', 'tmp');
+//   const puppeteerrcPath = path.join(config.appDir, '.puppeteerrc.js');
 
-  // ensure directory exists
-  await Promise.all([fs.ensureDir(cacheDirectory), fs.ensureDir(temporaryDirectory), fs.ensureFile(puppeteerrcPath)]);
+//   // ensure directory exists
+//   await Promise.all([fs.ensureDir(cacheDirectory), fs.ensureDir(temporaryDirectory), fs.ensureFile(puppeteerrcPath)]);
 
-  puppeteerConfig = {
-    cacheDirectory,
-    temporaryDirectory,
-  };
+//   puppeteerConfig = {
+//     cacheDirectory,
+//     temporaryDirectory,
+//   };
 
-  const fileContent = `module.exports = ${JSON.stringify(puppeteerConfig, null, 2)}`;
-  await fs.writeFile(puppeteerrcPath, fileContent);
+//   const fileContent = `module.exports = ${JSON.stringify(puppeteerConfig, null, 2)}`;
+//   await fs.writeFile(puppeteerrcPath, fileContent);
 
-  return puppeteerConfig;
-}
+//   logger.debug(`Puppeteerrc file created at ${puppeteerrcPath}`, puppeteerConfig);
 
-export async function ensureBrowserDownloaded({
-  executablePath,
-  cacheDir,
-  appDir,
-}: {
-  executablePath: string;
-  cacheDir: string;
-  appDir: string;
-}) {
-  // check system chromium
-  if (fs.existsSync(executablePath)) {
-    logger.info(`System Chromium found and tested successfully: ${executablePath}`);
+//   return puppeteerConfig;
+// }
+
+export async function ensureBrowser() {
+  if (!config.puppeteerPath) {
+    throw new Error('Should provide process.env.PUPPETEER_PATH');
   }
 
-  logger.warn('System Chromium exists but test failed, will try to download');
+  // try to launch browser
+  const browser = await launchBrowser();
+  if (!browser) {
+    throw new Error('Failed to launch browser');
+  }
 
-  // system chromium is not available, execute original download logic
-  await ensurePuppeteerrc({ cacheDir, appDir });
-  // @ts-ignore
-  const { downloadBrowser } = await (() => {
-    // @ts-ignore
-    // eslint-disable-next-line import/extensions
-    return import('@blocklet/puppeteer/internal/node/install.js');
-  })();
+  await closeBrowser();
 
-  await downloadBrowser();
-
-  logger.info('Browser download completed successfully');
+  logger.info('Puppeteer is ready');
 }
 
 export async function connectBrowser() {
@@ -81,10 +71,11 @@ export async function connectBrowser() {
 
   // retry if browser is launching
   if (browserWSEndpoint.status === BrowserStatus.Launching) {
-    await sleep(Math.floor(Math.random() * 1000 * 1));
+    await sleep(Math.floor(Math.random() * 1000));
     return connectBrowser();
   }
 
+  // @ts-ignore
   browser = await puppeteer.connect({
     browserWSEndpoint: browserWSEndpoint.endpoint,
   });
@@ -100,8 +91,10 @@ export async function launchBrowser() {
   });
 
   try {
+    // @ts-ignore
     browser = await puppeteer.launch({
       headless: true,
+      executablePath: config.puppeteerPath,
       args: [
         // docs: https://peter.sh/experiments/chromium-command-line-switches/
         '--no-first-run',
@@ -135,7 +128,7 @@ export async function launchBrowser() {
   }
 
   // save browserWSEndpoint to cache
-  const endpoint = await browser.wsEndpoint();
+  const endpoint = await browser!.wsEndpoint();
   await useCache.set(BROWSER_WS_ENDPOINT_KEY, {
     endpoint,
     status: BrowserStatus.Ready,
@@ -220,15 +213,14 @@ export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean }
   // clear cache
   try {
     if (trimCache) {
-      // 非常重要！不能删除这行
       await puppeteer.trimCache();
       logger.info('Trim cache success');
     }
 
-    // try to clear cache directory and temporary directory
-    if (puppeteerConfig) {
-      await fs.emptyDir(puppeteerConfig.temporaryDirectory);
-    }
+    // try to clear temporary directory
+    // if (puppeteerConfig) {
+    //   await fs.emptyDir(puppeteerConfig.temporaryDirectory);
+    // }
 
     if (global.gc) {
       global.gc();

@@ -1,1 +1,1 @@
-declare module 'puppeteer/internal/node/install';
+declare module '@blocklet/logger';

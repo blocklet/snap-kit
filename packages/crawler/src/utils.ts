@@ -1,4 +1,4 @@
-import config from '@blocklet/sdk/lib/config';
+import { components, env } from '@blocklet/sdk/lib/config';
 import axios from 'axios';
 import flattenDeep from 'lodash/flattenDeep';
 import uniq from 'lodash/uniq';
@@ -6,10 +6,6 @@ import robotsParser from 'robots-parser';
 import { parseSitemap } from 'sitemap';
 import { Readable } from 'stream';
 import { joinURL } from 'ufo';
-
-const { logger } = config;
-
-export { logger };
 
 export const api = axios.create({
   timeout: 1000 * 10,
@@ -141,45 +137,37 @@ const staticFileExtensions = [
   'zip',
 ];
 
-export const getDefaultRobotsUrl = (req: any) => {
-  const { origin } = new URL(getFullUrl(req));
+export const getDefaultRobotsUrl = (url: string) => {
+  const { origin } = new URL(url);
   return joinURL(origin, 'robots.txt?nocache=1');
 };
 
-export const getDefaultSitemapUrl = (req: any) => {
-  const { origin } = new URL(getFullUrl(req));
+export async function getRobots(url: string) {
+  const { origin } = new URL(url);
+  const robotsUrl = joinURL(origin, 'robots.txt?nocache=1');
+  const { data } = await api.get(robotsUrl).catch(() => ({
+    data: '',
+  }));
+
+  return data ? robotsParser(robotsUrl, data) : null;
+}
+
+export const getDefaultSitemapUrl = (url: string) => {
+  const { origin } = new URL(url);
   return joinURL(origin, 'sitemap.xml?nocache=1');
 };
 
-// receive req or url
-export const isAcceptCrawler = async (req: any) => {
-  // default accept crawler
-  let acceptCrawler = true;
-  const robotsUrl = getDefaultRobotsUrl(req); // full url
-  const { data: robotsTxt } = await api.get(robotsUrl).catch(() => ({
-    data: '',
-  }));
-
-  if (robotsTxt) {
-    const robots = robotsParser(robotsUrl, robotsTxt);
-    acceptCrawler = !!(await robots.isAllowed(getFullUrl(req)));
-  }
-
-  return acceptCrawler;
+export const isAcceptCrawler = async (url: string) => {
+  const robots = await getRobots(url);
+  const isAllowed = robots ? await robots.isAllowed(url) : true;
+  return isAllowed;
 };
 
-// receive req or url
-export const getSitemapList = async (req: any) => {
-  const robotsUrl = getDefaultRobotsUrl(req); // full url
-  let sitemapUrlList = [getDefaultSitemapUrl(req)];
+export const getSitemapList = async (url: string) => {
+  let sitemapUrlList = [getDefaultSitemapUrl(url)];
+  const robots = await getRobots(url);
 
-  const { data: robotsTxt } = await api.get(robotsUrl).catch(() => ({
-    data: '',
-  }));
-
-  if (robotsTxt) {
-    const robots = robotsParser(robotsUrl, robotsTxt);
-
+  if (robots) {
     const robotsTxtSitemapUrlList = (await robots.getSitemaps()) || [];
     if (robotsTxtSitemapUrlList.length > 0) {
       sitemapUrlList = robotsTxtSitemapUrlList;
@@ -221,22 +209,16 @@ export const isBotUserAgent = (req: any) => {
   return true;
 };
 
-export const getBlockletPathname = (req: any) => {
-  return req.headers['x-path-prefix'] ? joinURL(req.headers['x-path-prefix'], req.originalUrl) : req.originalUrl;
-};
-
 export const getComponentInfo = () => {
-  const { env, components } = config;
   return components.find((item) => item.did === env.componentDid) || {};
 };
 
-// receive req or url
-export const getFullUrl = (req: any) => {
-  if (typeof req === 'string') {
-    return req;
-  }
+export const getFullUrl = (req) => {
+  const blockletPathname = req.headers['x-path-prefix']
+    ? joinURL(req.headers['x-path-prefix'], req.originalUrl)
+    : req.originalUrl;
 
-  return joinURL(config.env.appUrl, getBlockletPathname(req));
+  return joinURL(env.appUrl, blockletPathname);
 };
 
 export const getRelativePath = (url: string) => {
