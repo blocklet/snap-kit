@@ -1,0 +1,136 @@
+###########################################
+# default dockerfile from https://github.com/ArcBlock/blocklet-server/blob/25dace4816b4c95bd90686c4221c367cf3cb5c12/core/state/lib/util/docker/debian-dockerfile.js#L4
+###########################################
+
+# Base image
+FROM node:22
+
+# Fix permissions for temporary files
+RUN chmod 1777 /tmp
+
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential socat curl gnupg wget \
+    gosu strace passwd git ca-certificates libcairo2-dev libpango1.0-dev \
+    libjpeg-dev libgif-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create necessary directories
+RUN mkdir -p /data/bin /var/lib/blocklet /home/node/.npm-global/lib
+
+# Set environment variables
+ENV DOCKER_DATA=/var/lib/blocklet
+ENV NODE_VERSION=22
+ENV NPM_CONFIG_CACHE=/var/lib/blocklet/.npm
+ENV PATH="/home/node/.npm-global/bin:$PATH"
+
+###########################################
+# default dockerfile end
+###########################################
+
+###########################################
+# puppeteer and chromium dependencies start
+###########################################
+
+# Install Puppeteer and Chromium dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    chromium \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxi6 \
+    libxtst6 \
+    libnss3 \
+    libcups2 \
+    libxss1 \
+    libxrandr2 \
+    libasound2 \
+    libatk1.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libatk-bridge2.0-0 \
+    libatspi2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set Puppeteer environment variables
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV CHROMIUM_PATH=/usr/bin/chromium
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+# support gc for puppeteer
+ENV NODE_OPTIONS="--expose-gc"
+
+RUN echo "Start verifying chromium installation..."
+
+# Verify Chromium installation path and create a symbolic link to ensure the path is correct
+RUN which chromium || which chromium-browser || echo "Warning: Chromium not found in standard paths" && \
+    ls -la /usr/bin/chrom* || true && \
+    if [ -f /usr/bin/chromium-browser ] && [ ! -f /usr/bin/chromium ]; then \
+      ln -s /usr/bin/chromium-browser /usr/bin/chromium; \
+    fi
+
+# Add a simple test to confirm Puppeteer can find Chromium
+RUN mkdir -p /tmp/puppeteer-test && \
+    cd /tmp/puppeteer-test && \
+    echo '{"name":"puppeteer-test","version":"1.0.0"}' > package.json && \
+    npm install puppeteer && \
+    echo "console.log('Testing Puppeteer installation...');" > test.js && \
+    echo "console.log('Chromium path:', process.env.PUPPETEER_EXECUTABLE_PATH);" >> test.js && \
+    echo "const puppeteer = require('puppeteer');" >> test.js && \
+    echo "async function test() {" >> test.js && \
+    echo "  try {" >> test.js && \
+    echo "    console.log('Launching browser...');" >> test.js && \
+    echo "    const browser = await puppeteer.launch({" >> test.js && \
+    echo "      executablePath: '/usr/bin/chromium'," >> test.js && \
+    echo "      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--headless=new', '--disable-gpu', '--single-process']," >> test.js && \
+    echo "      timeout: 120000," >> test.js && \
+    echo "      ignoreDefaultArgs: ['--disable-extensions']" >> test.js && \
+    echo "    });" >> test.js && \
+    echo "    console.log('Browser launched successfully');" >> test.js && \
+    echo "    const page = await browser.newPage();" >> test.js && \
+    echo "    console.log('Page created');" >> test.js && \
+    echo "    await browser.close();" >> test.js && \
+    echo "    console.log('Puppeteer works correctly!');" >> test.js && \
+    echo "  } catch (err) {" >> test.js && \
+    echo "    console.error('Error details:', err);" >> test.js && \
+    echo "    throw err;" >> test.js && \
+    echo "  }" >> test.js && \
+    echo "}" >> test.js && \
+    echo "test().catch(err => {" >> test.js && \
+    echo "  console.error('Puppeteer test failed:', err);" >> test.js && \
+    echo "  process.exit(1);" >> test.js && \
+    echo "});" >> test.js && \
+    node --unhandled-rejections=strict test.js || (echo "Test failed. Checking if chromium is installed and executable:" && ls -la /usr/bin/chromium && /usr/bin/chromium --version) && \
+    cd / && \
+    rm -rf /tmp/puppeteer-test
+
+RUN echo "Chromium installation verified successfully!"
+
+###########################################
+# puppeteer and chromium dependencies end
+###########################################
+
+###########################################
+# continue default dockerfile last part
+###########################################
+
+# Set appropriate ownership and permissions
+RUN chmod 1777 -R /tmp /var/lib/blocklet && \
+    chown -R node:node /var/lib/blocklet /home/node/.npm-global
+
+# Switch to node user
+USER node
+
+# Configure npm global directory
+RUN npm config set prefix "/home/node/.npm-global"
+
+# Install global npm packages
+RUN npm install -g pnpm@9.14.2 --unsafe-perm
+
+# Set working directory
+WORKDIR /var/lib/blocklet

@@ -39,8 +39,11 @@
   },
   "dependencies": {
     "@abtnode/cron": "^1.16.43",
+    "@arcblock/crawler": "workspace:*",
     "@arcblock/did-auth": "^1.19.15",
     "@arcblock/did-auth-storage-nedb": "^1.7.1",
+    "@arcblock/validator": "^1.20.11",
+    "@blocklet/logger": "^1.16.43",
     "@blocklet/puppeteer": "^22.11.3",
     "@blocklet/sdk": "^1.16.43",
     "@ocap/client": "^1.19.15",
@@ -63,9 +66,7 @@
     "robots-parser": "^3.0.1",
     "sitemap": "^7.1.2",
     "ufo": "^1.5.4",
-    "url-join": "^4.0.1",
-    "@arcblock/crawler": "workspace:*",
-    "@arcblock/validator": "^1.20.11"
+    "url-join": "^4.0.1"
   },
   "devDependencies": {
     "@blocklet/js-sdk": "^1.16.39",

@@ -3,6 +3,7 @@ import { SqliteDialect } from '@sequelize/sqlite3';
 import path from 'path';
 
 import { config, logger } from '../config';
+import { initJobModel } from './job';
 import { initSnapshotModel } from './snapshot';
 
 export async function ensureDatabase() {
@@ -13,6 +14,7 @@ export async function ensureDatabase() {
   });
 
   await initSnapshotModel(sequelize);
+  await initJobModel(sequelize);
 
   try {
     await sequelize.authenticate();

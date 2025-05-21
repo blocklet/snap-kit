@@ -1,56 +1,78 @@
-import { createCrawlJob, getSnapshot } from '@arcblock/crawler';
+import { createCrawlJob, formatSnapshot, getSnapshot } from '@arcblock/crawler';
 import { Joi } from '@arcblock/validator';
-import { env } from '@blocklet/sdk/lib/config';
 import { Router } from 'express';
-import fs from 'fs/promises';
-import path from 'path';
-import { joinURL } from 'ufo';
+
+const middlewares = require('@blocklet/sdk/lib/middlewares');
 
 const router = Router();
+
+router.use(middlewares.session({ accessKey: true }));
 
 const crawlSchema = Joi.object({
   url: Joi.string().uri().required(),
   html: Joi.boolean().default(true),
-  screenshot: Joi.boolean().default(true),
+  screenshot: Joi.boolean().default(false),
   width: Joi.number().integer().min(375).default(1440),
   height: Joi.number().integer().min(500).default(900),
+  quality: Joi.number().integer().min(1).max(100).default(80),
+  timeout: Joi.number().integer().min(10).max(120).default(120),
+  sync: Joi.boolean().default(false),
 });
 
-router.post('/crawl', async (req, res) => {
+router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlSchema.validateAsync(req.body);
+  params.timeout = params.timeout * 1000;
 
-  await createCrawlJob(params);
+  let id: string;
 
-  return res.json({
-    code: 'ok',
-    data: null,
+  setTimeout(() => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        code: 'timeout',
+        data: { id },
+      });
+    }
+  }, params.timeout);
+
+  id = await createCrawlJob(params, async (snapshot) => {
+    if (params.sync && !res.headersSent) {
+      res.json({
+        code: 'ok',
+        data: snapshot ? await formatSnapshot(snapshot) : null,
+      });
+    }
   });
+
+  if (!params.sync) {
+    res.json({
+      code: 'ok',
+      data: { id },
+    });
+  }
 });
 
 const snapshotSchema = Joi.object({
-  url: Joi.string().uri().required(),
+  id: Joi.string().required(),
+  html: Joi.boolean().default(true),
+  screenshot: Joi.boolean().default(true),
 });
 
-router.get('/snapshot', async (req, res) => {
-  const { url } = await snapshotSchema.validateAsync(req.query);
-
-  const snapshot = await getSnapshot(url);
+router.get('/snapshot', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+  const params = await snapshotSchema.validateAsync(req.query);
+  const snapshot = await getSnapshot(params.id);
 
   if (snapshot) {
-    // format screenshot path to fullpath
-    if (snapshot.screenshot) {
-      snapshot.screenshot = joinURL(env.appUrl, snapshot?.screenshot);
+    if (!params.html) {
+      delete snapshot.html;
     }
-    // format html path to string
-    if (snapshot.html) {
-      const html = await fs.readFile(path.join(env.dataDir, snapshot.html));
-      snapshot.html = html.toString();
+    if (!params.screenshot) {
+      delete snapshot.screenshot;
     }
   }
 
   return res.json({
     code: 'ok',
-    data: snapshot,
+    data: snapshot ? await formatSnapshot(snapshot) : null,
   });
 });
 

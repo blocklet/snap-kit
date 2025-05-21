@@ -1,4 +1,4 @@
-title: @blocklet/snap-kit
+title: SnapKit
 description: A Blocklet DAPP blocklet
 keywords:
   - blocklet
@@ -19,7 +19,6 @@ files:
   - dist
   - logo.png
   - screenshots
-  - api/hooks/*.ts
 interfaces:
   - type: web
     name: publicUrl
@@ -49,12 +48,13 @@ environments:
     default: ''
     secure: true
     shared: false
-  - name: PUPPETEER_PATH
-    description: Please provide puppeteer path
-    required: true
-    default: ''
-    secure: false
-    shared: false
 capabilities: {}
 screenshots: []
 components: []
+docker:
+  image: arcblock/blocklet-with-puppeteer
+  shell: gosu
+  workdir: /var/lib/blocklet
+  installNodeModules: true
+  runBaseScript: true
+  command: ''

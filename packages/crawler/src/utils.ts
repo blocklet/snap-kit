@@ -2,6 +2,7 @@ import { components, env } from '@blocklet/sdk/lib/config';
 import axios from 'axios';
 import flattenDeep from 'lodash/flattenDeep';
 import uniq from 'lodash/uniq';
+import { createHash } from 'node:crypto';
 import robotsParser from 'robots-parser';
 import { parseSitemap } from 'sitemap';
 import { Readable } from 'stream';
@@ -229,3 +230,11 @@ export const getRelativePath = (url: string) => {
   }
   return url;
 };
+
+export const formatUrl = (url: string) => {
+  return url.replace(/\/$/, '').trim();
+};
+
+export function md5(content: string | Uint8Array) {
+  return createHash('md5').update(content).digest('hex');
+}

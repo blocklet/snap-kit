@@ -8,7 +8,7 @@ import express, { ErrorRequestHandler } from 'express';
 import 'express-async-errors';
 import path from 'path';
 
-import logger from './libs/logger';
+import { logger } from './libs/logger';
 import routes from './routes';
 
 dotenv.config();
@@ -17,7 +17,6 @@ const { name, version } = require('../../package.json');
 
 initCrawler({
   redisUrl: process.env.REDIS_URL,
-  puppeteerPath: process.env.PUPPETEER_PATH,
 });
 
 export const app = express();
@@ -32,30 +31,28 @@ const router = express.Router();
 router.use('/api', routes);
 app.use(router);
 
-const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
-
 app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '30d', index: false }));
+
+const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
 
 if (isProduction) {
   const staticDir = path.resolve(process.env.BLOCKLET_APP_DIR!, 'dist');
   app.use(express.static(staticDir, { maxAge: '30d', index: false }));
   app.use(fallback('index.html', { root: staticDir }));
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  app.use<ErrorRequestHandler>((err, _req, res, _next) => {
-    logger.error('API Error:', err);
-
-    const statusCode = err.statusCode || (err.name === 'ValidationError' ? 400 : 500);
-    const code = err.code || -1;
-
-    res.status(statusCode).json({
-      code,
-      message: err.message,
-    });
-
-    res.status(500).send('Something broke!');
-  });
 }
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use<ErrorRequestHandler>((err, _req, res, _next) => {
+  logger.error('API Error:', err);
+
+  const statusCode = err.statusCode || (err.name === 'ValidationError' ? 400 : 500);
+  const code = err.code || -1;
+
+  res.status(statusCode).json({
+    code,
+    message: err.message,
+  });
+});
 
 const port = parseInt(process.env.BLOCKLET_PORT!, 10);
 

@@ -29,3 +29,5 @@ pnpm-debug.log*
 lerna-debug.log*
 
 .puppeteerrc.js
+
+.env

@@ -1,3 +1,4 @@
-const logger = console;
+import createLogger from '@blocklet/logger';
 
-export default logger;
+export { createLogger };
+export const logger = createLogger('snap-kit', { level: process.env.LOG_LEVEL || 'info' });

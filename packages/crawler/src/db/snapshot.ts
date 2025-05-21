@@ -1,7 +1,7 @@
 import { DataTypes, Model, Sequelize } from '@sequelize/core';
 
-interface SnapshotAttributes {
-  id?: number;
+interface SnapshotModel {
+  id?: string;
   url: string;
   status: 'success' | 'failed' | 'pending';
   html?: string | null;
@@ -13,28 +13,30 @@ interface SnapshotAttributes {
     height?: number;
     includeScreenshot?: boolean;
     includeHtml?: boolean;
+    quality?: number;
   };
 }
 
-class Snapshot extends Model<SnapshotAttributes> implements SnapshotAttributes {
-  public id!: SnapshotAttributes['id'];
+class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
+  public id!: SnapshotModel['id'];
 
-  public url!: SnapshotAttributes['url'];
+  public url!: SnapshotModel['url'];
 
-  public status!: SnapshotAttributes['status'];
+  public status!: SnapshotModel['status'];
 
-  public html?: SnapshotAttributes['html'];
+  public html?: SnapshotModel['html'];
 
-  public screenshot?: SnapshotAttributes['screenshot'];
+  public screenshot?: SnapshotModel['screenshot'];
 
-  public error?: SnapshotAttributes['error'];
+  public error?: SnapshotModel['error'];
 
-  public lastModified?: SnapshotAttributes['lastModified'];
+  public lastModified?: SnapshotModel['lastModified'];
 
-  public options!: SnapshotAttributes['options'];
+  public options!: SnapshotModel['options'];
 }
 
 export { Snapshot };
+export type { SnapshotModel };
 
 export function initSnapshotModel(sequelize: Sequelize) {
   Snapshot.init(

@@ -1,7 +1,9 @@
-import { env } from '@blocklet/sdk/lib/config';
 // import fs from 'fs-extra';
 // import path from 'path';
-import puppeteer, { Browser, Page } from 'puppeteer';
+import puppeteer, { Browser, Page } from '@blocklet/puppeteer';
+import { env } from '@blocklet/sdk/lib/config';
+import fs from 'fs-extra';
+import path from 'path';
 import { clearInterval, setInterval } from 'timers';
 
 import { useCache } from './cache';
@@ -25,39 +27,62 @@ let browserActivatedTimer: NodeJS.Timeout | null;
 
 export { puppeteer };
 
-// export async function ensurePuppeteerrc() {
-//   const cacheDirectory = path.join(config.cacheDir, 'puppeteer', 'cache');
-//   const temporaryDirectory = path.join(config.cacheDir, 'puppeteer', 'tmp');
-//   const puppeteerrcPath = path.join(config.appDir, '.puppeteerrc.js');
+export async function ensurePuppeteerrc() {
+  const cacheDirectory = path.join(config.cacheDir, 'puppeteer', 'cache');
+  const temporaryDirectory = path.join(config.cacheDir, 'puppeteer', 'tmp');
+  const puppeteerrcPath = path.join(config.appDir, '.puppeteerrc.js');
 
-//   // ensure directory exists
-//   await Promise.all([fs.ensureDir(cacheDirectory), fs.ensureDir(temporaryDirectory), fs.ensureFile(puppeteerrcPath)]);
+  // ensure directory exists
+  await Promise.all([fs.ensureDir(cacheDirectory), fs.ensureDir(temporaryDirectory), fs.ensureFile(puppeteerrcPath)]);
 
-//   puppeteerConfig = {
-//     cacheDirectory,
-//     temporaryDirectory,
-//   };
+  const puppeteerConfig = {
+    cacheDirectory,
+    temporaryDirectory,
+  };
 
-//   const fileContent = `module.exports = ${JSON.stringify(puppeteerConfig, null, 2)}`;
-//   await fs.writeFile(puppeteerrcPath, fileContent);
+  const fileContent = `module.exports = ${JSON.stringify(puppeteerConfig, null, 2)}`;
+  await fs.writeFile(puppeteerrcPath, fileContent);
 
-//   logger.debug(`Puppeteerrc file created at ${puppeteerrcPath}`, puppeteerConfig);
+  logger.debug(`Puppeteerrc file created at ${puppeteerrcPath}`, puppeteerConfig);
 
-//   return puppeteerConfig;
-// }
+  return puppeteerConfig;
+}
 
 export async function ensureBrowser() {
-  if (!config.puppeteerPath) {
-    throw new Error('Should provide process.env.PUPPETEER_PATH');
+  const puppeteerConfig = await ensurePuppeteerrc();
+
+  const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
+
+  logger.info('executablePath', executablePath);
+
+  if (!fs.existsSync(executablePath)) {
+    logger.info('start download browser', puppeteerConfig);
+    const { downloadBrowser } = await (async () => {
+      try {
+        // @ts-ignore
+        // eslint-disable-next-line import/extensions
+        return await import('@blocklet/puppeteer/internal/node/install.js');
+      } catch (err) {
+        logger.warn(
+          'Skipping browser installation because the Puppeteer build is not available. Run `npm install` again after you have re-built Puppeteer.',
+        );
+      }
+    })();
+
+    if (downloadBrowser) {
+      await downloadBrowser();
+      logger.info('Browser download completed successfully');
+    }
   }
 
   // try to launch browser
-  const browser = await launchBrowser();
-  if (!browser) {
-    throw new Error('Failed to launch browser');
+  if (config.testOnInitialize) {
+    const browser = await launchBrowser();
+    if (!browser) {
+      throw new Error('Failed to launch browser');
+    }
+    await closeBrowser();
   }
-
-  await closeBrowser();
 
   logger.info('Puppeteer is ready');
 }
@@ -75,11 +100,16 @@ export async function connectBrowser() {
     return connectBrowser();
   }
 
-  // @ts-ignore
-  browser = await puppeteer.connect({
-    browserWSEndpoint: browserWSEndpoint.endpoint,
-  });
-  logger.info('Connect browser success');
+  try {
+    browser = await puppeteer.connect({
+      browserWSEndpoint: browserWSEndpoint.endpoint,
+    });
+    logger.info('Connect browser success');
+  } catch (err) {
+    logger.warn('Connect browser failed, clear endpoint', err);
+    await useCache.remove(BROWSER_WS_ENDPOINT_KEY);
+    return null;
+  }
 
   return browser;
 }
@@ -94,7 +124,6 @@ export async function launchBrowser() {
     // @ts-ignore
     browser = await puppeteer.launch({
       headless: true,
-      executablePath: config.puppeteerPath,
       args: [
         // docs: https://peter.sh/experiments/chromium-command-line-switches/
         '--no-first-run',
@@ -237,16 +266,7 @@ export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean }
   logger.info('Close browser success');
 };
 
-export async function initPage({
-  abortResourceTypes = [
-    'image', // 图片
-    'media', // 媒体文件
-    'font', // 字体
-    'websocket', // websocket 连接
-    'manifest', // manifest 文件
-    'other', // 其他资源
-  ],
-} = {}) {
+export async function initPage({ abortResourceTypes = [] } = {}) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900 });
