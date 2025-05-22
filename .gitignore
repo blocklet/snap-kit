@@ -12,6 +12,7 @@ coverage
 # production
 build
 dist
+esm
 dist-ssr
 .blocklet
 .next
@@ -31,3 +32,4 @@ lerna-debug.log*
 .puppeteerrc.js
 
 .env
+

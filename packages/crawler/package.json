@@ -7,11 +7,19 @@
     "access": "public"
   },
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "tsc -p tsconfig.cjs.json --watch",
     "lint": "tsc --noEmit && eslint src --ext .mjs,.js,.jsx,.ts,.tsx",
     "lint:fix": "npm run lint -- --fix",
-    "bundle": "tsc"
+    "bundle": "npm run build",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "npm run build:cjs && npm run build:esm",
+    "prepublish": "npm run build"
   },
+  "files": [
+    "dist",
+    "esm"
+  ],
   "lint-staged": {
     "*.{mjs,js,jsx,ts,tsx}": [
       "prettier --write",
