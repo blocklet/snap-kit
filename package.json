@@ -1,12 +1,13 @@
 {
   "name": "crawler",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.2",
   "scripts": {
     "dev": "blocklet dev",
     "lint": "pnpm -r lint",
     "lint:fix": "pnpm -r lint:fix",
-    "bundle": "tsc"
+    "bundle": "pnpm -r bundle",
+    "bump-version": "zx scripts/bump-version.mjs"
   },
   "lint-staged": {
     "*.{mjs,js,jsx,ts,tsx}": [
@@ -41,7 +42,8 @@
     "prettier-plugin-import-sort": "^0.0.7",
     "simple-git-hooks": "^2.11.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "zx": "^8.5.4"
   },
   "importSort": {
     ".js, .jsx, .mjs": {

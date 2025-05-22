@@ -44,15 +44,18 @@ importers:
       typescript:
         specifier: ^5.7.3
         version: 5.8.3
+      zx:
+        specifier: ^8.5.4
+        version: 8.5.4
 
-  packages/blocklet:
+  blocklets/snap-kit:
     dependencies:
       '@abtnode/cron':
         specifier: ^1.16.43
         version: 1.16.43
       '@arcblock/crawler':
         specifier: workspace:*
-        version: link:../crawler
+        version: link:../../packages/crawler
       '@arcblock/did-auth':
         specifier: ^1.19.15
         version: 1.20.11(encoding@0.1.13)
