@@ -30,6 +30,15 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      - name: Install dependencies
+        run: |
+          pnpm i
+        shell: bash
+  
+      - name: Build packages
+        run: |
+          pnpm run -r build
+
       - name: Upload to Dev Store
         uses: blocklet/action-workflow@v1
         env:

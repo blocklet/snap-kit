@@ -35,6 +35,10 @@ jobs:
           pnpm i
         shell: bash
 
+      - name: Build packages
+        run: |
+          pnpm run -r build
+
       - name: Config Git
         run: |
           git config --local user.name "bot"
