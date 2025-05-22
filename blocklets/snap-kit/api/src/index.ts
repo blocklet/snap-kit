@@ -1,4 +1,5 @@
 import { initCrawler } from '@arcblock/crawler';
+import createLogger from '@blocklet/logger';
 import { env } from '@blocklet/sdk/lib/config';
 // import fallback from '@blocklet/sdk/lib/middlewares/fallback';
 import cookieParser from 'cookie-parser';
@@ -17,6 +18,7 @@ initCrawler({
 });
 
 export const app = express();
+createLogger.setupAccessLogger(app);
 
 app.set('trust proxy', true);
 app.use(cookieParser());
@@ -25,10 +27,11 @@ app.use(express.urlencoded({ extended: true, limit: '1 mb' }));
 app.use(cors());
 
 const router = express.Router();
+
 router.use('/api', routes);
 
 app.use(router);
-app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '30d', index: false }));
+app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '365d', index: false }));
 
 // const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
 // if (isProduction) {

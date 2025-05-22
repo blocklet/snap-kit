@@ -1,7 +1,7 @@
 import { DataTypes, Model, Sequelize } from '@sequelize/core';
 
 interface SnapshotModel {
-  id?: string;
+  jobId: string;
   url: string;
   status: 'success' | 'failed' | 'pending';
   html?: string | null;
@@ -14,11 +14,12 @@ interface SnapshotModel {
     includeScreenshot?: boolean;
     includeHtml?: boolean;
     quality?: number;
+    fullPage?: boolean;
   };
 }
 
 class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
-  public id!: SnapshotModel['id'];
+  public jobId!: SnapshotModel['jobId'];
 
   public url!: SnapshotModel['url'];
 
@@ -41,13 +42,15 @@ export type { SnapshotModel };
 export function initSnapshotModel(sequelize: Sequelize) {
   Snapshot.init(
     {
-      id: {
+      jobId: {
         type: DataTypes.STRING,
         primaryKey: true,
+        allowNull: false,
       },
       url: {
         type: DataTypes.STRING,
         allowNull: false,
+        index: true,
       },
       status: {
         type: DataTypes.ENUM('success', 'failed'),
@@ -77,7 +80,7 @@ export function initSnapshotModel(sequelize: Sequelize) {
     {
       sequelize,
       modelName: 'snapshot',
-      tableName: 'snapshot',
+      tableName: 'snap',
       timestamps: true,
     },
   );

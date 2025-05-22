@@ -3,6 +3,7 @@ import SequelizeStore from '@abtnode/queue/lib/store/sequelize';
 import sequelize from '@sequelize/core';
 import { randomUUID } from 'crypto';
 import fs from 'fs-extra';
+import pick from 'lodash/pick';
 import path from 'path';
 import { joinURL } from 'ufo';
 
@@ -25,11 +26,9 @@ export function createCrawlQueue() {
     onJob: async (job: JobState) => {
       logger.debug('job start:', job);
 
-      const { url, includeScreenshot, includeHtml, width, height, quality, timeout } = job;
-
-      const canCrawl = await isAcceptCrawler(url);
+      const canCrawl = await isAcceptCrawler(job.url);
       if (!canCrawl) {
-        logger.error(`failed to crawl ${url}, denied by robots.txt`, job);
+        logger.error(`failed to crawl ${job.url}, denied by robots.txt`, job);
         const snapshot = convertJobToSnapshot({
           job,
           snapshot: {
@@ -52,18 +51,10 @@ export function createCrawlQueue() {
 
       try {
         // get page content later
-        const result = await getPageContent({
-          url,
-          includeScreenshot,
-          includeHtml,
-          width,
-          height,
-          quality,
-          timeout,
-        });
+        const result = await getPageContent(job);
 
         if (!result || (!result.html && !result.screenshot)) {
-          logger.error(`failed to crawl ${url}, empty content`, job);
+          logger.error(`failed to crawl ${job.url}, empty content`, job);
 
           const snapshot = convertJobToSnapshot({
             job,
@@ -105,7 +96,7 @@ export function createCrawlQueue() {
         //   return result;
         // }
       } catch (error) {
-        logger.error(`Failed to crawl ${url}`, { error, job });
+        logger.error(`Failed to crawl ${job.url}`, { error, job });
         console.error(error.stack);
 
         const snapshot = convertJobToSnapshot({
@@ -177,6 +168,7 @@ export const getPageContent = async ({
   height = 900,
   quality = 80,
   timeout = 60 * 1000,
+  fullPage = false,
 }: {
   url: string;
   formatPageContent?: Function;
@@ -186,8 +178,9 @@ export const getPageContent = async ({
   height?: number;
   quality?: number;
   timeout?: number;
+  fullPage?: boolean;
 }) => {
-  logger.debug('getPageContent', { url, includeScreenshot, includeHtml, width, height, quality, timeout });
+  logger.debug('getPageContent', { url, includeScreenshot, includeHtml, width, height, quality, timeout, fullPage });
 
   const page = await initPage();
 
@@ -222,7 +215,7 @@ export const getPageContent = async ({
     // get screenshot
     if (includeScreenshot) {
       try {
-        screenshot = await page.screenshot({ fullPage: true, quality, type: 'webp' });
+        screenshot = await page.screenshot({ fullPage, quality, type: 'webp' });
       } catch (err) {
         logger.error('Failed to get screenshot:', err);
       }
@@ -265,17 +258,18 @@ export async function createCrawlJob(params: JobState, callback?: (snapshot: Sna
     quality: params.quality,
     width: params.width,
     height: params.height,
+    fullPage: params.fullPage,
   });
 
-  logger.info('create crawl job', { params, existsJob });
+  logger.info('create crawl job', params);
 
   if (existsJob) {
     logger.warn(`Crawl job already exists for ${params.url}, skip`);
     return existsJob.id;
   }
 
-  const id = randomUUID();
-  const job = crawlQueue.push({ ...params, id });
+  const jobId = randomUUID();
+  const job = crawlQueue.push({ ...params, id: jobId });
 
   job.on('finished', ({ result }) => {
     logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, { job: params, result });
@@ -287,7 +281,7 @@ export async function createCrawlJob(params: JobState, callback?: (snapshot: Sna
     callback?.(null);
   });
 
-  return id;
+  return jobId;
 }
 
 // @ts-ignore
@@ -313,7 +307,8 @@ export async function getJob(condition: Partial<JobState>) {
 
 function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapshot?: Partial<SnapshotModel> }) {
   return {
-    id: job.id,
+    // @ts-ignore
+    jobId: job.jobId || job.id,
     url: job.url,
     options: {
       width: job.width,
@@ -321,13 +316,14 @@ function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapshot?: Par
       includeScreenshot: job.includeScreenshot,
       includeHtml: job.includeHtml,
       quality: job.quality,
+      fullPage: job.fullPage,
     },
     ...snapshot,
   } as SnapshotModel;
 }
 
-export async function formatSnapshot(snapshot: SnapshotModel) {
-  const data = Object.assign({}, snapshot);
+export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<keyof SnapshotModel>) {
+  let data = Object.assign({}, snapshot);
 
   // format screenshot path to full url
   if (data.screenshot) {
@@ -339,22 +335,27 @@ export async function formatSnapshot(snapshot: SnapshotModel) {
     data.html = html.toString();
   }
 
+  if (columns?.length) {
+    data = pick(data, columns);
+  }
+
   return data;
 }
 
 /**
  * get snapshot from db or crawl queue
  */
-export async function getSnapshot(id: string) {
-  const snapshotModel = await Snapshot.findByPk(id);
+export async function getSnapshot(jobId: string) {
+  const snapshotModel = await Snapshot.findByPk(jobId);
+
   if (snapshotModel) {
     return snapshotModel.toJSON();
   }
 
-  const job = await getJob({ id });
+  const job = await getJob({ id: jobId });
   if (job) {
     return {
-      id: job.id,
+      jobId,
       status: 'pending',
     } as SnapshotModel;
   }

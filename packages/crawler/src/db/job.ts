@@ -1,7 +1,8 @@
 import { DataTypes, Model, Sequelize } from '@sequelize/core';
 
 export interface JobState {
-  id: string;
+  id?: string;
+  jobId: string;
   url: string;
   includeScreenshot?: boolean;
   includeHtml?: boolean;
@@ -9,6 +10,7 @@ export interface JobState {
   height?: number;
   quality?: number;
   timeout?: number;
+  fullPage?: boolean;
 }
 
 export interface JobModel {

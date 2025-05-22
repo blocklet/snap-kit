@@ -8,71 +8,117 @@ const router = Router();
 
 router.use(middlewares.session({ accessKey: true }));
 
+/**
+ * Crawl page html
+ */
 const crawlSchema = Joi.object({
   url: Joi.string().uri().required(),
-  html: Joi.boolean().default(true),
-  screenshot: Joi.boolean().default(false),
-  width: Joi.number().integer().min(375).default(1440),
-  height: Joi.number().integer().min(500).default(900),
-  quality: Joi.number().integer().min(1).max(100).default(80),
   timeout: Joi.number().integer().min(10).max(120).default(120),
   sync: Joi.boolean().default(false),
 });
-
 router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlSchema.validateAsync(req.body);
-  params.timeout = params.timeout * 1000;
 
-  let id: string;
+  const jobId = await createCrawlJob(
+    {
+      ...params,
+      timeout: params.timeout * 1000,
+      includeHtml: true,
+      includeScreenshot: false,
+    },
+    async (snapshot) => {
+      if (params.sync && !res.headersSent) {
+        const data = snapshot ? await formatSnapshot(snapshot, ['jobId', 'url', 'html', 'status', 'error']) : null;
 
-  setTimeout(() => {
-    if (!res.headersSent) {
-      res.status(408).json({
-        code: 'timeout',
-        data: { id },
-      });
-    }
-  }, params.timeout);
-
-  id = await createCrawlJob(params, async (snapshot) => {
-    if (params.sync && !res.headersSent) {
-      res.json({
-        code: 'ok',
-        data: snapshot ? await formatSnapshot(snapshot) : null,
-      });
-    }
-  });
+        res.json({
+          code: 'ok',
+          data,
+        });
+      }
+    },
+  );
 
   if (!params.sync) {
     res.json({
       code: 'ok',
-      data: { id },
+      data: { jobId },
     });
   }
 });
 
-const snapshotSchema = Joi.object({
-  id: Joi.string().required(),
-  html: Joi.boolean().default(true),
-  screenshot: Joi.boolean().default(true),
+/**
+ * Get html crawl result
+ */
+const crawlGetSchema = Joi.object({
+  jobId: Joi.string().required(),
 });
-
-router.get('/snapshot', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
-  const params = await snapshotSchema.validateAsync(req.query);
-  const snapshot = await getSnapshot(params.id);
-
-  if (snapshot) {
-    if (!params.html) {
-      delete snapshot.html;
-    }
-    if (!params.screenshot) {
-      delete snapshot.screenshot;
-    }
-  }
+router.get('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+  const params = await crawlGetSchema.validateAsync(req.query);
+  const snapshot = await getSnapshot(params.jobId);
 
   return res.json({
     code: 'ok',
-    data: snapshot ? await formatSnapshot(snapshot) : null,
+    data: snapshot ? await formatSnapshot(snapshot, ['jobId', 'url', 'html', 'status', 'error']) : null,
+  });
+});
+
+/**
+ * Crawl page screenshot
+ */
+const snapSchema = Joi.object({
+  url: Joi.string().uri().required(),
+  width: Joi.number().integer().min(375).default(1440),
+  height: Joi.number().integer().min(500).default(900),
+  quality: Joi.number().integer().min(1).max(100).default(80),
+  timeout: Joi.number().integer().min(10).max(120).default(120),
+  fullPage: Joi.boolean().default(false),
+  sync: Joi.boolean().default(false),
+});
+router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+  const params = await snapSchema.validateAsync(req.body);
+
+  const jobId = await createCrawlJob(
+    {
+      ...params,
+      timeout: params.timeout * 1000,
+      includeHtml: false,
+      includeScreenshot: true,
+    },
+    async (snapshot) => {
+      if (params.sync && !res.headersSent) {
+        const data = snapshot
+          ? await formatSnapshot(snapshot, ['jobId', 'url', 'screenshot', 'status', 'error'])
+          : null;
+
+        res.json({
+          code: 'ok',
+          data,
+        });
+      }
+    },
+  );
+
+  if (!params.sync) {
+    res.json({
+      code: 'ok',
+      data: { jobId },
+    });
+  }
+});
+
+/**
+ * Get screenshot crawl result
+ */
+const snapGetSchema = Joi.object({
+  jobId: Joi.string().required(),
+});
+router.get('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+  const params = await snapGetSchema.validateAsync(req.query);
+  const snapshot = await getSnapshot(params.jobId);
+
+  return res.json({
+    code: 'ok',
+    data: snapshot ? await formatSnapshot(snapshot, ['jobId', 'url', 'screenshot', 'status', 'error']) : null,
   });
 });
 
