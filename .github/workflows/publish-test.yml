@@ -1,4 +1,4 @@
-name: upload-test-store
+name: Publish to Test Store and NPM
 
 env:
   NODE_OPTIONS: '--max_old_space_size=6144'
