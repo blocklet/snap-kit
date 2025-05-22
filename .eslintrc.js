@@ -8,5 +8,12 @@ module.exports = {
   },
   rules: {
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'consistent-return': 'off',
+    'import/prefer-default-export': 'off',
+    'no-await-in-loop': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-shadow': 'off',
+    'no-param-reassign': 'off',
+    'operator-assignment': 'off',
   },
 };

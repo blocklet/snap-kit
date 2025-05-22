@@ -9,7 +9,7 @@ async function main() {
   await fs.writeFileSync('version', version);
 
   console.log(chalk.greenBright(`[info]: start to modify blocklet version to ${version}`));
-  await $`cd blocklets/snap-kit && blocklet version ${version} && cd ../../`;
+  await $`blocklet version ${version}`;
   console.log(chalk.greenBright('[info]: blocklet version modified.'));
 
   let newChangelog = '';
