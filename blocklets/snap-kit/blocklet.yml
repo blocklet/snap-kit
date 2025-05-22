@@ -54,7 +54,8 @@ environments:
     shared: false
 capabilities:
   navigation: true
-screenshots: []
+screenshots: 
+  - 1.jpeg
 docker:
   image: arcblock/blocklet-with-puppeteer
   shell: gosu
