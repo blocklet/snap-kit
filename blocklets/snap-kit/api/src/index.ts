@@ -1,10 +1,10 @@
 import { initCrawler } from '@arcblock/crawler';
 import { env } from '@blocklet/sdk/lib/config';
-import fallback from '@blocklet/sdk/lib/middlewares/fallback';
+// import fallback from '@blocklet/sdk/lib/middlewares/fallback';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv-flow';
-import express, { ErrorRequestHandler } from 'express';
+import express from 'express';
 import 'express-async-errors';
 import path from 'path';
 
@@ -29,20 +29,19 @@ app.use(cors());
 
 const router = express.Router();
 router.use('/api', routes);
-app.use(router);
 
+app.use(router);
 app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '30d', index: false }));
 
-const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
-
-if (isProduction) {
-  const staticDir = path.resolve(process.env.BLOCKLET_APP_DIR!, 'dist');
-  app.use(express.static(staticDir, { maxAge: '30d', index: false }));
-  app.use(fallback('index.html', { root: staticDir }));
-}
+// const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
+// if (isProduction) {
+//   const staticDir = path.resolve(process.env.BLOCKLET_APP_DIR!, 'dist');
+//   app.use(express.static(staticDir, { maxAge: '30d', index: false }));
+//   app.use(fallback('index.html', { root: staticDir }));
+// }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use<ErrorRequestHandler>((err, _req, res, _next) => {
+app.use((err, _req, res, _next) => {
   logger.error('API Error:', err);
 
   const statusCode = err.statusCode || (err.name === 'ValidationError' ? 400 : 500);
