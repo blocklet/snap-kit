@@ -57,7 +57,7 @@ jobs:
         env:
           COMPONENT_STORE_URL: ${{ secrets.STORE_ENDPOINT_TEST }}
         with:
-          skip-deps: true
+          skip-deps: false
           skip-upload: false
           skip-deploy: true
           skip-release: true
