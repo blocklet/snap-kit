@@ -1,3 +1,7 @@
+## 1.0.4 (2025-5-22)
+
+- chore: add blocklet screenshots
+
 ## 1.0.3 (2025-5-22)
 
 - chore: add module entry
