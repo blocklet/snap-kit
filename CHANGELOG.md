@@ -1,3 +1,8 @@
+## 1.0.3 (2025-5-22)
+
+- chore: add module entry
+- ci: update skip-deps to false
+
 ## 1.0.2 (2025-5-22)
 
 - chore: support esm packaging for @arcblock/crawler
