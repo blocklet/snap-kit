@@ -1,3 +1,7 @@
+## 1.0.5 (2025-5-22)
+
+- chore: update screenshot
+
 ## 1.0.4 (2025-5-22)
 
 - chore: add blocklet screenshots
