@@ -56,20 +56,7 @@ jobs:
           skip-deploy: true
           skip-release: true
           bundle-command: pnpm bundle
-          working-directory: packages/blocklet
+          working-directory: blocklets/snap-kit
           store-endpoint: ${{ secrets.STORE_ENDPOINT_TEST }}
           store-access-token: ${{ secrets.STORE_ACCESS_TOKEN_TEST }}
-          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
-
-      - name: Upload Mini Store to Prod Store
-        uses: blocklet/action-workflow@v1
-        with:
-          skip-deps: true
-          skip-upload: false
-          skip-deploy: true
-          skip-release: true
-          bundle-command: pnpm bundle
-          working-directory: blocklets/store-kit
-          store-endpoint: ${{ secrets.STORE_ENDPOINT_PROD }}
-          store-access-token: ${{ secrets.STORE_ACCESS_TOKEN_PROD }}
           slack-webhook: ${{ secrets.SLACK_WEBHOOK }}

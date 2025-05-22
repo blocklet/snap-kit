@@ -1,5 +1,5 @@
-title: SnapKit
-description: A Blocklet DAPP blocklet
+title: Snap Kit
+description: Puppeteer-based service designed for seamless web automation. capture high-fidelity web page screenshots and web content for precise data extraction.
 keywords:
   - blocklet
   - react
@@ -50,7 +50,14 @@ environments:
     shared: false
 capabilities: {}
 screenshots: []
-components: []
+components:
+  - name: redis
+    mountPoint: /redis
+    required: true
+    source:
+      store: https://store.blocklet.dev
+      name: 'z2qa9dT99iMSgCWzZUTAh7o3YC9Xi6skWkjBH'
+      version: latest
 docker:
   image: arcblock/blocklet-with-puppeteer
   shell: gosu
