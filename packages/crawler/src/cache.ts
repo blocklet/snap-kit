@@ -1,7 +1,7 @@
 import { createPool } from 'generic-pool';
 import { createClient } from 'redis';
 
-import { logger } from './config';
+import { config, logger } from './config';
 
 const cacheKeyPrefix = process.env?.BLOCKLET_REAL_DID ? `${process.env.BLOCKLET_REAL_DID}:` : '';
 const MAX_REDIS_RETRY = 3;
@@ -11,10 +11,9 @@ export const cachePool = createPool(
   {
     create: async () => {
       try {
-        const redisUrl = process.env.REDIS_URL;
-
+        const { redisUrl } = config;
         const redisClient = createClient({
-          url: redisUrl as string,
+          url: redisUrl,
           socket: {
             // @ts-ignore
             reconnectStrategy: (retries) => {
@@ -50,15 +49,35 @@ export const cachePool = createPool(
   },
 );
 
+export const memoryPool = createPool(
+  {
+    create: () => {
+      const map = new Map<string, any>();
+      // @ts-ignore
+      map.del = map.delete;
+      return Promise.resolve(map);
+    },
+    destroy: (client: Map<string, any>) => {
+      client.clear();
+      return Promise.resolve();
+    },
+  },
+  {
+    max: 10,
+    min: 0,
+  },
+);
+
 export const withCache = async (cb: Function) => {
-  const client = await cachePool.acquire();
+  const pool = config.redisUrl ? cachePool : memoryPool;
+  const client = await pool.acquire();
 
   if (client) {
     try {
       return cb(client);
     } finally {
       // release client to pool, let other use
-      await cachePool.release(client);
+      await pool.release(client);
     }
   }
 };

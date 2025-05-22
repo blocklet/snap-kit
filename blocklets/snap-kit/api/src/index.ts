@@ -3,15 +3,12 @@ import { env } from '@blocklet/sdk/lib/config';
 // import fallback from '@blocklet/sdk/lib/middlewares/fallback';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import dotenv from 'dotenv-flow';
 import express from 'express';
 import 'express-async-errors';
 import path from 'path';
 
 import { logger } from './libs/logger';
 import routes from './routes';
-
-dotenv.config();
 
 const { name, version } = require('../../package.json');
 

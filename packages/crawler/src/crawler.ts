@@ -23,14 +23,13 @@ export function createCrawlQueue() {
     store: new SequelizeStore(db, 'crawler'),
     concurrency: 1,
     onJob: async (job: JobState) => {
-      logger.info('start crawling job:', job);
+      logger.debug('job start:', job);
 
       const { url, includeScreenshot, includeHtml, width, height, quality, timeout } = job;
 
       const canCrawl = await isAcceptCrawler(url);
       if (!canCrawl) {
         logger.error(`failed to crawl ${url}, denied by robots.txt`, job);
-
         const snapshot = convertJobToSnapshot({
           job,
           snapshot: {
@@ -142,11 +141,17 @@ async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Arr
   if (screenshot) {
     const hash = md5(screenshot);
     screenshotPath = path.join(screenshotDir, `${hash}.webp`);
+
+    logger.debug('saveSnapshotToLocal.screenshot', { screenshotPath });
+
     await fs.writeFile(screenshotPath, screenshot);
   }
   if (html) {
     const hash = md5(html);
     htmlPath = path.join(htmlDir, `${hash}.html`);
+
+    logger.debug('saveSnapshotToLocal.html', { htmlPath });
+
     await fs.writeFile(htmlPath, html);
   }
 
@@ -182,6 +187,8 @@ export const getPageContent = async ({
   quality?: number;
   timeout?: number;
 }) => {
+  logger.debug('getPageContent', { url, includeScreenshot, includeHtml, width, height, quality, timeout });
+
   const page = await initPage();
 
   if (width && height) {
@@ -199,6 +206,8 @@ export const getPageContent = async ({
     }
 
     const statusCode = response.status();
+
+    logger.debug('getPageContent.response', { response, statusCode });
 
     if (![200, 304].includes(statusCode)) {
       throw new Error(`Request failed with status ${statusCode}, in ${url}`);
@@ -258,7 +267,7 @@ export async function createCrawlJob(params: JobState, callback?: (snapshot: Sna
     height: params.height,
   });
 
-  logger.info('start create crawl job', { params, existsJob });
+  logger.info('create crawl job', { params, existsJob });
 
   if (existsJob) {
     logger.warn(`Crawl job already exists for ${params.url}, skip`);

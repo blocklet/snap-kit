@@ -206,6 +206,7 @@ export const getBrowser = async () => {
   // try to connect browser
   const connectedBrowser = await connectBrowser();
   if (connectedBrowser) {
+    logger.debug('getBrowser.connectedBrowser');
     browser = connectedBrowser;
     return browser;
   }
@@ -213,6 +214,7 @@ export const getBrowser = async () => {
   // try to launch browser
   const launchedBrowser = await launchBrowser();
   if (launchedBrowser) {
+    logger.debug('getBrowser.launchedBrowser');
     browser = launchedBrowser;
     checkBrowserActivated();
     return browser;
