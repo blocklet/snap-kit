@@ -11,7 +11,7 @@ import { config, logger } from './config';
 import { Job, JobState } from './db/job';
 import { Snapshot, SnapshotModel } from './db/snapshot';
 import { initPage } from './puppeteer';
-import { formatUrl, isAcceptCrawler, md5 } from './utils';
+import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5 } from './utils';
 
 const { BaseState } = require('@abtnode/models');
 
@@ -167,7 +167,7 @@ export const getPageContent = async ({
   width = 1440,
   height = 900,
   quality = 80,
-  timeout = 60 * 1000,
+  timeout = 90 * 1000,
   fullPage = false,
 }: {
   url: string;
@@ -207,13 +207,28 @@ export const getPageContent = async ({
     }
 
     // await for networkidle0
-    // https://pptr.dev/api/puppeteer.page.goforward/#remarks
+    // https://pptr.dev/api/puppeteer.page.waitfornetworkidle
     await page.waitForNetworkIdle({
-      idleTime: 2 * 1000,
+      idleTime: 1.5 * 1000,
     });
 
     // get screenshot
     if (includeScreenshot) {
+      // Try to find the tallest element and set the browser to the same height
+      if (fullPage) {
+        const maxScrollHeight = await findMaxScrollHeight(page);
+
+        logger.info('findMaxScrollHeight', { maxScrollHeight });
+
+        if (maxScrollHeight) {
+          await page.setViewport({ width, height: maxScrollHeight || height, deviceScaleFactor: 2 });
+          await page.evaluate((scrollHeight) => {
+            window.scrollTo(0, scrollHeight || 0);
+            document.documentElement.scrollTo(0, scrollHeight || 0);
+          }, maxScrollHeight);
+        }
+      }
+
       try {
         screenshot = await page.screenshot({ fullPage, quality, type: 'webp' });
       } catch (err) {
