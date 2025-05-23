@@ -24,7 +24,7 @@ export function createCrawlQueue() {
     store: new SequelizeStore(db, 'crawler'),
     concurrency: 1,
     onJob: async (job: JobState) => {
-      logger.debug('job start:', job);
+      logger.info('Starting to execute crawl job', job);
 
       const canCrawl = await isAcceptCrawler(job.url);
       if (!canCrawl) {
@@ -247,6 +247,7 @@ export const getPageContent = async ({
 export async function createCrawlJob(params: JobState, callback?: (snapshot: SnapshotModel | null) => void) {
   params = {
     ...params,
+    id: randomUUID(),
     url: formatUrl(params.url),
   };
 
@@ -261,18 +262,17 @@ export async function createCrawlJob(params: JobState, callback?: (snapshot: Sna
     fullPage: params.fullPage,
   });
 
-  logger.info('create crawl job', params);
-
   if (existsJob) {
     logger.warn(`Crawl job already exists for ${params.url}, skip`);
     return existsJob.id;
   }
 
-  const jobId = randomUUID();
-  const job = crawlQueue.push({ ...params, id: jobId });
+  logger.info('create crawl job', params);
+
+  const job = crawlQueue.push(params);
 
   job.on('finished', ({ result }) => {
-    logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, { job: params, result });
+    logger.info(`Crawl completed ${params.url}`, { job: params, result });
     callback?.(result);
   });
 
@@ -281,7 +281,7 @@ export async function createCrawlJob(params: JobState, callback?: (snapshot: Sna
     callback?.(null);
   });
 
-  return jobId;
+  return params.id;
 }
 
 // @ts-ignore
