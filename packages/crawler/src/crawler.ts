@@ -185,7 +185,7 @@ export const getPageContent = async ({
   const page = await initPage();
 
   if (width && height) {
-    await page.setViewport({ width, height });
+    await page.setViewport({ width, height, deviceScaleFactor: 2 });
   }
 
   let html: string | null = null;
