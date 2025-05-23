@@ -4,12 +4,9 @@ env:
   NODE_OPTIONS: '--max_old_space_size=6144'
 
 on:
-  workflow_dispatch:
-  push:
+  pull_request:
     branches:
       - master
-    paths:
-      - 'blocklets/snap-kit/dockerfile'
 
 jobs:
   build:
