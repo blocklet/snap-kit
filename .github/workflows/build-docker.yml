@@ -1,0 +1,78 @@
+name: Build and Push Docker Images
+
+env:
+  NODE_OPTIONS: '--max_old_space_size=6144'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'blocklets/snap-kit/dockerfile'
+
+jobs:
+  build:
+    if: "!contains(toJSON(github.event.commits.*.message) , '[skip ci]')"
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Check Dockerfile changes
+        id: check_changes
+        run: |
+          CHANGED=$(git diff --name-only HEAD^ HEAD | grep "blocklets/snap-kit/dockerfile" || echo "")
+          echo "CHANGED=$CHANGED" >> $GITHUB_ENV
+          if [ -z "$CHANGED" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No changes to Dockerfile, skipping build"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Dockerfile changed, proceeding with build"
+          fi
+        shell: bash
+
+      - name: Get version
+        if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        id: get_version
+        run: |
+          VERSION=$(cat version)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Send Notification Before Build
+        if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          curl -H 'Content-type: application/json' -X POST -d '{"text": "Starting to build Docker image for arcblock/blocklet-with-puppeteer from blocklets/snap-kit"}' ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Set up Docker Buildx
+        if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to DockerHub
+        if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER_NAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push
+        if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        uses: docker/build-push-action@v4
+        with:
+          context: blocklets/snap-kit
+          file: blocklets/snap-kit/dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            arcblock/blocklet-with-puppeteer:latest
+            arcblock/blocklet-with-puppeteer:${{ env.VERSION }}
+
+      - name: Send Notification After Build
+        if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        run: |
+          curl -H 'Content-type: application/json' -X POST -d '{"text": "Docker image arcblock/blocklet-with-puppeteer:${{ env.VERSION }} from blocklets/snap-kit has been built and pushed successfully"}' ${{ secrets.SLACK_WEBHOOK }}
