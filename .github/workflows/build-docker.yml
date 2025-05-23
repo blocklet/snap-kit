@@ -47,7 +47,7 @@ jobs:
       - name: Send Notification Before Build
         if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: |
-          curl -H 'Content-type: application/json' -X POST -d '{"text": "Starting to build Docker image for arcblock/blocklet-with-puppeteer from blocklets/snap-kit"}' ${{ secrets.SLACK_WEBHOOK }}
+          curl -H 'Content-type: application/json' -X POST -d '{"text": "Starting to build Docker image for arcblock/snap-kit from blocklets/snap-kit"}' ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Set up Docker Buildx
         if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
@@ -69,10 +69,10 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            arcblock/blocklet-with-puppeteer:latest
-            arcblock/blocklet-with-puppeteer:${{ env.VERSION }}
+            arcblock/snap-kit:latest
+            arcblock/snap-kit:${{ env.VERSION }}
 
       - name: Send Notification After Build
         if: steps.check_changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: |
-          curl -H 'Content-type: application/json' -X POST -d '{"text": "Docker image arcblock/blocklet-with-puppeteer:${{ env.VERSION }} from blocklets/snap-kit has been built and pushed successfully"}' ${{ secrets.SLACK_WEBHOOK }}
+          curl -H 'Content-type: application/json' -X POST -d '{"text": "Docker image arcblock/snap-kit:${{ env.VERSION }} from blocklets/snap-kit has been built and pushed successfully"}' ${{ secrets.SLACK_WEBHOOK }}

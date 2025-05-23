@@ -1,3 +1,7 @@
+## 1.0.6 (2025-5-23)
+
+- feat: add actions for building docker images; update dockerfile for font and locale support
+
 ## 1.0.5 (2025-5-22)
 
 - chore: update screenshot
