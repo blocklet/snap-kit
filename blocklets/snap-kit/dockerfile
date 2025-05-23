@@ -13,11 +13,18 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     build-essential socat curl gnupg wget \
     gosu strace passwd git ca-certificates libcairo2-dev libpango1.0-dev \
-    libjpeg-dev libgif-dev && \
+    libjpeg-dev libgif-dev \
+    # Install fontconfig and fonts for Chinese and emoji
+    fontconfig \
+    fonts-noto-cjk fonts-noto-color-emoji && \
     rm -rf /var/lib/apt/lists/*
 
 # Create necessary directories
 RUN mkdir -p /data/bin /var/lib/blocklet /home/node/.npm-global/lib
+
+# Set locale to C.UTF-8 for broad UTF-8 support
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 
 # Set environment variables
 ENV DOCKER_DATA=/var/lib/blocklet

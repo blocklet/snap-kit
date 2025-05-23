@@ -1,3 +1,4 @@
+import { Page } from '@blocklet/puppeteer';
 import { components, env } from '@blocklet/sdk/lib/config';
 import axios from 'axios';
 import flattenDeep from 'lodash/flattenDeep';
@@ -237,4 +238,28 @@ export const formatUrl = (url: string) => {
 
 export function md5(content: string | Uint8Array) {
   return createHash('md5').update(content).digest('hex');
+}
+
+export async function findMaxScrollHeight(page: Page) {
+  const maxHeightHandler = await page.evaluateHandle(() => {
+    const elements = Array.from(document.querySelectorAll('*'));
+    let maxHeight = document.body.scrollHeight;
+
+    for (const el of elements) {
+      const style = window.getComputedStyle(el);
+      if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+        if (el.scrollHeight > el.clientHeight && el.scrollHeight > maxHeight) {
+          maxHeight = el.scrollHeight;
+        }
+      }
+    }
+
+    return maxHeight;
+  });
+
+  const maxHeight = await maxHeightHandler.jsonValue();
+
+  maxHeightHandler.dispose();
+
+  return maxHeight;
 }
