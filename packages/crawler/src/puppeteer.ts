@@ -245,7 +245,7 @@ export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean }
   try {
     if (trimCache) {
       await puppeteer.trimCache();
-      logger.debugg('Trim cache success');
+      logger.debug('Trim cache success');
     }
 
     // try to clear temporary directory
