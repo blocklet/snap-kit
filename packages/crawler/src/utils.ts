@@ -1,3 +1,4 @@
+import { Page } from '@blocklet/puppeteer';
 import Axios from 'axios';
 import { Request } from 'express';
 import flattenDeep from 'lodash/flattenDeep';

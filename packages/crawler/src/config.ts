@@ -8,7 +8,6 @@ export type Site = {
 
 export type Config = {
   isProd: boolean;
-  redisUrl?: string;
   dataDir: string;
   appDir: string;
   appUrl: string;
@@ -21,12 +20,11 @@ export type Config = {
   };
 };
 
-export const logger = createLogger('crawler', { level: process.env.LOG_LEVEL || 'info' });
+export const logger = createLogger('@arcblock/crawler', { level: process.env.LOG_LEVEL || 'info' });
 
 export const config: Config = {
   isProd: process.env.NODE_ENV === 'production',
 
-  redisUrl: process.env.REDIS_URL!,
   dataDir: process.env.BLOCKLET_DATA_DIR!,
   appDir: process.env.BLOCKLET_APP_DIR! || process.cwd(),
   appUrl: process.env.BLOCKLET_APP_URL!,

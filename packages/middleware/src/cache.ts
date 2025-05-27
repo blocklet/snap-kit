@@ -72,7 +72,7 @@ export class CacheManager {
           url,
         },
         headers: {
-          Authorization: accessKey,
+          Authorization: `Bearer ${accessKey}`,
         },
       });
 

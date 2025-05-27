@@ -9,7 +9,7 @@ import { initPage } from './puppeteer';
 import { convertJobToSnapshot, formatSnapshot } from './services/snapshot';
 import { Job, JobState } from './store/job';
 import { Snapshot, SnapshotModel } from './store/snapshot';
-import { formatUrl, isAcceptCrawler, md5 } from './utils';
+import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5 } from './utils';
 
 const { BaseState } = require('@abtnode/models');
 
@@ -262,7 +262,6 @@ export const getPageContent = async ({
 export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
   params = {
     ...params,
-    id: randomUUID(),
     url: formatUrl(params.url),
   };
 
@@ -298,5 +297,5 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
     callback?.(null);
   });
 
-  return params.id;
+  return jobId;
 }

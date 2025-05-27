@@ -6,4 +6,4 @@ export const env = {
   databasePath: path.join(config.env.dataDir, 'crawler-middleware/snapshot.db'),
 };
 
-export const logger = createLogger('crawler-middleware', { level: process.env.LOG_LEVEL || 'info' });
+export const logger = createLogger('@arcblock/crawler-middleware', { level: process.env.LOG_LEVEL || 'info' });

@@ -38,20 +38,13 @@ payment:
   price: []
   share: []
 timeout:
-  start: 60
+  start: 90
 requirements:
   server: '>=1.16.28'
   os: '*'
   cpu: '*'
 scripts:
   dev: npm run start
-environments:
-  - name: REDIS_URL
-    description: Please provide redis url
-    required: false
-    default: ''
-    secure: true
-    shared: false
 capabilities:
   navigation: true
 screenshots:
