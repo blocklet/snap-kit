@@ -1,5 +1,5 @@
 {
-  "name": "@arcblock/crawler",
+  "name": "@arcblock/crawler-middleware",
   "version": "0.1.0",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -21,23 +21,6 @@
     "dist",
     "esm"
   ],
-  "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "import": "./lib/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./utils": {
-      "require": "./dist/utils.js",
-      "import": "./lib/utils.js",
-      "types": "./dist/utils.d.ts"
-    },
-    "./types": {
-      "require": "./dist/types.js",
-      "import": "./lib/types.js",
-      "types": "./dist/types.d.ts"
-    }
-  },
   "lint-staged": {
     "*.{mjs,js,jsx,ts,tsx}": [
       "prettier --write",
@@ -78,7 +61,8 @@
     "sequelize": "^6.37.7",
     "sitemap": "^7.1.2",
     "sqlite3": "^5.1.7",
-    "ufo": "^1.5.4"
+    "ufo": "^1.5.4",
+    "@arcblock/crawler": "workspace:*"
   },
   "devDependencies": {
     "@blocklet/js-sdk": "^1.16.39",

@@ -1,13 +1,13 @@
-import { createSnapKit, initCrawler } from '@arcblock/crawler';
+import { initCrawler } from '@arcblock/crawler';
+import { createSnapshotMiddleware } from '@arcblock/crawler-middleware';
 import createLogger from '@blocklet/logger';
-import { env } from '@blocklet/sdk/lib/config';
-// import fallback from '@blocklet/sdk/lib/middlewares/fallback';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import 'express-async-errors';
 import path from 'path';
 
+import env from './libs/env';
 import { logger } from './libs/logger';
 import routes from './routes';
 
@@ -15,13 +15,8 @@ const { name, version } = require('../../package.json');
 
 initCrawler({
   siteCron: {
-    sites: [
-      {
-        url: 'https://bbqaymu4kjfkin6caatebvo7m4uak4t4eoqfircjfpi.did.abtnet.io',
-        pathname: '/',
-      },
-    ],
-    runOnInit: true,
+    sites: env.preferences.siteCron || [],
+    runOnInit: env.isDev,
   },
 });
 
@@ -40,16 +35,17 @@ router.use('/api', routes);
 app.use(router);
 app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '365d', index: false }));
 
-app.use(
-  createSnapKit({
-    endpoint: env.appUrl,
-    accessKey: process.env.SNAP_KIT_ACCESS_KEY!,
-    autoReturnHtml: true,
-    allowCrawler: (req) => {
-      return req.path === '/';
-    },
-  }),
-);
+if (env.isDev && process.env.SNAP_KIT_ACCESS_KEY) {
+  app.use(
+    createSnapshotMiddleware({
+      endpoint: process.env.SNAP_KIT_ENDPOINT || env.appUrl,
+      accessKey: process.env.SNAP_KIT_ACCESS_KEY,
+      allowCrawler: (req) => {
+        return req.path === '/';
+      },
+    }),
+  );
+}
 
 // const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
 // if (isProduction) {

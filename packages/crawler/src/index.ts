@@ -3,13 +3,13 @@ import merge from 'lodash/merge';
 import { Config, config, logger } from './config';
 import { createCrawlQueue } from './crawler';
 import { initCron } from './cron';
-import { ensureDatabase } from './db';
 import { ensureBrowser } from './puppeteer';
+import { initDatabase } from './store';
 
 export * from './crawler';
-export * from './middleware';
 export * from './site';
-export { Snapshot } from './db/snapshot';
+export * from './services/snapshot';
+export * as utils from './utils';
 
 type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
@@ -18,8 +18,8 @@ export async function initCrawler(params: DeepPartial<Config>) {
 
   logger.debug('initCrawler', config);
 
-  await ensureDatabase();
-  await createCrawlQueue();
+  await initDatabase();
   await ensureBrowser();
+  await createCrawlQueue();
   await initCron();
 }

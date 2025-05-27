@@ -4,7 +4,7 @@ import { joinURL } from 'ufo';
 
 import { Site, logger } from './config';
 import { crawlUrl } from './crawler';
-import { Snapshot } from './db/snapshot';
+import { Snapshot } from './store/snapshot';
 import { formatUrl, getSitemapList } from './utils';
 
 const crawlBlockletRunningMap = new Map();

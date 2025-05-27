@@ -3,7 +3,8 @@
   "private": true,
   "version": "1.0.5",
   "scripts": {
-    "dev": "blocklet dev",
+    "dev": "pnpm run --filter @arcblock/crawler dev & pnpm run --filter @arcblock/crawler-middleware dev & pnpm run --filter @blocklet/snap-kit dev",
+    "build:packages": "pnpm -r build",
     "lint": "pnpm -r lint",
     "lint:fix": "pnpm -r lint:fix",
     "bundle": "pnpm -r bundle",

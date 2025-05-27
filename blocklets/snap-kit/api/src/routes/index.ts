@@ -1,4 +1,4 @@
-import { crawlSite, crawlUrl, formatSnapshot, getSnapshot, getSnapshotByUrl } from '@arcblock/crawler';
+import { crawlUrl, getLatestSnapshot, getSnapshot } from '@arcblock/crawler';
 import { Joi } from '@arcblock/validator';
 import { Router } from 'express';
 
@@ -26,13 +26,13 @@ router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, 
       includeHtml: true,
       includeScreenshot: false,
     },
-    async (snapshot) => {
+    (snapshot) => {
       if (params.sync && !res.headersSent) {
-        const data = snapshot ? await formatSnapshot(snapshot, ['jobId', 'url', 'html', 'status', 'error']) : null;
+        delete snapshot?.screenshot;
 
         res.json({
           code: 'ok',
-          data,
+          data: snapshot,
         });
       }
     },
@@ -56,11 +56,13 @@ const crawlGetSchema = Joi.object({
 
 router.get('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlGetSchema.validateAsync(req.query);
-  const snapshot = params.jobId ? await getSnapshot(params.jobId) : await getSnapshotByUrl(params.url);
+  const snapshot = params.jobId ? await getSnapshot(params.jobId) : await getLatestSnapshot(params.url);
+
+  delete snapshot?.screenshot;
 
   return res.json({
     code: 'ok',
-    data: snapshot ? await formatSnapshot(snapshot, ['jobId', 'url', 'html', 'status', 'error']) : null,
+    data: snapshot,
   });
 });
 
@@ -86,15 +88,13 @@ router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, r
       includeHtml: false,
       includeScreenshot: true,
     },
-    async (snapshot) => {
+    (snapshot) => {
       if (params.sync && !res.headersSent) {
-        const data = snapshot
-          ? await formatSnapshot(snapshot, ['jobId', 'url', 'screenshot', 'status', 'error'])
-          : null;
+        delete snapshot?.html;
 
         res.json({
           code: 'ok',
-          data,
+          data: snapshot,
         });
       }
     },
@@ -118,21 +118,11 @@ router.get('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, re
   const params = await snapGetSchema.validateAsync(req.query);
   const snapshot = await getSnapshot(params.jobId);
 
+  delete snapshot?.html;
+
   return res.json({
     code: 'ok',
-    data: snapshot ? await formatSnapshot(snapshot, ['jobId', 'url', 'screenshot', 'status', 'error']) : null,
-  });
-});
-
-router.post('/test', async (req, res) => {
-  const jobIds = await crawlSite({
-    url: 'https://www.blocklet.io/',
-    pathname: '/payment-kit',
-  });
-
-  res.json({
-    code: 'ok',
-    data: jobIds,
+    data: snapshot,
   });
 });
 

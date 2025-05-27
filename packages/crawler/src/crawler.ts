@@ -1,16 +1,14 @@
 import createQueue from '@abtnode/queue';
 import SequelizeStore from '@abtnode/queue/lib/store/sequelize';
-import sequelize from '@sequelize/core';
 import { randomUUID } from 'crypto';
 import fs from 'fs-extra';
-import pick from 'lodash/pick';
 import path from 'path';
-import { joinURL } from 'ufo';
 
 import { config, logger } from './config';
-import { Job, JobState } from './db/job';
-import { Snapshot, SnapshotModel } from './db/snapshot';
 import { initPage } from './puppeteer';
+import { convertJobToSnapshot, formatSnapshot } from './services/snapshot';
+import { Job, JobState } from './store/job';
+import { Snapshot, SnapshotModel } from './store/snapshot';
 import { formatUrl, isAcceptCrawler, md5 } from './utils';
 
 const { BaseState } = require('@abtnode/models');
@@ -84,17 +82,6 @@ export function createCrawlQueue() {
         });
         await Snapshot.upsert(snapshot);
         return snapshot;
-
-        // save to redis
-        // if (saveToRedis) {
-        //   useCache.set(url, {
-        //     html: result.html || '',
-        //     lastModified,
-        //   });
-
-        //   logger.info(`success to crawl ${url}`, job);
-        //   return result;
-        // }
       } catch (error) {
         logger.error(`Failed to crawl ${job.url}`, { error, job });
         console.error(error.stack);
@@ -264,15 +251,16 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
   };
 
   // skip duplicate job
-  const duplicateJob = await getJob({
-    url: params.url,
-    includeScreenshot: params.includeScreenshot,
-    includeHtml: params.includeHtml,
-    quality: params.quality,
-    width: params.width,
-    height: params.height,
-    fullPage: params.fullPage,
-  });
+  const { job: duplicateJob } =
+    (await Job.findJob({
+      url: params.url,
+      includeScreenshot: params.includeScreenshot,
+      includeHtml: params.includeHtml,
+      quality: params.quality,
+      width: params.width,
+      height: params.height,
+      fullPage: params.fullPage,
+    })) || {};
 
   if (duplicateJob) {
     logger.warn(`Crawl job already exists for ${params.url}, skip`);
@@ -284,9 +272,9 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
   const jobId = randomUUID();
   const job = crawlQueue.push({ ...params, id: jobId });
 
-  job.on('finished', ({ result }) => {
+  job.on('finished', async ({ result }) => {
     logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, { job: params, result });
-    callback?.(result);
+    callback?.(result ? await formatSnapshot(result) : null);
   });
 
   job.on('failed', ({ error }) => {
@@ -295,97 +283,4 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
   });
 
   return jobId;
-}
-
-export async function getJob(condition: Partial<JobState>) {
-  const where = Object.keys(condition)
-    .filter((key) => condition[key] !== undefined)
-    .map((key) => {
-      return sequelize.where(sequelize.fn('json_extract', sequelize.col('job'), `$.${key}`), condition[key]);
-    });
-
-  const job = await crawlQueue.store.db.findOne({
-    where: {
-      [sequelize.Op.and]: where,
-    },
-  });
-
-  if (job) {
-    return job.job;
-  }
-
-  return null;
-}
-
-function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapshot?: Partial<SnapshotModel> }) {
-  return {
-    jobId: job.jobId || job.id,
-    url: job.url,
-    lastModified: job.lastModified || new Date().toISOString(),
-    options: {
-      width: job.width,
-      height: job.height,
-      includeScreenshot: job.includeScreenshot,
-      includeHtml: job.includeHtml,
-      quality: job.quality,
-      fullPage: job.fullPage,
-    },
-    ...snapshot,
-  } as SnapshotModel;
-}
-
-export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<keyof SnapshotModel>) {
-  let data = Object.assign({}, snapshot);
-
-  // format screenshot path to full url
-  if (data.screenshot) {
-    data.screenshot = joinURL(config.appUrl, data.screenshot);
-  }
-  // format html path to string
-  if (data.html) {
-    const html = await fs.readFile(path.join(config.dataDir, data.html));
-    data.html = html.toString();
-  }
-
-  if (columns?.length) {
-    data = pick(data, columns);
-  }
-
-  return data;
-}
-
-/**
- * get snapshot from db or crawl queue
- */
-export async function getSnapshot(jobId: string) {
-  const snapshot = await Snapshot.findByPk(jobId);
-
-  if (snapshot) {
-    return snapshot.toJSON();
-  }
-
-  const job = await getJob({ id: jobId });
-  if (job) {
-    return {
-      jobId,
-      status: 'pending',
-    } as SnapshotModel;
-  }
-
-  return null;
-}
-
-export async function getSnapshotByUrl(url: string) {
-  const snapshot = await Snapshot.findOne({
-    where: {
-      url,
-      status: 'success',
-    },
-    order: [
-      ['lastModified', 'DESC'],
-      ['updatedAt', 'DESC'],
-    ],
-  });
-
-  return snapshot?.toJSON();
 }
