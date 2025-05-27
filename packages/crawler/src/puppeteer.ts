@@ -136,7 +136,7 @@ export async function launchBrowser() {
         '--font-render-hinting=none',
       ],
     });
-    logger.info('Launch browser success');
+    logger.info('Launch browser');
   } catch (error) {
     logger.error('launch browser failed: ', error);
     browserStatus = BrowserStatus.None;
@@ -217,21 +217,21 @@ export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean }
     const pages = await browser.pages();
     await Promise.all(pages.map((page) => page.close()));
   } catch (err) {
-    logger.error('Failed to close all pages:', err);
+    logger.warn('Failed to close all pages:', err);
   }
 
   // close browser
   try {
     await browser.close();
   } catch (err) {
-    logger.error('Failed to close browser:', err);
+    logger.warn('Failed to close browser:', err);
   }
 
   // clear cache
   try {
     if (trimCache) {
       await puppeteer.trimCache();
-      logger.info('Trim cache success');
+      logger.debug('Trim cache success');
     }
 
     // try to clear temporary directory
@@ -243,7 +243,7 @@ export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean }
       global.gc();
     }
   } catch (err) {
-    logger.error('Failed to clear browser cache:', err);
+    logger.warn('Failed to clear browser cache:', err);
   }
 
   browser = null;

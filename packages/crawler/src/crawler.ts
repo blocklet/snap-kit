@@ -22,7 +22,7 @@ export function createCrawlQueue() {
     store: new SequelizeStore(db, 'crawler'),
     concurrency: 1,
     onJob: async (job: JobState) => {
-      logger.debug('job start:', job);
+      logger.info('Starting to execute crawl job', job);
 
       const canCrawl = await isAcceptCrawler(job.url);
       if (!canCrawl) {
@@ -153,7 +153,7 @@ export const getPageContent = async ({
   width = 1440,
   height = 900,
   quality = 80,
-  timeout = 60 * 1000,
+  timeout = 90 * 1000,
   fullPage = false,
 }: {
   url: string;
@@ -170,7 +170,7 @@ export const getPageContent = async ({
   const page = await initPage();
 
   if (width && height) {
-    await page.setViewport({ width, height });
+    await page.setViewport({ width, height, deviceScaleFactor: 2 });
   }
 
   let html: string | null = null;
@@ -192,13 +192,28 @@ export const getPageContent = async ({
     }
 
     // await for networkidle0
-    // https://pptr.dev/api/puppeteer.page.goforward/#remarks
+    // https://pptr.dev/api/puppeteer.page.waitfornetworkidle
     await page.waitForNetworkIdle({
-      idleTime: 2 * 1000,
+      idleTime: 1.5 * 1000,
     });
 
     // get screenshot
     if (includeScreenshot) {
+      // Try to find the tallest element and set the browser to the same height
+      if (fullPage) {
+        const maxScrollHeight = await findMaxScrollHeight(page);
+
+        logger.info('findMaxScrollHeight', { maxScrollHeight });
+
+        if (maxScrollHeight) {
+          await page.setViewport({ width, height: maxScrollHeight || height, deviceScaleFactor: 2 });
+          await page.evaluate((scrollHeight) => {
+            window.scrollTo(0, scrollHeight || 0);
+            document.documentElement.scrollTo(0, scrollHeight || 0);
+          }, maxScrollHeight);
+        }
+      }
+
       try {
         screenshot = await page.screenshot({ fullPage, quality, type: 'webp' });
       } catch (err) {
@@ -247,6 +262,7 @@ export const getPageContent = async ({
 export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
   params = {
     ...params,
+    id: randomUUID(),
     url: formatUrl(params.url),
   };
 
@@ -282,5 +298,5 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
     callback?.(null);
   });
 
-  return jobId;
+  return params.id;
 }
