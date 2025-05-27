@@ -3,7 +3,7 @@ import { LRUCache } from 'lru-cache';
 import { joinURL } from 'ufo';
 
 import { logger } from './config';
-import { axios, getFullUrl, isAcceptCrawler, isBotUserAgent, isSelfCrawler } from './utils';
+import { axios, getFullUrl, isAcceptCrawler, isSelfCrawler, isSpider, isStaticFile } from './utils';
 
 export type Cache = LRUCache<string, { html: string; lastModified: number; createdAt: string }>;
 
@@ -39,17 +39,22 @@ export function createSnapKit({
    * fetch content from SnapKit and cache it
    */
   async function fetchSnapKit(url: string) {
-    const api = joinURL(endpoint, '/crawl');
+    const api = joinURL(endpoint, 'api/crawl');
 
     try {
-      const { data: snapshot } = await axios.get(api, {
+      const { data } = await axios.get(api, {
         params: {
           url,
         },
+        headers: {
+          Authorization: accessKey,
+        },
       });
 
+      const { data: snapshot } = data || {};
+
       if (snapshot?.status !== 'success') {
-        logger.error('Failed to fetch content by SnapKit', { url, snapshot });
+        logger.info(`No valid HTML found for ${url} from SnapKit`, { snapshot, data });
         return;
       }
 
@@ -58,7 +63,11 @@ export function createSnapKit({
         lastModified: snapshot.lastModified,
         createdAt: new Date().toISOString(),
       });
-      logger.info('Success to fetch content by SnapKit and cache it', { url });
+      logger.info('Success to fetch content by SnapKit and cache it', {
+        url,
+        jobId: snapshot.jobId,
+        lastModified: snapshot.lastModified,
+      });
 
       return snapshot;
     } catch (error) {
@@ -87,16 +96,18 @@ export function createSnapKit({
 
     // Always fetch content from SnapKit and cache it, even for non-crawler requests
     if (isCacheExpired(fullUrl)) {
+      logger.info(`Cache expired for ${fullUrl}, fetching from SnapKit`);
       fetchSnapKit(fullUrl);
     }
 
-    if (!isBotUserAgent(req) || isSelfCrawler(req)) {
+    if (!isSpider(req) || isSelfCrawler(req) || isStaticFile(req)) {
       return next();
     }
 
     const canCrawl = await isAcceptCrawler(fullUrl);
 
     if (!canCrawl) {
+      logger.debug(`${fullUrl} is not accepted by crawler`);
       return next();
     }
 
@@ -113,6 +124,10 @@ export function createSnapKit({
       }
 
       if (autoReturnHtml) {
+        logger.debug(`Cache hit: ${fullUrl} `, {
+          lastModified: cachedContent.lastModified,
+          createdAt: cachedContent.createdAt,
+        });
         res.send(cachedContent.html);
         return;
       }
@@ -120,6 +135,7 @@ export function createSnapKit({
       return next();
     }
 
+    logger.debug(`Cache not hit: ${fullUrl}`);
     return next();
   };
 }

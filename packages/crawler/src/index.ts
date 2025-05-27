@@ -2,7 +2,7 @@ import merge from 'lodash/merge';
 
 import { Config, config, logger } from './config';
 import { createCrawlQueue } from './crawler';
-import { startCron } from './cron';
+import { initCron } from './cron';
 import { ensureDatabase } from './db';
 import { ensureBrowser } from './puppeteer';
 
@@ -21,5 +21,5 @@ export async function initCrawler(params: DeepPartial<Config>) {
   await ensureDatabase();
   await createCrawlQueue();
   await ensureBrowser();
-  await startCron(config.cron);
+  await initCron();
 }

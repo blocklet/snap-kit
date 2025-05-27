@@ -1,26 +1,20 @@
-// import fs from 'fs-extra';
-// import path from 'path';
 import puppeteer, { Browser, Page, ResourceType } from '@blocklet/puppeteer';
-import { env } from '@blocklet/sdk/lib/config';
 import fs from 'fs-extra';
 import path from 'path';
 import { clearInterval, setInterval } from 'timers';
 
-import { useCache } from './cache';
 import { config, logger } from './config';
 import { CRAWLER_FLAG, sleep } from './utils';
 
-// let puppeteerConfig: {
-//   cacheDirectory: string;
-//   temporaryDirectory: string;
-// };
-
-const BROWSER_WS_ENDPOINT_KEY = `browserWSEndpoint-${env.appId || 'unknown'}`;
-
 const BrowserStatus = {
+  None: 'None',
   Launching: 'Launching',
   Ready: 'Ready',
 };
+let browserStatus = BrowserStatus.None;
+
+/** Chromium WebSocket endpoint that allows puppeteer browser instance to connect to the browser */
+let browserEndpoint = '';
 
 let browser: Browser | null;
 let browserActivatedTimer: NodeJS.Timeout | null;
@@ -87,26 +81,24 @@ export async function ensureBrowser() {
 }
 
 export async function connectBrowser() {
-  const browserWSEndpoint = await useCache.get(BROWSER_WS_ENDPOINT_KEY);
-
-  if (!browserWSEndpoint) {
+  if (!browserEndpoint) {
     return null;
   }
 
   // retry if browser is launching
-  if (browserWSEndpoint.status === BrowserStatus.Launching) {
+  if (browserStatus === BrowserStatus.Launching) {
     await sleep(Math.floor(Math.random() * 1000));
     return connectBrowser();
   }
 
   try {
     browser = await puppeteer.connect({
-      browserWSEndpoint: browserWSEndpoint.endpoint,
+      browserWSEndpoint: browserEndpoint,
     });
     logger.info('Connect browser success');
   } catch (err) {
     logger.warn('Connect browser failed, clear endpoint', err);
-    await useCache.remove(BROWSER_WS_ENDPOINT_KEY);
+    browserEndpoint = '';
     return null;
   }
 
@@ -114,10 +106,8 @@ export async function connectBrowser() {
 }
 
 export async function launchBrowser() {
-  await useCache.set(BROWSER_WS_ENDPOINT_KEY, {
-    endpoint: null,
-    status: BrowserStatus.Launching,
-  });
+  browserEndpoint = '';
+  browserStatus = BrowserStatus.Launching;
 
   try {
     browser = await puppeteer.launch({
@@ -149,17 +139,14 @@ export async function launchBrowser() {
     logger.info('Launch browser success');
   } catch (error) {
     logger.error('launch browser failed: ', error);
-    // cleanup browser endpoint
-    await useCache.remove(BROWSER_WS_ENDPOINT_KEY);
+    browserStatus = BrowserStatus.None;
+    browserEndpoint = '';
     throw error;
   }
 
   // save browserWSEndpoint to cache
-  const endpoint = await browser!.wsEndpoint();
-  await useCache.set(BROWSER_WS_ENDPOINT_KEY, {
-    endpoint,
-    status: BrowserStatus.Ready,
-  });
+  browserEndpoint = await browser!.wsEndpoint();
+  browserStatus = BrowserStatus.Ready;
 
   return browser;
 }
@@ -262,7 +249,8 @@ export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean }
   browser = null;
 
   clearBrowserActivatedTimer();
-  await useCache.remove(BROWSER_WS_ENDPOINT_KEY);
+  browserEndpoint = '';
+  browserStatus = BrowserStatus.None;
 
   logger.info('Close browser success');
 };

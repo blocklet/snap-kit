@@ -1,4 +1,3 @@
-import { components, env } from '@blocklet/sdk/lib/config';
 import Axios from 'axios';
 import { Request } from 'express';
 import flattenDeep from 'lodash/flattenDeep';
@@ -7,7 +6,9 @@ import { createHash } from 'node:crypto';
 import robotsParser from 'robots-parser';
 import { parseSitemap } from 'sitemap';
 import { Readable } from 'stream';
-import { joinURL } from 'ufo';
+import { joinURL, withQuery } from 'ufo';
+
+import { config, logger } from './config';
 
 export const axios = Axios.create({
   timeout: 1000 * 30,
@@ -16,18 +17,7 @@ export const axios = Axios.create({
   },
 });
 
-export const sleep = (ms: number) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-};
-
-export const CRAWLER_FLAG = 'x-snap-kit';
-
-export const isSelfCrawler = (req: Request) => {
-  const ua = req.get('user-agent') || '';
-  return req.get(CRAWLER_FLAG) === 'true' || ua.toLowerCase().indexOf('headless') !== -1;
-};
+export const CRAWLER_FLAG = 'x-arcblock-crawler';
 
 /**
  * A default set of user agent patterns for bots/crawlers that do not perform
@@ -86,14 +76,8 @@ const botUserAgents = [
   /adaptive-edge-crawler/i,
 ];
 
-const isSpider = (ua: string) =>
-  botUserAgents.some((spider) => {
-    return spider.test(ua);
-  });
-
 /**
- * A default set of file extensions for static assets that do not need to be
- * proxied.
+ * A default set of file extensions for static assets that do not need to be proxied.
  */
 const staticFileExtensions = [
   'ai',
@@ -139,58 +123,91 @@ const staticFileExtensions = [
   'zip',
 ];
 
-export const getDefaultRobotsUrl = (url: string) => {
-  const { origin } = new URL(url);
-  return joinURL(origin, 'robots.txt?nocache=1');
+export const sleep = (ms: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 };
 
+/**
+ * Check if the request is a arcblock crawler
+ */
+export const isSelfCrawler = (req: Request) => {
+  const ua = req.get('user-agent') || '';
+  return req.get(CRAWLER_FLAG) === 'true' || ua.toLowerCase().indexOf('headless') !== -1;
+};
+
+/**
+ * Check if the request is a static file
+ */
+export function isStaticFile(req: Request) {
+  const excludeUrlPattern = new RegExp(`\\.(${staticFileExtensions.join('|')})$`, 'i');
+  return excludeUrlPattern.test(req.path);
+}
+
+/**
+ * Check if the request is a spider
+ */
+export function isSpider(req: Request) {
+  const ua = req.get('user-agent') || '';
+  return botUserAgents.some((spider) => spider.test(ua));
+}
+
+/**
+ * Get and parse the robots.txt by `robots-parser`
+ */
 export async function getRobots(url: string) {
   const { origin } = new URL(url);
   const robotsUrl = joinURL(origin, 'robots.txt?nocache=1');
   const { data } = await axios.get(robotsUrl).catch(() => ({
-    data: '',
+    data: null,
   }));
 
   return data ? robotsParser(robotsUrl, data) : null;
 }
 
-export const getDefaultSitemapUrl = (url: string) => {
-  const { origin } = new URL(url);
-  return joinURL(origin, 'sitemap.xml?nocache=1');
-};
-
+/**
+ * Check if the url is allowed to crawl from robots.txt
+ */
 export const isAcceptCrawler = async (url: string) => {
   const robots = await getRobots(url);
   const isAllowed = robots ? await robots.isAllowed(url) : true;
   return isAllowed;
 };
 
+/**
+ * Get and parse the sitemap.xml by `sitemap` package
+ */
 export const getSitemapList = async (url: string) => {
-  let sitemapUrlList = [getDefaultSitemapUrl(url)];
-  const robots = await getRobots(url);
+  let sitemapUrlList: string[] = [];
 
+  const robots = await getRobots(url);
   if (robots) {
-    const robotsTxtSitemapUrlList = (await robots.getSitemaps()) || [];
-    if (robotsTxtSitemapUrlList.length > 0) {
-      sitemapUrlList = robotsTxtSitemapUrlList;
-    }
+    sitemapUrlList = (await robots.getSitemaps()) || [];
+  }
+
+  if (!sitemapUrlList.length) {
+    const { origin } = new URL(url);
+    sitemapUrlList.push(joinURL(origin, 'sitemap.xml?nocache=1'));
   }
 
   // loop site map url list
   const sitemapList = await Promise.all(
     sitemapUrlList.map(async (sitemapUrl) => {
-      const newUrl = new URL(sitemapUrl);
-      newUrl.searchParams.set('nocache', '1');
-      sitemapUrl = newUrl.toString();
+      sitemapUrl = withQuery(sitemapUrl, { nocache: '1' });
 
-      const { data: sitemapTxt } = await axios.get(sitemapUrl).catch(() => ({
-        data: '',
-      }));
+      try {
+        const { data: sitemapTxt } = await axios.get(sitemapUrl).catch(() => ({
+          data: '',
+        }));
 
-      if (sitemapTxt) {
-        const stream = Readable.from([sitemapTxt]);
-        const sitemapJson = await parseSitemap(stream);
-        return sitemapJson;
+        if (sitemapTxt) {
+          const stream = Readable.from([sitemapTxt]);
+          const sitemapJson = await parseSitemap(stream);
+          return sitemapJson;
+        }
+      } catch (error) {
+        logger.error(`Could not get sitemap from ${sitemapUrl}`, { error });
       }
 
       return [];
@@ -200,36 +217,12 @@ export const getSitemapList = async (url: string) => {
   return uniq(flattenDeep(sitemapList.filter(Boolean)));
 };
 
-export const isBotUserAgent = (req: Request) => {
-  const ua = req.get('user-agent');
-  const excludeUrlPattern = new RegExp(`\\.(${staticFileExtensions.join('|')})$`, 'i');
-
-  if (ua === undefined || !isSpider(ua) || excludeUrlPattern.test(req.path)) {
-    return false;
-  }
-
-  return true;
-};
-
-export const getComponentInfo = () => {
-  return components.find((item) => item.did === env.componentDid) || {};
-};
-
 export const getFullUrl = (req: Request) => {
   const blockletPathname = req.headers['x-path-prefix']
     ? joinURL(req.headers['x-path-prefix'] as string, req.originalUrl)
     : req.originalUrl;
 
-  return joinURL(env.appUrl, blockletPathname);
-};
-
-export const getRelativePath = (url: string) => {
-  try {
-    return new URL(url).pathname;
-  } catch (error) {
-    // ignore error
-  }
-  return url;
+  return joinURL(config.appUrl, blockletPathname);
 };
 
 export const formatUrl = (url: string) => {

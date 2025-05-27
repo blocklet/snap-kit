@@ -14,7 +14,7 @@ export type Config = {
   appUrl: string;
   cacheDir: string;
   puppeteerPath?: string;
-  cron: {
+  siteCron: {
     sites: Site[];
     time: string;
     runOnInit: boolean;
@@ -34,7 +34,7 @@ export const config: Config = {
   cacheDir: process.env.BLOCKLET_CACHE_DIR!,
 
   // cron
-  cron: {
+  siteCron: {
     sites: [],
     time: '0 0 */12 * * *',
     runOnInit: false,

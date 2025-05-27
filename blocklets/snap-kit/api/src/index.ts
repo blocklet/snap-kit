@@ -1,4 +1,4 @@
-import { initCrawler } from '@arcblock/crawler';
+import { createSnapKit, initCrawler } from '@arcblock/crawler';
 import createLogger from '@blocklet/logger';
 import { env } from '@blocklet/sdk/lib/config';
 // import fallback from '@blocklet/sdk/lib/middlewares/fallback';
@@ -14,12 +14,11 @@ import routes from './routes';
 const { name, version } = require('../../package.json');
 
 initCrawler({
-  cron: {
+  siteCron: {
     sites: [
       {
-        url: 'https://www.staging.arcblock.io',
-        pathname: '/content/discussions',
-        interval: 1,
+        url: 'https://bbqaymu4kjfkin6caatebvo7m4uak4t4eoqfircjfpi.did.abtnet.io',
+        pathname: '/',
       },
     ],
     runOnInit: true,
@@ -36,11 +35,21 @@ app.use(express.urlencoded({ extended: true, limit: '1 mb' }));
 app.use(cors());
 
 const router = express.Router();
-
 router.use('/api', routes);
 
 app.use(router);
 app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '365d', index: false }));
+
+app.use(
+  createSnapKit({
+    endpoint: env.appUrl,
+    accessKey: process.env.SNAP_KIT_ACCESS_KEY!,
+    autoReturnHtml: true,
+    allowCrawler: (req) => {
+      return req.path === '/';
+    },
+  }),
+);
 
 // const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
 // if (isProduction) {

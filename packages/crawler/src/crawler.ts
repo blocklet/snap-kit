@@ -161,7 +161,6 @@ function formatHtml(htmlString: string) {
 
 export const getPageContent = async ({
   url,
-  formatPageContent,
   includeScreenshot = true,
   includeHtml = true,
   width = 1440,
@@ -171,7 +170,6 @@ export const getPageContent = async ({
   fullPage = false,
 }: {
   url: string;
-  formatPageContent?: Function;
   includeScreenshot?: boolean;
   includeHtml?: boolean;
   width?: number;
@@ -225,11 +223,15 @@ export const getPageContent = async ({
     // get html
     if (includeHtml) {
       try {
-        if (formatPageContent) {
-          html = await formatPageContent({ page, url });
-        } else {
-          html = await page.content();
-        }
+        html = await page.evaluate(() => {
+          // add meta tag to record crawler
+          const meta = document.createElement('meta');
+          meta.name = 'arcblock-crawler';
+          meta.content = 'true';
+          document.head.appendChild(meta);
+
+          return document.documentElement.outerHTML;
+        });
       } catch (err) {
         logger.error('Failed to get html:', err);
         throw err;
