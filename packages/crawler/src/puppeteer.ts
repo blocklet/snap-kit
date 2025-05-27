@@ -1,6 +1,6 @@
 // import fs from 'fs-extra';
 // import path from 'path';
-import puppeteer, { Browser, Page } from '@blocklet/puppeteer';
+import puppeteer, { Browser, Page, ResourceType } from '@blocklet/puppeteer';
 import { env } from '@blocklet/sdk/lib/config';
 import fs from 'fs-extra';
 import path from 'path';
@@ -50,12 +50,11 @@ export async function ensurePuppeteerrc() {
 
 export async function ensureBrowser() {
   const puppeteerConfig = await ensurePuppeteerrc();
+  const executablePath = config.puppeteerPath;
 
-  const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium';
+  logger.debug('executablePath', executablePath);
 
-  logger.info('executablePath', executablePath);
-
-  if (!fs.existsSync(executablePath)) {
+  if (!executablePath || !fs.existsSync(executablePath)) {
     logger.info('start download browser', puppeteerConfig);
     const { downloadBrowser } = await (async () => {
       try {
@@ -76,7 +75,7 @@ export async function ensureBrowser() {
   }
 
   // try to launch browser
-  if (config.testOnInitialize) {
+  if (config.isProd) {
     const browser = await launchBrowser();
     if (!browser) {
       throw new Error('Failed to launch browser');
@@ -121,7 +120,6 @@ export async function launchBrowser() {
   });
 
   try {
-    // @ts-ignore
     browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -208,6 +206,7 @@ export const getBrowser = async () => {
   if (connectedBrowser) {
     logger.debug('getBrowser.connectedBrowser');
     browser = connectedBrowser;
+    checkBrowserActivated();
     return browser;
   }
 
@@ -268,7 +267,7 @@ export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean }
   logger.info('Close browser success');
 };
 
-export async function initPage({ abortResourceTypes = [] } = {}) {
+export async function initPage({ abortResourceTypes = [] }: { abortResourceTypes?: ResourceType[] } = {}) {
   const browser = await getBrowser();
   const page = await browser.newPage();
   await page.setViewport({ width: 1440, height: 900 });
@@ -283,8 +282,7 @@ export async function initPage({ abortResourceTypes = [] } = {}) {
   if (abortResourceTypes.length > 0) {
     await page.setRequestInterception(true);
 
-    page.on('request', (req: any) => {
-      // @ts-ignore
+    page.on('request', (req) => {
       if (abortResourceTypes.includes(req.resourceType())) {
         return req.abort();
       }

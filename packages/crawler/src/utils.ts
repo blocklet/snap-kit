@@ -1,5 +1,6 @@
 import { components, env } from '@blocklet/sdk/lib/config';
-import axios from 'axios';
+import Axios from 'axios';
+import { Request } from 'express';
 import flattenDeep from 'lodash/flattenDeep';
 import uniq from 'lodash/uniq';
 import { createHash } from 'node:crypto';
@@ -8,8 +9,8 @@ import { parseSitemap } from 'sitemap';
 import { Readable } from 'stream';
 import { joinURL } from 'ufo';
 
-export const api = axios.create({
-  timeout: 1000 * 10,
+export const axios = Axios.create({
+  timeout: 1000 * 30,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -21,11 +22,11 @@ export const sleep = (ms: number) => {
   });
 };
 
-export const CRAWLER_FLAG = 'x-crawler';
+export const CRAWLER_FLAG = 'x-snap-kit';
 
-export const isSelfCrawler = (req: any) => {
+export const isSelfCrawler = (req: Request) => {
   const ua = req.get('user-agent') || '';
-  return req.get(CRAWLER_FLAG) === 'true' || `${ua}`.toLowerCase().indexOf('headless') !== -1;
+  return req.get(CRAWLER_FLAG) === 'true' || ua.toLowerCase().indexOf('headless') !== -1;
 };
 
 /**
@@ -146,7 +147,7 @@ export const getDefaultRobotsUrl = (url: string) => {
 export async function getRobots(url: string) {
   const { origin } = new URL(url);
   const robotsUrl = joinURL(origin, 'robots.txt?nocache=1');
-  const { data } = await api.get(robotsUrl).catch(() => ({
+  const { data } = await axios.get(robotsUrl).catch(() => ({
     data: '',
   }));
 
@@ -182,7 +183,7 @@ export const getSitemapList = async (url: string) => {
       newUrl.searchParams.set('nocache', '1');
       sitemapUrl = newUrl.toString();
 
-      const { data: sitemapTxt } = await api.get(sitemapUrl).catch(() => ({
+      const { data: sitemapTxt } = await axios.get(sitemapUrl).catch(() => ({
         data: '',
       }));
 
@@ -199,7 +200,7 @@ export const getSitemapList = async (url: string) => {
   return uniq(flattenDeep(sitemapList.filter(Boolean)));
 };
 
-export const isBotUserAgent = (req: any) => {
+export const isBotUserAgent = (req: Request) => {
   const ua = req.get('user-agent');
   const excludeUrlPattern = new RegExp(`\\.(${staticFileExtensions.join('|')})$`, 'i');
 
@@ -214,9 +215,9 @@ export const getComponentInfo = () => {
   return components.find((item) => item.did === env.componentDid) || {};
 };
 
-export const getFullUrl = (req) => {
+export const getFullUrl = (req: Request) => {
   const blockletPathname = req.headers['x-path-prefix']
-    ? joinURL(req.headers['x-path-prefix'], req.originalUrl)
+    ? joinURL(req.headers['x-path-prefix'] as string, req.originalUrl)
     : req.originalUrl;
 
   return joinURL(env.appUrl, blockletPathname);

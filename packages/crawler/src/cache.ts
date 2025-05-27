@@ -11,6 +11,8 @@ export const cachePool = createPool(
   {
     create: async () => {
       try {
+        logger.info('Connecting to Redis...');
+
         const { redisUrl } = config;
         const redisClient = createClient({
           url: redisUrl,
@@ -31,8 +33,8 @@ export const cachePool = createPool(
 
         return redisClient;
       } catch (error) {
-        logger.warn('Redis connection failed', error);
-        return null;
+        logger.error('Redis connection failed', error);
+        throw error;
       }
     },
     destroy: async (client: any) => {

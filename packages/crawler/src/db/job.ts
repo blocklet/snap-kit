@@ -11,6 +11,7 @@ export interface JobState {
   quality?: number;
   timeout?: number;
   fullPage?: boolean;
+  lastModified?: string;
 }
 
 export interface JobModel {

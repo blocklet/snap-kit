@@ -10,7 +10,7 @@ export async function ensureDatabase() {
   const sequelize = new Sequelize({
     dialect: SqliteDialect,
     storage: path.join(config.dataDir, 'snap-kit.db'),
-    logging: (msg) => logger.debug(msg),
+    logging: (msg) => process.env.SQLITE_LOG && logger.debug(msg),
   });
 
   await initSnapshotModel(sequelize);

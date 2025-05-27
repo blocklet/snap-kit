@@ -218,15 +218,21 @@ export const getPageContent = async ({
         screenshot = await page.screenshot({ fullPage, quality, type: 'webp' });
       } catch (err) {
         logger.error('Failed to get screenshot:', err);
+        throw err;
       }
     }
 
     // get html
     if (includeHtml) {
-      if (formatPageContent) {
-        html = await formatPageContent({ page, url });
-      } else {
-        html = await page.content();
+      try {
+        if (formatPageContent) {
+          html = await formatPageContent({ page, url });
+        } else {
+          html = await page.content();
+        }
+      } catch (err) {
+        logger.error('Failed to get html:', err);
+        throw err;
       }
     }
   } catch (error) {
@@ -244,14 +250,19 @@ export const getPageContent = async ({
   };
 };
 
-export async function createCrawlJob(params: JobState, callback?: (snapshot: SnapshotModel | null) => void) {
+/**
+ * crawl url and return job id
+ * @param params
+ * @param callback callback when job finished
+ */
+export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
   params = {
     ...params,
     url: formatUrl(params.url),
   };
 
   // skip duplicate job
-  const existsJob = await getJob({
+  const duplicateJob = await getJob({
     url: params.url,
     includeScreenshot: params.includeScreenshot,
     includeHtml: params.includeHtml,
@@ -261,12 +272,12 @@ export async function createCrawlJob(params: JobState, callback?: (snapshot: Sna
     fullPage: params.fullPage,
   });
 
-  logger.info('create crawl job', params);
-
-  if (existsJob) {
+  if (duplicateJob) {
     logger.warn(`Crawl job already exists for ${params.url}, skip`);
-    return existsJob.id;
+    return duplicateJob.id;
   }
+
+  logger.info('create crawl job', params);
 
   const jobId = randomUUID();
   const job = crawlQueue.push({ ...params, id: jobId });
@@ -284,7 +295,6 @@ export async function createCrawlJob(params: JobState, callback?: (snapshot: Sna
   return jobId;
 }
 
-// @ts-ignore
 export async function getJob(condition: Partial<JobState>) {
   const where = Object.keys(condition)
     .filter((key) => condition[key] !== undefined)
@@ -307,9 +317,9 @@ export async function getJob(condition: Partial<JobState>) {
 
 function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapshot?: Partial<SnapshotModel> }) {
   return {
-    // @ts-ignore
     jobId: job.jobId || job.id,
     url: job.url,
+    lastModified: job.lastModified || new Date().toISOString(),
     options: {
       width: job.width,
       height: job.height,
@@ -346,10 +356,10 @@ export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<ke
  * get snapshot from db or crawl queue
  */
 export async function getSnapshot(jobId: string) {
-  const snapshotModel = await Snapshot.findByPk(jobId);
+  const snapshot = await Snapshot.findByPk(jobId);
 
-  if (snapshotModel) {
-    return snapshotModel.toJSON();
+  if (snapshot) {
+    return snapshot.toJSON();
   }
 
   const job = await getJob({ id: jobId });
@@ -361,4 +371,19 @@ export async function getSnapshot(jobId: string) {
   }
 
   return null;
+}
+
+export async function getSnapshotByUrl(url: string) {
+  const snapshot = await Snapshot.findOne({
+    where: {
+      url,
+      status: 'success',
+    },
+    order: [
+      ['lastModified', 'DESC'],
+      ['updatedAt', 'DESC'],
+    ],
+  });
+
+  return snapshot?.toJSON();
 }

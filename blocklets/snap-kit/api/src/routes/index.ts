@@ -1,4 +1,4 @@
-import { createCrawlJob, formatSnapshot, getSnapshot } from '@arcblock/crawler';
+import { crawlSite, crawlUrl, formatSnapshot, getSnapshot, getSnapshotByUrl } from '@arcblock/crawler';
 import { Joi } from '@arcblock/validator';
 import { Router } from 'express';
 
@@ -19,7 +19,7 @@ const crawlSchema = Joi.object({
 router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlSchema.validateAsync(req.body);
 
-  const jobId = await createCrawlJob(
+  const jobId = await crawlUrl(
     {
       ...params,
       timeout: params.timeout * 1000,
@@ -50,11 +50,13 @@ router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, 
  * Get html crawl result
  */
 const crawlGetSchema = Joi.object({
-  jobId: Joi.string().required(),
-});
+  jobId: Joi.string(),
+  url: Joi.string().uri(),
+}).or('jobId', 'url');
+
 router.get('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlGetSchema.validateAsync(req.query);
-  const snapshot = await getSnapshot(params.jobId);
+  const snapshot = params.jobId ? await getSnapshot(params.jobId) : await getSnapshotByUrl(params.url);
 
   return res.json({
     code: 'ok',
@@ -77,7 +79,7 @@ const snapSchema = Joi.object({
 router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await snapSchema.validateAsync(req.body);
 
-  const jobId = await createCrawlJob(
+  const jobId = await crawlUrl(
     {
       ...params,
       timeout: params.timeout * 1000,
@@ -119,6 +121,18 @@ router.get('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, re
   return res.json({
     code: 'ok',
     data: snapshot ? await formatSnapshot(snapshot, ['jobId', 'url', 'screenshot', 'status', 'error']) : null,
+  });
+});
+
+router.post('/test', async (req, res) => {
+  const jobIds = await crawlSite({
+    url: 'https://www.blocklet.io/',
+    pathname: '/payment-kit',
+  });
+
+  res.json({
+    code: 'ok',
+    data: jobIds,
   });
 });
 

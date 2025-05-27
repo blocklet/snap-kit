@@ -14,7 +14,16 @@ import routes from './routes';
 const { name, version } = require('../../package.json');
 
 initCrawler({
-  redisUrl: process.env.REDIS_URL,
+  cron: {
+    sites: [
+      {
+        url: 'https://www.staging.arcblock.io',
+        pathname: '/content/discussions',
+        interval: 1,
+      },
+    ],
+    runOnInit: true,
+  },
 });
 
 export const app = express();

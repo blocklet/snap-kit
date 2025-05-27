@@ -1,46 +1,125 @@
-import { useCache } from './cache';
-import { getFullUrl, isAcceptCrawler, isBotUserAgent, isSelfCrawler } from './utils';
+import { NextFunction, Request, Response } from 'express';
+import { LRUCache } from 'lru-cache';
+import { joinURL } from 'ufo';
 
-export function initSEOMiddleware({
+import { logger } from './config';
+import { axios, getFullUrl, isAcceptCrawler, isBotUserAgent, isSelfCrawler } from './utils';
+
+export type Cache = LRUCache<string, { html: string; lastModified: number; createdAt: string }>;
+
+export function createSnapKit({
+  endpoint,
+  accessKey,
+  cacheMax = 500,
+  cacheUpdateInterval = 1000 * 60 * 60 * 24,
   autoReturnHtml = true,
-  allowCrawler = true,
+  allowCrawler = () => true,
 }: {
-  autoReturnHtml?: Boolean;
-  allowCrawler?: Boolean | Function;
+  /** SnapKit endpoint */
+  endpoint: string;
+  /** SnapKit access key */
+  accessKey: string;
+  /** Max cache size for LRU cache */
+  cacheMax?: number;
+  /**
+   * Cache update interval
+   * When cache exceeds this time, it will try to fetch and update cache from SnapKit
+   */
+  cacheUpdateInterval?: number;
+  /** Call res.send(html) when cache hit */
+  autoReturnHtml?: boolean;
+  /** Custom function to determine whether to return cached content */
+  allowCrawler?: (req: Request) => boolean;
 }) {
-  return async (req: any, res: any, next: Function) => {
-    const isBot = isBotUserAgent(req);
-    const isSelf = isSelfCrawler(req);
+  const cache: Cache = new LRUCache({
+    max: cacheMax,
+  });
 
-    if (!isBot || isSelf) {
+  /**
+   * fetch content from SnapKit and cache it
+   */
+  async function fetchSnapKit(url: string) {
+    const api = joinURL(endpoint, '/crawl');
+
+    try {
+      const { data: snapshot } = await axios.get(api, {
+        params: {
+          url,
+        },
+      });
+
+      if (snapshot?.status !== 'success') {
+        logger.error('Failed to fetch content by SnapKit', { url, snapshot });
+        return;
+      }
+
+      cache.set(url, {
+        html: snapshot.html,
+        lastModified: snapshot.lastModified,
+        createdAt: new Date().toISOString(),
+      });
+      logger.info('Success to fetch content by SnapKit and cache it', { url });
+
+      return snapshot;
+    } catch (error) {
+      logger.error('Failed to fetch content by SnapKit', { url, error });
+    }
+  }
+
+  function isCacheExpired(url: string) {
+    const cachedContent = cache.get(url);
+    if (!cachedContent) {
+      return true;
+    }
+    return Date.now() - new Date(cachedContent.createdAt).getTime() > cacheUpdateInterval;
+  }
+
+  return async (req: Request, res: Response, next: NextFunction) => {
+    if (!accessKey || !endpoint) {
+      throw new Error('accessKey and endpoint are required');
+    }
+
+    if (!allowCrawler(req)) {
       return next();
     }
 
     const fullUrl = getFullUrl(req);
-    const canCrawl = await isAcceptCrawler(fullUrl);
-    const allowCrawlerResult = typeof allowCrawler === 'function' ? allowCrawler(req) : allowCrawler;
 
-    // can not crawl, skip
-    if (!canCrawl || !allowCrawlerResult) {
+    // Always fetch content from SnapKit and cache it, even for non-crawler requests
+    if (isCacheExpired(fullUrl)) {
+      fetchSnapKit(fullUrl);
+    }
+
+    if (!isBotUserAgent(req) || isSelfCrawler(req)) {
       return next();
     }
 
-    const cacheData = await useCache.get(fullUrl);
+    const canCrawl = await isAcceptCrawler(fullUrl);
 
-    // add cached html to req
-    req.cachedHtml = cacheData?.content || cacheData || null;
-    // add cached lastModified to req, ISO string to GMT string
-    req.cachedLastmod = cacheData?.lastModified ? new Date(cacheData?.lastModified).toUTCString() : null;
-
-    if (req.cachedLastmod) {
-      res.setHeader('Last-Modified', req.cachedLastmod);
+    if (!canCrawl) {
+      return next();
     }
 
-    if (autoReturnHtml && req.cachedHtml) {
-      res.send(req.cachedHtml);
-      return;
+    // cache hit
+    const cachedContent = cache.get(fullUrl);
+    if (cachedContent) {
+      // @ts-ignore
+      req.cachedHtml = cachedContent.html;
+
+      if (cachedContent.lastModified) {
+        // @ts-ignore
+        req.cachedLastmod = new Date(cachedContent.lastModified).toUTCString();
+        res.setHeader('Last-Modified', cachedContent.lastModified);
+      }
+
+      if (autoReturnHtml) {
+        res.send(cachedContent.html);
+        return;
+      }
+
+      return next();
     }
-    // missing cache
-    next();
+
+    return next();
   };
 }
