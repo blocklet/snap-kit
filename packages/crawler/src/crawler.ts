@@ -253,22 +253,6 @@ export const getPageContent = async ({
       logger.error('Failed to get html:', err);
       throw err;
     }
-
-    // get meta
-    try {
-      html = await page.evaluate(() => {
-        // add meta tag to record crawler
-        const meta = document.createElement('meta');
-        meta.name = 'arcblock-crawler';
-        meta.content = 'true';
-        document.head.appendChild(meta);
-
-        return document.documentElement.outerHTML;
-      });
-    } catch (err) {
-      logger.error('Failed to get html:', err);
-      throw err;
-    }
   } catch (error) {
     logger.error('Failed to get page content:', error);
     throw error;
@@ -309,7 +293,7 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
     })) || {};
 
   if (duplicateJob) {
-    logger.warn(`Crawl job already exists for ${params.url}, skip`);
+    logger.info(`Crawl job already exists for ${params.url}, skip`);
     return duplicateJob.id;
   }
 

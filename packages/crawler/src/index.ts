@@ -16,7 +16,7 @@ type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } 
 export async function initCrawler(params: DeepPartial<Pick<Config, 'puppeteerPath' | 'siteCron'>>) {
   merge(config, params);
 
-  logger.info('Init crawler', config);
+  logger.info('Init crawler', { params, config });
 
   try {
     await initDatabase();

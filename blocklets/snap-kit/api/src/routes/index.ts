@@ -2,6 +2,8 @@ import { crawlUrl, getLatestSnapshot, getSnapshot } from '@arcblock/crawler';
 import { Joi } from '@arcblock/validator';
 import { Router } from 'express';
 
+import { logger } from '../libs/logger';
+
 const middlewares = require('@blocklet/sdk/lib/middlewares');
 
 const router = Router();
@@ -59,6 +61,8 @@ router.get('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, r
   const snapshot = params.jobId ? await getSnapshot(params.jobId) : await getLatestSnapshot(params.url);
 
   delete snapshot?.screenshot;
+
+  logger.info('GET /crawl', { params, result: !!snapshot });
 
   return res.json({
     code: 'ok',
@@ -119,6 +123,8 @@ router.get('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, re
   const snapshot = await getSnapshot(params.jobId);
 
   delete snapshot?.html;
+
+  logger.info('GET /snap', { params, result: !!snapshot });
 
   return res.json({
     code: 'ok',

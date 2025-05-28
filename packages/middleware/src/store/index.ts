@@ -7,6 +7,8 @@ import { Snapshot } from './model-snapshot';
 export * from './model-snapshot';
 
 export async function initDatabase() {
+  logger.debug(`Init database at ${env.databasePath}`);
+
   const sequelize = new Sequelize({
     dialect: SqliteDialect,
     storage: env.databasePath,

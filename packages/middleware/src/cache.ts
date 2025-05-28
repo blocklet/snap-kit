@@ -1,5 +1,6 @@
 import { utils } from '@arcblock/crawler';
 import { LRUCache } from 'lru-cache';
+import Queue from 'queue';
 import { joinURL } from 'ufo';
 
 import { logger } from './env';
@@ -12,11 +13,12 @@ export type CacheManagerOptions = {
   accessKey: string;
   /** Max cache size for LRU cache */
   cacheMax?: number;
-  /**
-   * Cache update interval
-   * When cache exceeds this time, it will try to fetch and update cache from SnapKit
-   */
-  cacheUpdateInterval?: number;
+  /** When cache exceeds this time, it will try to fetch and update cache from SnapKit */
+  updateInterval?: number;
+  /** When failed cache exceeds this time, it will try to fetch and update cache from SnapKit */
+  failedUpdateInterval?: number;
+  /** Update queue concurrency */
+  updatedConcurrency?: number;
 };
 
 export class CacheManager {
@@ -26,13 +28,23 @@ export class CacheManager {
 
   private initializedPromise: Promise<any[]>;
 
+  private updateQueue: any;
+
   constructor(options: CacheManagerOptions) {
     this.options = {
       cacheMax: 500,
-      cacheUpdateInterval: 1000 * 60 * 60 * 24,
+      updateInterval: 1000 * 60 * 60 * 24,
+      failedUpdateInterval: 1000 * 60 * 60 * 24,
+      updatedConcurrency: 10,
       ...options,
     };
     this.cache = new LRUCache({ max: this.options.cacheMax || 500 });
+
+    this.updateQueue = new Queue({
+      autostart: true,
+      concurrency: this.options.updatedConcurrency,
+    });
+
     this.initializedPromise = Promise.all([initDatabase()]);
   }
 
@@ -91,7 +103,7 @@ export class CacheManager {
 
       return snapshotData;
     } catch (error) {
-      logger.error('Failed to fetch content by SnapKit', { url, error });
+      logger.error('Failed to fetch content by SnapKit', { url, error, data: error?.response?.data, accessKey });
       return null;
     }
   }
@@ -101,24 +113,27 @@ export class CacheManager {
     if (!snapshot) {
       return true;
     }
-    return Date.now() - new Date(snapshot.createdAt!).getTime() > this.options.cacheUpdateInterval;
+    const interval = snapshot.html ? this.options.updateInterval : this.options.failedUpdateInterval;
+    return Date.now() - new Date(snapshot.updatedAt!).getTime() > interval;
   }
 
   public async updateSnapshot(url: string) {
     try {
       const snapshot = await this.fetchSnapKit(url);
-      if (snapshot) {
-        // update db
-        const [updatedSnapshot] = await Snapshot.upsert({
-          url,
-          html: snapshot.html,
-          lastModified: snapshot.lastModified,
-        });
-        // update cache
-        this.cache.set(url, updatedSnapshot);
-      }
+      // update db
+      const [updatedSnapshot] = await Snapshot.upsert({
+        url,
+        html: snapshot?.html || '',
+        lastModified: snapshot?.lastModified,
+      });
+      // update cache
+      this.cache.set(url, updatedSnapshot);
     } catch (error) {
       logger.error('Failed to update snapshot', { url, error });
     }
+  }
+
+  public enqueueUpdateSnapshot(url: string) {
+    return this.updateQueue.push(() => this.updateSnapshot(url));
   }
 }
