@@ -13,8 +13,8 @@ async function main() {
   console.log(chalk.greenBright('[info]: blocklet version modified.'));
 
   console.log(chalk.greenBright(`[info]: start to modify packages version to ${version}`));
-  await $`cd packages/crawler && blocklet version ${version} && cd ../../`;
-  await $`cd packages/middleware && blocklet version ${version} && cd ../../`;
+  await $`cd packages/crawler && npm version ${version} && cd ../../`;
+  await $`cd packages/middleware && npm version ${version} && cd ../../`;
   console.log(chalk.greenBright('[info]: packages version modified.'));
 
   let newChangelog = '';

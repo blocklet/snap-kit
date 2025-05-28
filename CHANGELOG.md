@@ -1,3 +1,8 @@
+## 1.1.0 (2025-5-28)
+
+- feat: implement @arcblock/crawler-middleware
+- feat: enhance site crawler support and improved API endpoints
+
 ## 1.0.6 (2025-5-23)
 
 - feat: add actions for building docker images; update dockerfile for font and locale support
