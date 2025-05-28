@@ -24,7 +24,7 @@ export class CacheManager {
 
   private cache: LRUCache<string, SnapshotModel>;
 
-  private initializedPromise: Promise<void[]>;
+  private initializedPromise: Promise<any[]>;
 
   constructor(options: CacheManagerOptions) {
     this.options = {
@@ -32,7 +32,7 @@ export class CacheManager {
       cacheUpdateInterval: 1000 * 60 * 60 * 24,
       ...options,
     };
-    this.cache = new LRUCache({ max: options.cacheMax || 500 });
+    this.cache = new LRUCache({ max: this.options.cacheMax || 500 });
     this.initializedPromise = Promise.all([initDatabase()]);
   }
 
@@ -56,8 +56,8 @@ export class CacheManager {
   }
 
   public async setSnapshot(url: string, snapshot: SnapshotModel) {
-    this.cache.set(url, snapshot);
     await Snapshot.create(snapshot);
+    this.cache.set(url, snapshot);
   }
 
   public async fetchSnapKit(url: string) {

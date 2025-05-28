@@ -27,7 +27,6 @@
               "x-component-props": {
                 "title": "Site Url"
               },
-              "name": "",
               "x-designable-id": "a89gnk1caxv",
               "x-index": 0,
               "properties": {
@@ -52,7 +51,6 @@
               "x-component-props": {
                 "title": "Pathname"
               },
-              "name": "",
               "x-designable-id": "qgiensr1fix",
               "x-index": 1,
               "properties": {
@@ -78,7 +76,6 @@
               "x-component-props": {
                 "title": "Interval"
               },
-              "name": "",
               "x-designable-id": "w8kld6v7gf0",
               "x-index": 2,
               "properties": {
@@ -140,6 +137,6 @@
         }
       }
     },
-    "x-designable-id": "4wk51ka49fc"
+    "x-designable-id": "uci6n57xqgy"
   }
 }

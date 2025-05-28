@@ -9,7 +9,7 @@ import { parseSitemap } from 'sitemap';
 import { Readable } from 'stream';
 import { joinURL, withQuery } from 'ufo';
 
-import { config, logger } from './config';
+import { logger } from './config';
 
 export const axios = Axios.create({
   timeout: 1000 * 30,
@@ -160,9 +160,10 @@ export function isSpider(req: Request) {
 export async function getRobots(url: string) {
   const { origin } = new URL(url);
   const robotsUrl = joinURL(origin, 'robots.txt?nocache=1');
-  const { data } = await axios.get(robotsUrl).catch(() => ({
-    data: null,
-  }));
+  const { data } = await axios.get(robotsUrl).catch((error) => {
+    logger.warn(`Failed to fetch robots.txt from ${robotsUrl}:`, { error });
+    return { data: null };
+  });
 
   return data ? robotsParser(robotsUrl, data) : null;
 }
@@ -216,14 +217,6 @@ export const getSitemapList = async (url: string) => {
   );
 
   return uniq(flattenDeep(sitemapList.filter(Boolean)));
-};
-
-export const getFullUrl = (req: Request) => {
-  const blockletPathname = req.headers['x-path-prefix']
-    ? joinURL(req.headers['x-path-prefix'] as string, req.originalUrl)
-    : req.originalUrl;
-
-  return joinURL(config.appUrl, blockletPathname);
 };
 
 export const formatUrl = (url: string) => {

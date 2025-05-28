@@ -1,5 +1,5 @@
 import { initCrawler } from '@arcblock/crawler';
-import { createSnapshotMiddleware } from '@arcblock/crawler-middleware';
+// import { createSnapshotMiddleware } from '@arcblock/crawler-middleware';
 import createLogger from '@blocklet/logger';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -13,10 +13,12 @@ import routes from './routes';
 
 const { name, version } = require('../../package.json');
 
+logger.debug('env', env);
+
 initCrawler({
   siteCron: {
     sites: env.preferences.siteCron || [],
-    runOnInit: env.isDev,
+    runOnInit: env.runCronOnInit,
   },
 });
 
@@ -35,17 +37,17 @@ router.use('/api', routes);
 app.use(router);
 app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '365d', index: false }));
 
-if (env.isDev && process.env.SNAP_KIT_ACCESS_KEY) {
-  app.use(
-    createSnapshotMiddleware({
-      endpoint: process.env.SNAP_KIT_ENDPOINT || env.appUrl,
-      accessKey: process.env.SNAP_KIT_ACCESS_KEY,
-      allowCrawler: (req) => {
-        return req.path === '/';
-      },
-    }),
-  );
-}
+// if (process.env.SNAP_KIT_ACCESS_KEY) {
+//   app.use(
+//     createSnapshotMiddleware({
+//       endpoint: process.env.SNAP_KIT_ENDPOINT || env.appUrl,
+//       accessKey: process.env.SNAP_KIT_ACCESS_KEY,
+//       allowCrawler: (req) => {
+//         return req.path === '/';
+//       },
+//     }),
+//   );
+// }
 
 // const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
 // if (isProduction) {

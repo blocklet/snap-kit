@@ -1,6 +1,6 @@
 import uniq from 'lodash/uniq';
+import pMap from 'p-map';
 import { SitemapItem } from 'sitemap';
-import { joinURL } from 'ufo';
 
 import { Site, logger } from './config';
 import { crawlUrl } from './crawler';
@@ -15,44 +15,19 @@ function parseSitemapUrl(sitemapItem: SitemapItem) {
   return urls.map((url) => ({ url, sitemapItem }));
 }
 
-// function calculateNextCrawlDate(lastmod: string) {
-//   const now = new Date();
-//   const lastmodDate = new Date(lastmod);
-//   const daysDiff = (now.getTime() - lastmodDate.getTime()) / (24 * 60 * 60 * 1000);
-
-//   const CRAWL_INTERVALS = new Map<[number, number], number>([
-//     [[0, 3], 1], // 3 天内活跃
-//     [[3, 7], 3], // 7 天内活跃
-//     [[7, 30], 14], // 30 天内活跃
-//     [[30, 90], 30], // 90 天内活跃
-//     [[90, Infinity], 365], // 长期不活跃
-//   ]);
-
-//   let interval = 30;
-
-//   CRAWL_INTERVALS.forEach((value, [min, max]) => {
-//     if (daysDiff > min && daysDiff <= max) {
-//       interval = value;
-//     }
-//   });
-
-//   return new Date(now.getTime() + interval * 24 * 60 * 60 * 1000).toISOString();
-// }
-
 export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
-  const fullUrl = joinURL(url, pathname);
-
-  logger.info(`Start crawl from sitemap ${url} ${pathname}`);
+  logger.info(`Start crawl from sitemap ${url}`, { pathname });
 
   const sitemapList = await getSitemapList(url);
-
-  logger.info(`Found ${sitemapList.length} sitemap items from ${url} ${pathname}`);
+  const pathnameRegex = new RegExp(pathname);
 
   const sitemapItems = sitemapList
-    .filter((item) => pathname === '/' || item.url.indexOf(fullUrl) > -1)
+    .filter((item) => new URL(item.url).pathname.match(pathnameRegex))
     .flatMap((sitemapItem) => {
       return parseSitemapUrl(sitemapItem);
     });
+
+  logger.info(`Found ${sitemapItems.length} sitemap items which match ${pathname} from ${url}`);
 
   const crawlableItems = (
     await Promise.all(
@@ -78,26 +53,29 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
     )
   ).filter(Boolean) as { url: string; sitemapItem: SitemapItem }[];
 
-  logger.info(`Found ${crawlableItems.length} pages to crawl from sitemap ${url} ${pathname}`);
+  logger.info(`Found ${crawlableItems.length} pages to crawl from sitemap ${url}`, { pathname });
 
-  crawlBlockletRunningMap.set(fullUrl, crawlableItems);
+  const key = `${url}-${pathname}`;
+  crawlBlockletRunningMap.set(key, crawlableItems);
 
   try {
-    const jobIds = await Promise.all(
-      crawlableItems.map(({ url, sitemapItem }) => {
+    const jobIds = await pMap(
+      crawlableItems,
+      ({ url, sitemapItem }) => {
         return crawlUrl({
           url,
           lastModified: sitemapItem.lastmod,
-          includeScreenshot: true,
+          includeScreenshot: false,
           includeHtml: true,
         });
-      }),
+      },
+      { concurrency: 10 },
     );
     return jobIds;
   } catch (error) {
     logger.error(`Failed to crawl from sitemap ${url} ${pathname}`, error);
     throw new Error(error);
   } finally {
-    crawlBlockletRunningMap.delete(fullUrl);
+    crawlBlockletRunningMap.delete(key);
   }
 };

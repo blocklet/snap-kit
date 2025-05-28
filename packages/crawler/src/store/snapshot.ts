@@ -49,7 +49,7 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
           index: true,
         },
         status: {
-          type: DataTypes.ENUM('success', 'failed'),
+          type: DataTypes.ENUM('success', 'failed', 'pending'),
           allowNull: false,
         },
         html: {

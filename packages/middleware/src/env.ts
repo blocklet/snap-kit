@@ -4,6 +4,7 @@ import path from 'node:path';
 
 export const env = {
   databasePath: path.join(config.env.dataDir, 'crawler-middleware/snapshot.db'),
+  appUrl: config.env.appUrl,
 };
 
 export const logger = createLogger('@arcblock/crawler-middleware', { level: process.env.LOG_LEVEL || 'info' });

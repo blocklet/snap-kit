@@ -6,13 +6,21 @@ import { Snapshot } from './model-snapshot';
 
 export * from './model-snapshot';
 
-let sequelize: Sequelize;
-
 export async function initDatabase() {
-  sequelize = new Sequelize({
+  const sequelize = new Sequelize({
     dialect: SqliteDialect,
     storage: env.databasePath,
     logging: (msg) => process.env.SQLITE_LOG && logger.debug(msg),
+    pool: {
+      min: 0,
+      max: 10,
+      idle: 10000,
+    },
+    retry: {
+      match: [/SQLITE_BUSY/],
+      name: 'query',
+      max: 10,
+    },
   });
 
   Snapshot.initModel(sequelize);
@@ -30,4 +38,6 @@ export async function initDatabase() {
     logger.error('Failed to connect to database:', error);
     throw error;
   }
+
+  return sequelize;
 }

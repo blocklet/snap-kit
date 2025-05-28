@@ -6,6 +6,7 @@ import { joinURL } from 'ufo';
 import { config } from '../config';
 import { Job, JobState } from '../store/job';
 import { Snapshot, SnapshotModel } from '../store/snapshot';
+import { formatUrl } from '../utils';
 
 export function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapshot?: Partial<SnapshotModel> }) {
   return {
@@ -67,7 +68,7 @@ export async function getSnapshot(jobId: string) {
 export async function getLatestSnapshot(url: string) {
   const snapshot = await Snapshot.findSnapshot({
     where: {
-      url,
+      url: formatUrl(url),
       status: 'success',
     },
   });

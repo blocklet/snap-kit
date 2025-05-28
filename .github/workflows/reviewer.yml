@@ -33,7 +33,9 @@ jobs:
           path_filters: |
             !**/*.md
             !**/package.json
+            !**/pnpm-lock.yaml
             !**/blocklet.yml
+            !**/blocklet.prefs.json
             !**/types.js
             !**/*.d.ts
             !**/*.lock

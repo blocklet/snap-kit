@@ -1,10 +1,19 @@
 import { utils } from '@arcblock/crawler';
 import { NextFunction, Request, Response } from 'express';
+import { joinURL } from 'ufo';
 
 import { CacheManager } from './cache';
-import { logger } from './env';
+import { env, logger } from './env';
 
-const { getFullUrl, isSelfCrawler, isSpider, isStaticFile } = utils;
+const { isSelfCrawler, isSpider, isStaticFile } = utils;
+
+function getFullUrl(req: Request) {
+  const blockletPathname = req.headers['x-path-prefix']
+    ? joinURL(req.headers['x-path-prefix'] as string, req.originalUrl)
+    : req.originalUrl;
+
+  return joinURL(env.appUrl || req.get('host')!, blockletPathname);
+}
 
 export function createSnapshotMiddleware({
   endpoint,
@@ -30,6 +39,10 @@ export function createSnapshotMiddleware({
   /** Custom function to determine whether to return cached content */
   allowCrawler?: (req: Request) => boolean;
 }) {
+  if (!accessKey || !endpoint) {
+    throw new Error('accessKey and endpoint are required');
+  }
+
   const cacheManager = new CacheManager({
     endpoint,
     accessKey,
@@ -38,10 +51,6 @@ export function createSnapshotMiddleware({
   });
 
   return async (req: Request, res: Response, next: NextFunction) => {
-    if (!accessKey || !endpoint) {
-      throw new Error('accessKey and endpoint are required');
-    }
-
     await cacheManager.waitReady();
 
     if (!allowCrawler(req)) {

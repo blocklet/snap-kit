@@ -52,7 +52,8 @@ The options for createSnapshotMiddleware:
 
 When using this middleware outside of a Blocklet environment, you need to configure the following environment variables:
 
-- `BLOCKLET_APP_DATA_DIR`: Directory path for storing the sqlite file
-- `BLOCKLET_LOG_DIR`: Directory path for storing @blocklet/logger logs
+- `BLOCKLET_APP_DATA_DIR`: (Required) Directory path for storing the sqlite file
+- `BLOCKLET_LOG_DIR`: (Required) Directory path for storing @blocklet/logger logs
+- `BLOCKLET_APP_URL`: (Optional) Deployed domain
 
 You can set these variables in your `.env` file.

@@ -3,6 +3,7 @@ import createLogger from '@blocklet/logger';
 export type Site = {
   url: string;
   pathname: string;
+  /** Minimum crawl interval to avoid frequent crawling by scheduled tasks, in milliseconds */
   interval?: number;
 };
 

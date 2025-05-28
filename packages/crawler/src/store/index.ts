@@ -11,6 +11,16 @@ export async function initDatabase() {
     dialect: SqliteDialect,
     storage: path.join(config.dataDir, 'snap-kit.db'),
     logging: (msg) => process.env.SQLITE_LOG && logger.debug(msg),
+    pool: {
+      min: 0,
+      max: 10,
+      idle: 10000,
+    },
+    retry: {
+      match: [/SQLITE_BUSY/],
+      name: 'query',
+      max: 10,
+    },
   });
 
   Job.initModel(sequelize);
@@ -30,4 +40,6 @@ export async function initDatabase() {
     logger.error('Failed to connect to database:', error);
     throw error;
   }
+
+  return sequelize;
 }

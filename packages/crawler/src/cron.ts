@@ -8,6 +8,8 @@ let cron = null as any;
 export function initCron() {
   if (cron) return;
 
+  logger.info('Init cron', { config: config.siteCron });
+
   cron = Cron.init({
     context: {},
     jobs: [
@@ -16,8 +18,13 @@ export function initCron() {
         time: config.siteCron.time,
         options: { runOnInit: config.siteCron.runOnInit },
         fn: async () => {
+          logger.info('Start cron to crawl site', { sites: config.siteCron.sites });
           for (const site of config.siteCron.sites) {
-            await crawlSite(site);
+            try {
+              await crawlSite(site);
+            } catch (err) {
+              logger.error('Cron task error', { err, site });
+            }
           }
         },
       },

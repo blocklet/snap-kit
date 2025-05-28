@@ -99,6 +99,7 @@ export class Job extends Model<JobModel> implements JobModel {
       where: {
         [sequelize.Op.and]: where,
       },
+      order: [['createdAt', 'DESC']],
     });
 
     return job?.toJSON() || null;

@@ -84,7 +84,6 @@ export function createCrawlQueue() {
         return snapshot;
       } catch (error) {
         logger.error(`Failed to crawl ${job.url}`, { error, job });
-        console.error(error.stack);
 
         const snapshot = convertJobToSnapshot({
           job,

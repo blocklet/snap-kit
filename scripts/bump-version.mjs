@@ -12,6 +12,11 @@ async function main() {
   await $`cd blocklets/snap-kit && blocklet version ${version} && cd ../../`;
   console.log(chalk.greenBright('[info]: blocklet version modified.'));
 
+  console.log(chalk.greenBright(`[info]: start to modify packages version to ${version}`));
+  await $`cd packages/crawler && blocklet version ${version} && cd ../../`;
+  await $`cd packages/middleware && blocklet version ${version} && cd ../../`;
+  console.log(chalk.greenBright('[info]: packages version modified.'));
+
   let newChangelog = '';
   try {
     const gitRes = await $`git log --pretty=format:"- %s" "main"...HEAD`;
