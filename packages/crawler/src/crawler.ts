@@ -20,7 +20,7 @@ export function createCrawlQueue() {
 
   crawlQueue = createQueue({
     store: new SequelizeStore(db, 'crawler'),
-    concurrency: 1,
+    concurrency: config.siteCron.concurrency,
     onJob: async (job: JobState) => {
       logger.info('Starting to execute crawl job', job);
 
@@ -78,6 +78,7 @@ export function createCrawlQueue() {
             status: 'success',
             screenshot: screenshotPath?.replace(config.dataDir, ''),
             html: htmlPath?.replace(config.dataDir, ''),
+            meta: result.meta,
           },
         });
         await Snapshot.upsert(snapshot);
@@ -174,6 +175,7 @@ export const getPageContent = async ({
 
   let html: string | null = null;
   let screenshot: Uint8Array | null = null;
+  const meta: { title?: string; description?: string } = {};
 
   try {
     const response = await page.goto(url, { timeout });
@@ -222,21 +224,50 @@ export const getPageContent = async ({
     }
 
     // get html
-    if (includeHtml) {
-      try {
-        html = await page.evaluate(() => {
-          // add meta tag to record crawler
-          const meta = document.createElement('meta');
-          meta.name = 'arcblock-crawler';
-          meta.content = 'true';
-          document.head.appendChild(meta);
+    try {
+      const data = await page.evaluate(() => {
+        // add meta tag to record crawler
+        const meta = document.createElement('meta');
+        meta.name = 'arcblock-crawler';
+        meta.content = 'true';
+        document.head.appendChild(meta);
 
-          return document.documentElement.outerHTML;
-        });
-      } catch (err) {
-        logger.error('Failed to get html:', err);
-        throw err;
+        // get title and meta description
+        const title = document.title || '';
+        const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+
+        return {
+          html: document.documentElement.outerHTML,
+          title,
+          description,
+        };
+      });
+
+      meta.title = data.title;
+      meta.description = data.description;
+
+      if (includeHtml) {
+        html = data.html;
       }
+    } catch (err) {
+      logger.error('Failed to get html:', err);
+      throw err;
+    }
+
+    // get meta
+    try {
+      html = await page.evaluate(() => {
+        // add meta tag to record crawler
+        const meta = document.createElement('meta');
+        meta.name = 'arcblock-crawler';
+        meta.content = 'true';
+        document.head.appendChild(meta);
+
+        return document.documentElement.outerHTML;
+      });
+    } catch (err) {
+      logger.error('Failed to get html:', err);
+      throw err;
     }
   } catch (error) {
     logger.error('Failed to get page content:', error);
@@ -250,6 +281,7 @@ export const getPageContent = async ({
   return {
     html,
     screenshot,
+    meta,
   };
 };
 

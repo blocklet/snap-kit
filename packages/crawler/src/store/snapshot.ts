@@ -8,6 +8,10 @@ export interface SnapshotModel {
   screenshot?: string | null;
   error?: string;
   lastModified?: string;
+  meta?: {
+    title?: string;
+    description?: string;
+  };
   options?: {
     width?: number;
     height?: number;
@@ -32,6 +36,8 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
   public error?: SnapshotModel['error'];
 
   public lastModified?: SnapshotModel['lastModified'];
+
+  public meta?: SnapshotModel['meta'];
 
   public options!: SnapshotModel['options'];
 
@@ -66,6 +72,10 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
         },
         lastModified: {
           type: DataTypes.STRING,
+          allowNull: true,
+        },
+        meta: {
+          type: DataTypes.JSON,
           allowNull: true,
         },
         options: {

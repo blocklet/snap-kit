@@ -61,7 +61,6 @@ export function createSnapshotMiddleware({
 
     // Always fetch content from SnapKit and cache it, even for non-crawler requests
     if (await cacheManager.isCacheExpired(fullUrl)) {
-      logger.info(`Cache expired for ${fullUrl}, fetching from SnapKit`);
       // Don't await here, the cache will be effective after the next request
       cacheManager.updateSnapshot(fullUrl);
     }
@@ -73,6 +72,8 @@ export function createSnapshotMiddleware({
     // cache hit
     const cachedSnapshot = await cacheManager.getSnapshot(fullUrl);
     if (cachedSnapshot) {
+      logger.info(`Cache hit: ${fullUrl}`);
+
       // @ts-ignore
       req.cachedHtml = cachedSnapshot.html;
 
@@ -94,7 +95,7 @@ export function createSnapshotMiddleware({
       return next();
     }
 
-    logger.debug(`Cache not hit: ${fullUrl}`);
+    logger.info(`Cache miss: ${fullUrl}`);
     return next();
   };
 }

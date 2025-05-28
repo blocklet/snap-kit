@@ -34,7 +34,7 @@ export async function initDatabase() {
     ]);
 
     await sequelize.authenticate();
-    await sequelize.sync();
+    await sequelize.sync({ alter: process.env.ALERT_SQLITE === 'true' });
     logger.info('Successfully connected to database');
   } catch (error) {
     logger.error('Failed to connect to database:', error);
