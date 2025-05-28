@@ -20,7 +20,7 @@ export function createCrawlQueue() {
 
   crawlQueue = createQueue({
     store: new SequelizeStore(db, 'crawler'),
-    concurrency: config.siteCron.concurrency,
+    concurrency: config.siteCron.crawlConcurrency,
     onJob: async (job: JobState) => {
       logger.info('Starting to execute crawl job', job);
 
@@ -204,7 +204,7 @@ export const getPageContent = async ({
       if (fullPage) {
         const maxScrollHeight = await findMaxScrollHeight(page);
 
-        logger.info('findMaxScrollHeight', { maxScrollHeight });
+        logger.debug('findMaxScrollHeight', { maxScrollHeight });
 
         if (maxScrollHeight) {
           await page.setViewport({ width, height: maxScrollHeight || height, deviceScaleFactor: 2 });

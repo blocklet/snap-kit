@@ -29,8 +29,11 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
 
   logger.info(`Found ${sitemapItems.length} sitemap items which match ${pathname} from ${url}`);
 
-  const crawlableItems = (
-    await pMap(
+  const key = `${url}-${pathname}`;
+  crawlBlockletRunningMap.set(key, true);
+
+  try {
+    const jobIds = await pMap(
       sitemapItems,
       async ({ url, sitemapItem }) => {
         const snapshot = await Snapshot.findOne({ where: { url: formatUrl(url) } });
@@ -49,21 +52,6 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
           }
         }
 
-        return { url, sitemapItem };
-      },
-      { concurrency: config.siteCron.sitemapConcurrency },
-    )
-  ).filter(Boolean) as { url: string; sitemapItem: SitemapItem }[];
-
-  logger.info(`Found ${crawlableItems.length} pages to crawl from sitemap ${url}`, { pathname });
-
-  const key = `${url}-${pathname}`;
-  crawlBlockletRunningMap.set(key, crawlableItems);
-
-  try {
-    const jobIds = await pMap(
-      crawlableItems,
-      ({ url, sitemapItem }) => {
         return crawlUrl({
           url,
           lastModified: sitemapItem.lastmod,
@@ -71,8 +59,9 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
           includeHtml: true,
         });
       },
-      { concurrency: config.siteCron.concurrency },
+      { concurrency: config.siteCron.sitemapConcurrency },
     );
+
     return jobIds;
   } catch (error) {
     logger.error(`Failed to crawl from sitemap ${url} ${pathname}`, error);

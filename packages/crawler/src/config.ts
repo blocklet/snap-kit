@@ -19,7 +19,7 @@ export type Config = {
     time: string;
     enabled: boolean;
     immediate: boolean;
-    concurrency: number;
+    crawlConcurrency: number;
     sitemapConcurrency: number;
   };
 };
@@ -41,7 +41,7 @@ export const config: Config = {
     enabled: true,
     time: '0 0 */12 * * *',
     immediate: false,
-    concurrency: 1,
-    sitemapConcurrency: 20,
+    crawlConcurrency: 1,
+    sitemapConcurrency: 30,
   },
 };
