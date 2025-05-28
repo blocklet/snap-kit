@@ -1,3 +1,8 @@
+## 1.1.2 (2025-5-28)
+
+- feat: support crawl title and description from page
+- feat: enhance blocklet studio configuration
+
 ## 1.1.1 (2025-5-28)
 
 - chore: remove npm version command from publish workflow
