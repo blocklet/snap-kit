@@ -49,7 +49,6 @@ jobs:
           npm config set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
           VERSION=$(cat version | awk '{$1=$1;print}')
           echo "publish version ${VERSION}"
-          pnpm -r --filter="*" exec -- npm version ${VERSION} --no-git-tag-version
           pnpm -r publish --no-git-checks
 
       - name: Upload to Test Store
