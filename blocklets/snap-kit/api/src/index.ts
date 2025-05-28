@@ -3,6 +3,7 @@ import { initCrawler } from '@arcblock/crawler';
 import createLogger from '@blocklet/logger';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import dotenv from 'dotenv-flow';
 import express from 'express';
 import 'express-async-errors';
 import path from 'path';
@@ -13,11 +14,14 @@ import routes from './routes';
 
 const { name, version } = require('../../package.json');
 
+dotenv.config();
+
+logger.debug('process.env', process.env);
 logger.debug('env', env);
 
 initCrawler({
   siteCron: {
-    sites: env.preferences.siteCron || [],
+    sites: env.siteCron,
     runOnInit: env.runCronOnInit,
   },
 });

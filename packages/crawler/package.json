@@ -1,9 +1,9 @@
 {
   "name": "@arcblock/crawler",
   "version": "1.1.0",
-  "main": "dist/index.js",
-  "module": "esm/index.js",
-  "types": "dist/index.d.ts",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/cjs/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -19,24 +19,19 @@
     "fix:sqlite": "cd node_modules/sqlite3 && npm run rebuild"
   },
   "files": [
-    "dist",
-    "esm"
+    "lib",
+    "*.d.ts"
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./lib/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./lib/cjs/index.js",
+      "import": "./lib/esm/index.js",
+      "types": "./lib/cjs/index.d.ts"
     },
     "./utils": {
-      "require": "./dist/utils.js",
-      "import": "./lib/utils.js",
-      "types": "./dist/utils.d.ts"
-    },
-    "./types": {
-      "require": "./dist/types.js",
-      "import": "./lib/types.js",
-      "types": "./dist/types.d.ts"
+      "require": "./lib/cjs/utils.js",
+      "import": "./lib/esm/utils.js",
+      "types": "./lib/cjs/utils.d.ts"
     }
   },
   "lint-staged": {

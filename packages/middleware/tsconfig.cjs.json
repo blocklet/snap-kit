@@ -4,6 +4,6 @@
   "exclude": ["node_modules", "tests"],
   "compilerOptions": {
     "module": "commonjs",
-    "outDir": "dist"
+    "outDir": "lib/cjs"
   }
 }

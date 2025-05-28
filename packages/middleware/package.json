@@ -1,9 +1,9 @@
 {
   "name": "@arcblock/crawler-middleware",
   "version": "1.1.0",
-  "main": "dist/index.js",
-  "module": "esm/index.js",
-  "types": "dist/index.d.ts",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/cjs/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
@@ -18,9 +18,16 @@
     "prepublishOnly": "npm run build"
   },
   "files": [
-    "dist",
-    "esm"
+    "lib",
+    "*.d.ts"
   ],
+  "exports": {
+    ".": {
+      "require": "./lib/cjs/index.js",
+      "import": "./lib/esm/index.js",
+      "types": "./lib/cjs/index.d.ts"
+    }
+  },
   "lint-staged": {
     "*.{mjs,js,jsx,ts,tsx}": [
       "prettier --write",

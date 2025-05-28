@@ -2,7 +2,7 @@ import uniq from 'lodash/uniq';
 import pMap from 'p-map';
 import { SitemapItem } from 'sitemap';
 
-import { Site, logger } from './config';
+import { Site, config, logger } from './config';
 import { crawlUrl } from './crawler';
 import { Snapshot } from './store/snapshot';
 import { formatUrl, getSitemapList } from './utils';
@@ -69,7 +69,7 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
           includeHtml: true,
         });
       },
-      { concurrency: 10 },
+      { concurrency: config.siteCron.concurrency },
     );
     return jobIds;
   } catch (error) {

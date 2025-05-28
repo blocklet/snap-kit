@@ -18,6 +18,7 @@ export type Config = {
     sites: Site[];
     time: string;
     runOnInit: boolean;
+    concurrency: number;
   };
 };
 
@@ -37,5 +38,6 @@ export const config: Config = {
     sites: [],
     time: '0 0 */12 * * *',
     runOnInit: false,
+    concurrency: 5,
   },
 };
