@@ -16,7 +16,7 @@ export function initCron() {
       {
         name: 'crawl-site',
         time: config.siteCron.time,
-        options: { runOnInit: config.siteCron.runOnInit },
+        options: { runOnInit: config.siteCron.immediate },
         fn: async () => {
           logger.info('Start cron to crawl site', { sites: config.siteCron.sites });
           for (const site of config.siteCron.sites) {

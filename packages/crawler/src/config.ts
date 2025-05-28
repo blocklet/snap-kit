@@ -17,7 +17,8 @@ export type Config = {
   siteCron: {
     sites: Site[];
     time: string;
-    runOnInit: boolean;
+    enabled: boolean;
+    immediate: boolean;
     concurrency: number;
   };
 };
@@ -36,8 +37,9 @@ export const config: Config = {
   // cron
   siteCron: {
     sites: [],
+    enabled: true,
     time: '0 0 */12 * * *',
-    runOnInit: false,
-    concurrency: 5,
+    immediate: false,
+    concurrency: 1,
   },
 };

@@ -14,15 +14,17 @@ export * as utils from './utils';
 type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
 export async function initCrawler(params: DeepPartial<Pick<Config, 'puppeteerPath' | 'siteCron'>>) {
-  logger.info('Init crawler', { params });
-
   merge(config, params);
+
+  logger.info('Init crawler', config);
 
   try {
     await initDatabase();
     await ensureBrowser();
     await createCrawlQueue();
-    await initCron();
+    if (config.siteCron.enabled) {
+      await initCron();
+    }
   } catch (err) {
     logger.error('Init crawler error', { err });
     throw err;
