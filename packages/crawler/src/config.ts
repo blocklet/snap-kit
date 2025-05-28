@@ -20,6 +20,7 @@ export type Config = {
     enabled: boolean;
     immediate: boolean;
     concurrency: number;
+    sitemapConcurrency: number;
   };
 };
 
@@ -41,5 +42,6 @@ export const config: Config = {
     time: '0 0 */12 * * *',
     immediate: false,
     concurrency: 1,
+    sitemapConcurrency: 20,
   },
 };

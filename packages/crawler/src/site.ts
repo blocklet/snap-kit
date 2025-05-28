@@ -30,8 +30,9 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
   logger.info(`Found ${sitemapItems.length} sitemap items which match ${pathname} from ${url}`);
 
   const crawlableItems = (
-    await Promise.all(
-      sitemapItems.map(async ({ url, sitemapItem }) => {
+    await pMap(
+      sitemapItems,
+      async ({ url, sitemapItem }) => {
         const snapshot = await Snapshot.findOne({ where: { url: formatUrl(url) } });
 
         if (snapshot?.lastModified) {
@@ -49,7 +50,8 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
         }
 
         return { url, sitemapItem };
-      }),
+      },
+      { concurrency: config.siteCron.sitemapConcurrency },
     )
   ).filter(Boolean) as { url: string; sitemapItem: SitemapItem }[];
 

@@ -260,7 +260,7 @@
                 "type": "string",
                 "x-component": "Text",
                 "x-component-props": {
-                  "content": "Interval: Minimum crawl interval (ms)",
+                  "content": "Interval: Minimum crawl interval (day)",
                   "mode": "p",
                   "style": {
                     "color": "#666",
@@ -289,6 +289,6 @@
         }
       }
     },
-    "x-designable-id": "2hyuplajm6p"
+    "x-designable-id": "9emekthhw40"
   }
 }
