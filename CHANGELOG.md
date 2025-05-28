@@ -1,3 +1,7 @@
+## 1.1.1 (2025-5-28)
+
+- chore: remove npm version command from publish workflow
+
 ## 1.1.0 (2025-5-28)
 
 - feat: implement @arcblock/crawler-middleware
