@@ -22,12 +22,6 @@ jobs:
           sha: ${{ github.event.pull_request.head.sha }}
           filterOutClosed: true
 
-      - name: Check WIP in PR Title
-        uses: embano1/wip@v1
-        with:
-          title: '${{ steps.PR.outputs.pr_title }}'
-          regex: '^WIP'
-
       - name: Checkout repo
         uses: actions/checkout@v4
 

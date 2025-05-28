@@ -50,12 +50,12 @@ importers:
 
   blocklets/snap-kit:
     dependencies:
-      '@abtnode/cron':
-        specifier: ^1.16.43
-        version: 1.16.43
       '@arcblock/crawler':
         specifier: workspace:*
         version: link:../../packages/crawler
+      '@arcblock/crawler-middleware':
+        specifier: workspace:*
+        version: link:../../packages/middleware
       '@arcblock/did-auth':
         specifier: ^1.19.15
         version: 1.20.11(encoding@0.1.13)
@@ -68,24 +68,9 @@ importers:
       '@blocklet/logger':
         specifier: ^1.16.43
         version: 1.16.43(encoding@0.1.13)
-      '@blocklet/puppeteer':
-        specifier: ^22.11.3
-        version: 22.11.3
       '@blocklet/sdk':
         specifier: ^1.16.43
         version: 1.16.43(encoding@0.1.13)
-      '@ocap/client':
-        specifier: ^1.19.15
-        version: 1.20.11(encoding@0.1.13)
-      '@ocap/mcrypto':
-        specifier: ^1.19.15
-        version: 1.20.11
-      '@ocap/util':
-        specifier: ^1.20.11
-        version: 1.20.11
-      '@ocap/wallet':
-        specifier: ^1.19.15
-        version: 1.20.11
       axios:
         specifier: ^1.7.9
         version: 1.9.0
@@ -104,39 +89,12 @@ importers:
       express-async-errors:
         specifier: ^3.1.1
         version: 3.1.1(express@4.21.2)
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.3.0
-      generic-pool:
-        specifier: ^3.9.0
-        version: 3.9.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
-      lru-cache:
-        specifier: ^10.4.3
-        version: 10.4.3
-      p-queue:
-        specifier: 6.6.2
-        version: 6.6.2
-      p-wait-for:
-        specifier: ^5.0.2
-        version: 5.0.2
-      redis:
-        specifier: ^4.7.0
-        version: 4.7.1
-      robots-parser:
-        specifier: ^3.0.1
-        version: 3.0.1
-      sitemap:
-        specifier: ^7.1.2
-        version: 7.1.2
       ufo:
         specifier: ^1.5.4
         version: 1.6.1
-      url-join:
-        specifier: ^4.0.1
-        version: 4.0.1
     devDependencies:
       '@blocklet/js-sdk':
         specifier: ^1.16.39
@@ -219,12 +177,6 @@ importers:
       '@abtnode/queue':
         specifier: ^1.16.43
         version: 1.16.43(encoding@0.1.13)
-      '@arcblock/did-auth':
-        specifier: ^1.19.15
-        version: 1.20.11(encoding@0.1.13)
-      '@arcblock/did-auth-storage-nedb':
-        specifier: ^1.7.1
-        version: 1.7.1
       '@blocklet/logger':
         specifier: ^1.16.43
         version: 1.16.43(encoding@0.1.13)
@@ -234,18 +186,6 @@ importers:
       '@blocklet/sdk':
         specifier: ^1.16.43
         version: 1.16.43(encoding@0.1.13)
-      '@ocap/client':
-        specifier: ^1.19.15
-        version: 1.20.11(encoding@0.1.13)
-      '@ocap/mcrypto':
-        specifier: ^1.19.15
-        version: 1.20.11
-      '@ocap/util':
-        specifier: ^1.20.11
-        version: 1.20.11
-      '@ocap/wallet':
-        specifier: ^1.19.15
-        version: 1.20.11
       '@sequelize/core':
         specifier: 7.0.0-alpha.46
         version: 7.0.0-alpha.46
@@ -255,21 +195,6 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.9.0
-      cookie-parser:
-        specifier: ^1.4.7
-        version: 1.4.7
-      cors:
-        specifier: ^2.8.5
-        version: 2.8.5
-      dotenv-flow:
-        specifier: ^4.1.0
-        version: 4.1.0
-      express:
-        specifier: ^4.21.2
-        version: 4.21.2
-      express-async-errors:
-        specifier: ^3.1.1
-        version: 3.1.1(express@4.21.2)
       fs-extra:
         specifier: ^11.2.0
         version: 11.3.0
@@ -282,12 +207,9 @@ importers:
       lru-cache:
         specifier: ^10.4.3
         version: 10.4.3
-      p-queue:
-        specifier: 6.6.2
-        version: 6.6.2
-      p-wait-for:
-        specifier: ^5.0.2
-        version: 5.0.2
+      p-map:
+        specifier: ^7.0.3
+        version: 7.0.3
       redis:
         specifier: ^4.7.0
         version: 4.7.1
@@ -306,19 +228,10 @@ importers:
       ufo:
         specifier: ^1.5.4
         version: 1.6.1
-      url-join:
-        specifier: ^4.0.1
-        version: 4.0.1
     devDependencies:
       '@blocklet/js-sdk':
         specifier: ^1.16.39
         version: 1.16.43
-      '@types/cookie-parser':
-        specifier: ^1.4.8
-        version: 1.4.8(@types/express@4.17.22)
-      '@types/cors':
-        specifier: ^2.8.17
-        version: 2.8.18
       '@types/dotenv-flow':
         specifier: ^3.3.3
         version: 3.3.3
@@ -334,18 +247,12 @@ importers:
       '@types/node':
         specifier: ^20.17.19
         version: 20.17.48
-      '@types/react':
-        specifier: ^18.3.18
-        version: 18.3.21
-      '@types/react-dom':
-        specifier: ^18.3.5
-        version: 18.3.7(@types/react@18.3.21)
-      '@vitejs/plugin-react':
-        specifier: ^4.3.4
-        version: 4.4.1(vite@5.4.19(@types/node@20.17.48))
       bumpp:
         specifier: ^9.11.1
         version: 9.11.1
+      express:
+        specifier: ^4.21.2
+        version: 4.21.2
       nodemon:
         specifier: ^3.1.9
         version: 3.1.10
@@ -355,30 +262,112 @@ importers:
       puppeteer:
         specifier: ^24.8.2
         version: 24.8.2(typescript@5.8.3)
-      react:
-        specifier: ~18.2.0
-        version: 18.2.0
-      react-dom:
-        specifier: ~18.2.0
-        version: 18.2.0(react@18.2.0)
-      react-router-dom:
-        specifier: ^6.29.0
-        version: 6.30.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      rimraf:
-        specifier: ^5.0.10
-        version: 5.0.10
       tsx:
         specifier: ^4.19.3
         version: 4.19.4
-      vite:
-        specifier: ^5.4.14
-        version: 5.4.19(@types/node@20.17.48)
-      vite-plugin-blocklet:
-        specifier: ^0.9.32
-        version: 0.9.32(rollup@4.41.0)(vite@5.4.19(@types/node@20.17.48))
-      vite-plugin-svgr:
-        specifier: ^4.3.0
-        version: 4.3.0(rollup@4.41.0)(typescript@5.8.3)(vite@5.4.19(@types/node@20.17.48))
+      zx:
+        specifier: ^8.3.2
+        version: 8.5.4
+
+  packages/middleware:
+    dependencies:
+      '@abtnode/cron':
+        specifier: ^1.16.43
+        version: 1.16.43
+      '@abtnode/models':
+        specifier: ^1.16.43
+        version: 1.16.43(@types/node@20.17.48)(encoding@0.1.13)
+      '@abtnode/queue':
+        specifier: ^1.16.43
+        version: 1.16.43(encoding@0.1.13)
+      '@arcblock/crawler':
+        specifier: workspace:*
+        version: link:../crawler
+      '@blocklet/logger':
+        specifier: ^1.16.43
+        version: 1.16.43(encoding@0.1.13)
+      '@blocklet/puppeteer':
+        specifier: ^22.11.3
+        version: 22.11.3
+      '@blocklet/sdk':
+        specifier: ^1.16.43
+        version: 1.16.43(encoding@0.1.13)
+      '@sequelize/core':
+        specifier: 7.0.0-alpha.46
+        version: 7.0.0-alpha.46
+      '@sequelize/sqlite3':
+        specifier: 7.0.0-alpha.46
+        version: 7.0.0-alpha.46
+      axios:
+        specifier: ^1.7.9
+        version: 1.9.0
+      fs-extra:
+        specifier: ^11.2.0
+        version: 11.3.0
+      generic-pool:
+        specifier: ^3.9.0
+        version: 3.9.0
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      lru-cache:
+        specifier: ^10.4.3
+        version: 10.4.3
+      redis:
+        specifier: ^4.7.0
+        version: 4.7.1
+      robots-parser:
+        specifier: ^3.0.1
+        version: 3.0.1
+      sequelize:
+        specifier: ^6.37.7
+        version: 6.37.7(sqlite3@5.1.7)
+      sitemap:
+        specifier: ^7.1.2
+        version: 7.1.2
+      sqlite3:
+        specifier: ^5.1.7
+        version: 5.1.7
+      ufo:
+        specifier: ^1.5.4
+        version: 1.6.1
+    devDependencies:
+      '@blocklet/js-sdk':
+        specifier: ^1.16.39
+        version: 1.16.43
+      '@types/dotenv-flow':
+        specifier: ^3.3.3
+        version: 3.3.3
+      '@types/express':
+        specifier: ^4.17.21
+        version: 4.17.22
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
+      '@types/lodash':
+        specifier: ^4.17.16
+        version: 4.17.16
+      '@types/node':
+        specifier: ^20.17.19
+        version: 20.17.48
+      bumpp:
+        specifier: ^9.11.1
+        version: 9.11.1
+      express:
+        specifier: ^4.21.2
+        version: 4.21.2
+      nodemon:
+        specifier: ^3.1.9
+        version: 3.1.10
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
+      puppeteer:
+        specifier: ^24.8.2
+        version: 24.8.2(typescript@5.8.3)
+      tsx:
+        specifier: ^4.19.3
+        version: 4.19.4
       zx:
         specifier: ^8.3.2
         version: 8.5.4
@@ -4811,9 +4800,9 @@ packages:
     resolution: {integrity: sha512-/bjOqmgETBYB5BoEeGVea8dmvHb2m9GLy1E9W43yeyfP6QQCZGFNa+XRceJEuDB6zqr+gKpIAmlLebMpykw/MQ==}
     engines: {node: '>=10'}
 
-  p-queue@6.6.2:
-    resolution: {integrity: sha512-RwFpb72c/BhQLEXIZ5K2e+AhgNVmIejGlTgiB9MzZ0e93GRvqZ7uSi0dvRF7/XIXDeNkra2fNHBxTyPDGySpjQ==}
-    engines: {node: '>=8'}
+  p-map@7.0.3:
+    resolution: {integrity: sha512-VkndIv2fIB99swvQoA65bm+fsmt6UNdGeIB0oxBs+WhAhdh08QA04JXpI7rbB9r08/nkbysKoya9rtDERYOYMA==}
+    engines: {node: '>=18'}
 
   p-retry@4.6.2:
     resolution: {integrity: sha512-312Id396EbJdvRONlngUx0NydfrIQ5lsYu0znKVUzVvArzEIt08V1qhtyESbGVd1FGX7UKtiFp5uwKZdM8wIuQ==}
@@ -4823,10 +4812,6 @@ packages:
     resolution: {integrity: sha512-rhIwUycgwwKcP9yTOOFK/AKsAopjjCakVqLHePO3CC6Mir1Z99xT+R63jZxAT5lFZLa2inS5h+ZS2GvR99/FBg==}
     engines: {node: '>=8'}
 
-  p-timeout@6.1.4:
-    resolution: {integrity: sha512-MyIV3ZA/PmyBN/ud8vV9XzwTrNtR4jFrObymZYnZqMmW0zA8Z17vnT0rBgFE/TlohB+YCHqXMgZzb3Csp49vqg==}
-    engines: {node: '>=14.16'}
-
   p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
@@ -4834,10 +4819,6 @@ packages:
   p-wait-for@3.2.0:
     resolution: {integrity: sha512-wpgERjNkLrBiFmkMEjuZJEWKKDrNfHCKA1OhyN1wg1FrLkULbviEy6py1AyJUgZ72YWFbZ38FIpnqvVqAlDUwA==}
     engines: {node: '>=8'}
-
-  p-wait-for@5.0.2:
-    resolution: {integrity: sha512-lwx6u1CotQYPVju77R+D0vFomni/AqRfqLmqQ8hekklqZ6gAY9rONh7lBQ0uxWMkC2AuX9b2DVAl8To0NyP1JA==}
-    engines: {node: '>=12'}
 
   pac-proxy-agent@7.2.0:
     resolution: {integrity: sha512-TEB8ESquiLMc0lV8vcd5Ql/JAKAoyzHFXaStwjkzpOpC5Yv+pIzLfHvjTSdf3vpa2bMiUQrg9i6276yn8666aA==}
@@ -12395,10 +12376,7 @@ snapshots:
     dependencies:
       aggregate-error: 3.1.0
 
-  p-queue@6.6.2:
-    dependencies:
-      eventemitter3: 4.0.7
-      p-timeout: 3.2.0
+  p-map@7.0.3: {}
 
   p-retry@4.6.2:
     dependencies:
@@ -12409,17 +12387,11 @@ snapshots:
     dependencies:
       p-finally: 1.0.0
 
-  p-timeout@6.1.4: {}
-
   p-try@2.2.0: {}
 
   p-wait-for@3.2.0:
     dependencies:
       p-timeout: 3.2.0
-
-  p-wait-for@5.0.2:
-    dependencies:
-      p-timeout: 6.1.4
 
   pac-proxy-agent@7.2.0:
     dependencies:

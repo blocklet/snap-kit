@@ -28,16 +28,14 @@ jobs:
         with:
           debug: true
           language: 'zh-CN'
-          disable_review: true
           review_simple_changes: false
           review_comment_lgtm: false
           path_filters: |
-            !core/types/**
-            !core/schema/lib/**
-            !core/client/src/schema/**
             !**/*.md
             !**/package.json
+            !**/pnpm-lock.yaml
             !**/blocklet.yml
+            !**/blocklet.prefs.json
             !**/types.js
             !**/*.d.ts
             !**/*.lock

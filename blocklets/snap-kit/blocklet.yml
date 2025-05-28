@@ -16,7 +16,7 @@ repository:
   type: git
   url: git+https://github.com/blocklet/create-blocklet.git
 specVersion: 1.2.8
-version: 1.0.6
+version: 1.1.0
 logo: logo.png
 files:
   - dist
@@ -38,20 +38,13 @@ payment:
   price: []
   share: []
 timeout:
-  start: 60
+  start: 90
 requirements:
   server: '>=1.16.28'
   os: '*'
   cpu: '*'
 scripts:
   dev: npm run start
-environments:
-  - name: REDIS_URL
-    description: Please provide redis url
-    required: false
-    default: ''
-    secure: true
-    shared: false
 capabilities:
   navigation: true
 screenshots:
@@ -66,3 +59,4 @@ docker:
 name: z2qaEE3vhcouzhZVntfX3WbcvtL1uQhjXKr72
 components: []
 egress: true
+environments: []
