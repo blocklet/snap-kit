@@ -6,7 +6,7 @@ Puppeteer-based service designed for seamless web automation. It enables you to 
 
 After installing the Blocklet, Snap Kit provides four APIs:
 
-### POST /crawl
+### POST /api/crawl
 
 Crawl a webpage and extract its HTML content.
 
@@ -41,12 +41,16 @@ For synchronous requests (`sync: true`):
     "url": "https://example.com",
     "html": "<!DOCTYPE html>...",
     "status": "success | failed | pending",
-    "error": "error message when the status is failed"
+    "error": "error message when the status is failed",
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
   }
 }
 ```
 
-### GET /crawl
+### GET /api/crawl
 
 Retrieves the HTML content of a previous crawling job.
 
@@ -66,12 +70,16 @@ Retrieves the HTML content of a previous crawling job.
     "url": "https://example.com",
     "html": "<!DOCTYPE html>...",
     "status": "success | failed | pending",
-    "error": "error message when the status is failed"
+    "error": "error message when the status is failed",
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
   }
 }
 ```
 
-### POST /snap
+### POST /api/snap
 
 Capture a screenshot of a webpage.
 
@@ -110,12 +118,17 @@ For synchronous requests (`sync: true`):
     "url": "https://example.com",
     "screenshot": "image path",
     "status": "success | failed | pending",
-    "error": "error message when the status is failed"
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
   }
 }
 ```
 
-#### GET /snap
+#### GET /api/snap
 
 Retrieves the screenshot of a previous capture job.
 
@@ -135,7 +148,12 @@ Retrieves the screenshot of a previous capture job.
     "url": "https://example.com",
     "screenshot": "image path",
     "status": "success | failed | pending",
-    "error": "error message when the status is failed"
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
   }
 }
 ```

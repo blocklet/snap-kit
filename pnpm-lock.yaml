@@ -277,9 +277,6 @@ importers:
       '@abtnode/models':
         specifier: ^1.16.43
         version: 1.16.43(@types/node@20.17.48)(encoding@0.1.13)
-      '@abtnode/queue':
-        specifier: ^1.16.43
-        version: 1.16.43(encoding@0.1.13)
       '@arcblock/crawler':
         specifier: workspace:*
         version: link:../crawler
@@ -313,6 +310,9 @@ importers:
       lru-cache:
         specifier: ^10.4.3
         version: 10.4.3
+      queue:
+        specifier: ^7.0.0
+        version: 7.0.0
       redis:
         specifier: ^4.7.0
         version: 4.7.1
@@ -5188,6 +5188,9 @@ packages:
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
+
+  queue@7.0.0:
+    resolution: {integrity: sha512-sphwS7HdfQnvrJAXUNAUgpf9H/546IE3p/5Lf2jr71O4udEYlqAhkevykumas2FYuMkX/29JMOgrRdRoYZ/X9w==}
 
   quick-lru@7.0.1:
     resolution: {integrity: sha512-kLjThirJMkWKutUKbZ8ViqFc09tDQhlbQo2MNuVeLWbRauqYP96Sm6nzlQ24F0HFjUNZ4i9+AgldJ9H6DZXi7g==}
@@ -12830,6 +12833,8 @@ snapshots:
   querystring-es3@0.2.1: {}
 
   queue-microtask@1.2.3: {}
+
+  queue@7.0.0: {}
 
   quick-lru@7.0.1: {}
 

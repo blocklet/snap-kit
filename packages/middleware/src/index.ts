@@ -19,7 +19,9 @@ export function createSnapshotMiddleware({
   endpoint,
   accessKey,
   cacheMax = 500,
-  cacheUpdateInterval = 1000 * 60 * 60 * 24,
+  updateInterval = 1000 * 60 * 60 * 24,
+  failedUpdateInterval = 1000 * 60 * 60 * 24,
+  updatedConcurrency = 10,
   autoReturnHtml = true,
   allowCrawler = () => true,
 }: {
@@ -29,11 +31,12 @@ export function createSnapshotMiddleware({
   accessKey: string;
   /** Max cache size for LRU cache */
   cacheMax?: number;
-  /**
-   * Cache update interval
-   * When cache exceeds this time, it will try to fetch and update cache from SnapKit
-   */
-  cacheUpdateInterval?: number;
+  /** When cache exceeds this time, it will try to fetch and update cache from SnapKit */
+  updateInterval?: number;
+  /** When failed cache exceeds this time, it will try to fetch and update cache from SnapKit */
+  failedUpdateInterval?: number;
+  /** Update queue concurrency */
+  updatedConcurrency?: number;
   /** Call res.send(html) when cache hit */
   autoReturnHtml?: boolean;
   /** Custom function to determine whether to return cached content */
@@ -47,7 +50,9 @@ export function createSnapshotMiddleware({
     endpoint,
     accessKey,
     cacheMax,
-    cacheUpdateInterval,
+    updateInterval,
+    failedUpdateInterval,
+    updatedConcurrency,
   });
 
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -59,20 +64,21 @@ export function createSnapshotMiddleware({
 
     const fullUrl = getFullUrl(req);
 
-    // Always fetch content from SnapKit and cache it, even for non-crawler requests
-    if (await cacheManager.isCacheExpired(fullUrl)) {
-      logger.info(`Cache expired for ${fullUrl}, fetching from SnapKit`);
-      // Don't await here, the cache will be effective after the next request
-      cacheManager.updateSnapshot(fullUrl);
-    }
-
     if (!isSpider(req) || isSelfCrawler(req) || isStaticFile(req)) {
       return next();
     }
 
+    // fetch content from SnapKit and cache it
+    // Don't await here, the cache will be effective after the next request
+    if (await cacheManager.isCacheExpired(fullUrl)) {
+      cacheManager.enqueueUpdateSnapshot(fullUrl);
+    }
+
     // cache hit
     const cachedSnapshot = await cacheManager.getSnapshot(fullUrl);
-    if (cachedSnapshot) {
+    if (cachedSnapshot?.html) {
+      logger.info(`Cache hit: ${fullUrl}`);
+
       // @ts-ignore
       req.cachedHtml = cachedSnapshot.html;
 
@@ -94,7 +100,7 @@ export function createSnapshotMiddleware({
       return next();
     }
 
-    logger.debug(`Cache not hit: ${fullUrl}`);
+    logger.info(`Cache miss: ${fullUrl}`);
     return next();
   };
 }

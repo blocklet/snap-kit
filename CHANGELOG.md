@@ -1,3 +1,10 @@
+## 1.1.2 (2025-5-28)
+
+- feat(crawler): support crawl title and description from page
+- feat(crawler): loop sitemap with concurrency control
+- feat(middleware): improve middleware with concurrency control
+- feat: enhance blocklet studio configuration
+
 ## 1.1.1 (2025-5-28)
 
 - chore: remove npm version command from publish workflow

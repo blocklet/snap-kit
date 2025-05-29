@@ -17,8 +17,10 @@ export type Config = {
   siteCron: {
     sites: Site[];
     time: string;
-    runOnInit: boolean;
-    concurrency: number;
+    enabled: boolean;
+    immediate: boolean;
+    crawlConcurrency: number;
+    sitemapConcurrency: number;
   };
 };
 
@@ -29,15 +31,17 @@ export const config: Config = {
 
   dataDir: process.env.BLOCKLET_DATA_DIR!,
   appDir: process.env.BLOCKLET_APP_DIR! || process.cwd(),
-  appUrl: process.env.BLOCKLET_APP_URL!,
+  cacheDir: process.env.BLOCKLET_CACHE_DIR! || process.cwd(),
+  appUrl: process.env.BLOCKLET_APP_URL! || '/',
   puppeteerPath: process.env.PUPPETEER_EXECUTABLE_PATH!,
-  cacheDir: process.env.BLOCKLET_CACHE_DIR!,
 
   // cron
   siteCron: {
     sites: [],
-    time: '0 0 */12 * * *',
-    runOnInit: false,
-    concurrency: 5,
+    enabled: true,
+    time: '0 0 0 * * *',
+    immediate: false,
+    crawlConcurrency: 2,
+    sitemapConcurrency: 30,
   },
 };

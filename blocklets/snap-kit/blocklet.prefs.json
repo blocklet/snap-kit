@@ -6,137 +6,307 @@
   "schema": {
     "type": "object",
     "properties": {
-      "siteCron": {
-        "type": "array",
-        "x-decorator": "FormItem",
-        "x-component": "ArrayTable",
-        "x-validator": [],
+      "qy8kts7wvb9": {
+        "type": "void",
+        "x-component": "FormTab",
         "x-component-props": {},
-        "x-decorator-props": {},
-        "name": "siteCron",
-        "title": "",
-        "x-designable-id": "62hw9y9yg1j",
+        "x-designable-id": "qy8kts7wvb9",
         "x-index": 0,
-        "items": {
-          "type": "object",
-          "x-designable-id": "ujexcbb8cph",
-          "properties": {
-            "a89gnk1caxv": {
-              "type": "void",
-              "x-component": "ArrayTable.Column",
-              "x-component-props": {
-                "title": "Site Url"
-              },
-              "x-designable-id": "a89gnk1caxv",
-              "x-index": 0,
-              "properties": {
-                "url": {
-                  "type": "string",
-                  "title": "",
-                  "x-decorator": "FormItem",
-                  "x-component": "Input",
-                  "x-validator": [],
-                  "x-component-props": {},
-                  "x-decorator-props": {},
-                  "name": "url",
-                  "required": true,
-                  "x-designable-id": "tnjie4lllmx",
-                  "x-index": 0
-                }
-              }
+        "properties": {
+          "ts1mwi51hil": {
+            "type": "void",
+            "x-component": "FormTab.TabPane",
+            "x-component-props": {
+              "tab": "Basic"
             },
-            "qgiensr1fix": {
-              "type": "void",
-              "x-component": "ArrayTable.Column",
-              "x-component-props": {
-                "title": "Pathname"
-              },
-              "x-designable-id": "qgiensr1fix",
-              "x-index": 1,
-              "properties": {
-                "pathname": {
-                  "type": "string",
-                  "title": "",
-                  "x-decorator": "FormItem",
-                  "x-component": "Input",
-                  "x-validator": [],
-                  "x-component-props": {},
-                  "x-decorator-props": {},
-                  "default": "/",
-                  "name": "pathname",
-                  "required": true,
-                  "x-designable-id": "zeg6n47ghxt",
-                  "x-index": 0
-                }
-              }
-            },
-            "w8kld6v7gf0": {
-              "type": "void",
-              "x-component": "ArrayTable.Column",
-              "x-component-props": {
-                "title": "Interval"
-              },
-              "x-designable-id": "w8kld6v7gf0",
-              "x-index": 2,
-              "properties": {
-                "interval": {
-                  "type": "string",
-                  "x-decorator": "FormItem",
-                  "x-component": "Input",
-                  "x-validator": [],
-                  "x-component-props": {},
-                  "x-decorator-props": {},
-                  "name": "interval",
-                  "default": "0",
-                  "description": "",
-                  "x-designable-id": "n7umbeejnu5",
-                  "x-index": 0
-                }
-              }
-            },
-            "jryok60h0oy": {
-              "type": "void",
-              "x-component": "ArrayTable.Column",
-              "x-component-props": {
-                "title": "Title"
-              },
-              "x-designable-id": "jryok60h0oy",
-              "x-index": 3,
-              "properties": {
-                "z0zvrclj14h": {
-                  "type": "void",
-                  "x-component": "ArrayTable.Remove",
-                  "x-designable-id": "z0zvrclj14h",
-                  "x-index": 0
+            "x-designable-id": "ts1mwi51hil",
+            "x-index": 0,
+            "properties": {
+              "cronEnabled": {
+                "type": "boolean",
+                "title": "Enable Cron",
+                "x-decorator": "FormItem",
+                "x-component": "Switch",
+                "x-validator": [],
+                "x-component-props": {},
+                "x-decorator-props": {
+                  "labelCol": 6,
+                  "wrapperCol": 12,
+                  "labelAlign": "left",
+                  "gridSpan": null,
+                  "labelWrap": false,
+                  "wrapperAlign": "left"
                 },
-                "bmeqc7itlg0": {
-                  "type": "void",
-                  "x-component": "ArrayTable.MoveDown",
-                  "x-designable-id": "bmeqc7itlg0",
-                  "x-index": 1
+                "required": false,
+                "default": true,
+                "name": "cronEnabled",
+                "x-designable-id": "tp896bojp1m",
+                "x-index": 0
+              },
+              "cronImmediate": {
+                "type": "boolean",
+                "title": "Run Cron on init",
+                "x-decorator": "FormItem",
+                "x-component": "Switch",
+                "x-validator": [],
+                "x-component-props": {},
+                "x-decorator-props": {
+                  "labelCol": 6,
+                  "wrapperCol": 12,
+                  "labelAlign": "left"
                 },
-                "lzobd4rqfuv": {
-                  "type": "void",
-                  "x-component": "ArrayTable.MoveUp",
-                  "x-designable-id": "lzobd4rqfuv",
-                  "x-index": 2
-                }
+                "default": false,
+                "name": "cronImmediate",
+                "x-designable-id": "qco6iom9ibt",
+                "x-index": 1
+              },
+              "cronTime": {
+                "type": "string",
+                "title": "Cron time",
+                "x-decorator": "FormItem",
+                "x-component": "Input",
+                "x-validator": [],
+                "x-component-props": {},
+                "x-decorator-props": {
+                  "labelAlign": "left",
+                  "labelCol": 6,
+                  "wrapperCol": 12
+                },
+                "default": "0 0 0 * * *",
+                "required": false,
+                "name": "cronTime",
+                "x-designable-id": "lupxjlnitl5",
+                "x-index": 2
+              },
+              "crawlConcurrency": {
+                "type": "string",
+                "title": "Crawl Concurrency",
+                "x-decorator": "FormItem",
+                "x-component": "Input",
+                "x-validator": "number",
+                "x-component-props": {},
+                "x-decorator-props": {
+                  "labelCol": 6,
+                  "wrapperCol": 12,
+                  "labelAlign": "left"
+                },
+                "default": "2",
+                "required": false,
+                "name": "crawlConcurrency",
+                "x-designable-id": "4bc5ffswcke",
+                "x-index": 3
+              },
+              "sitemapConcurrency": {
+                "type": "string",
+                "title": "Sitemap Concurrency",
+                "x-decorator": "FormItem",
+                "x-component": "Input",
+                "x-validator": "number",
+                "x-component-props": {},
+                "x-decorator-props": {
+                  "labelCol": 6,
+                  "wrapperCol": 12,
+                  "labelAlign": "left"
+                },
+                "default": "30",
+                "required": false,
+                "name": "sitemapConcurrency",
+                "x-designable-id": "9pfs1t705mw",
+                "x-index": 4
               }
             }
-          }
-        },
-        "properties": {
-          "10c6ljjp047": {
+          },
+          "7cjo4t2fefm": {
             "type": "void",
-            "title": "Addition",
-            "x-component": "ArrayTable.Addition",
-            "x-component-props": {},
-            "x-designable-id": "10c6ljjp047",
-            "x-index": 0
+            "x-component": "FormTab.TabPane",
+            "x-component-props": {
+              "tab": "Cron Sites"
+            },
+            "x-designable-id": "7cjo4t2fefm",
+            "x-index": 1,
+            "properties": {
+              "cronSites": {
+                "type": "array",
+                "x-decorator": "FormItem",
+                "x-component": "ArrayTable",
+                "x-validator": [],
+                "x-component-props": {
+                  "showHeader": true
+                },
+                "x-decorator-props": {},
+                "name": "cronSites",
+                "title": "",
+                "x-designable-id": "ds3sp0o1qnn",
+                "x-index": 0,
+                "items": {
+                  "type": "object",
+                  "x-designable-id": "067oskztnb6",
+                  "properties": {
+                    "6jxdaantf0w": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Site Url"
+                      },
+                      "x-designable-id": "6jxdaantf0w",
+                      "x-index": 0,
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "title": "",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {},
+                          "x-decorator-props": {},
+                          "name": "url",
+                          "required": true,
+                          "x-designable-id": "liiidr9rqqo",
+                          "x-index": 0
+                        }
+                      }
+                    },
+                    "tmrvqmg2awg": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Pathname"
+                      },
+                      "x-designable-id": "tmrvqmg2awg",
+                      "x-index": 1,
+                      "properties": {
+                        "pathname": {
+                          "type": "string",
+                          "title": "",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {
+                            "placeholder": ""
+                          },
+                          "x-decorator-props": {},
+                          "default": "/",
+                          "name": "pathname",
+                          "required": true,
+                          "x-designable-id": "xxr732qeebr",
+                          "x-index": 0,
+                          "description": ""
+                        }
+                      }
+                    },
+                    "fru71qk9hxs": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Interval"
+                      },
+                      "x-designable-id": "fru71qk9hxs",
+                      "x-index": 2,
+                      "properties": {
+                        "interval": {
+                          "type": "string",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {},
+                          "x-decorator-props": {},
+                          "name": "interval",
+                          "default": "0",
+                          "description": "",
+                          "x-designable-id": "9luhqrqrhb4",
+                          "x-index": 0
+                        }
+                      }
+                    },
+                    "3c8npoklu00": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Action"
+                      },
+                      "x-designable-id": "3c8npoklu00",
+                      "x-index": 3,
+                      "properties": {
+                        "cwj6lxknqkq": {
+                          "type": "void",
+                          "x-component": "ArrayTable.Remove",
+                          "x-designable-id": "cwj6lxknqkq",
+                          "x-index": 0
+                        },
+                        "feclf74y8s3": {
+                          "type": "void",
+                          "x-component": "ArrayTable.MoveDown",
+                          "x-designable-id": "feclf74y8s3",
+                          "x-index": 1
+                        },
+                        "d6y6f9950ds": {
+                          "type": "void",
+                          "x-component": "ArrayTable.MoveUp",
+                          "x-designable-id": "d6y6f9950ds",
+                          "x-index": 2
+                        }
+                      }
+                    }
+                  }
+                },
+                "properties": {
+                  "oo0nxlfx2bi": {
+                    "type": "void",
+                    "title": "Addition",
+                    "x-component": "ArrayTable.Addition",
+                    "x-component-props": {},
+                    "x-designable-id": "oo0nxlfx2bi",
+                    "x-index": 0
+                  }
+                }
+              },
+              "miln7fqgyri": {
+                "type": "string",
+                "x-component": "Text",
+                "x-component-props": {
+                  "content": "Pathname: RegExp used to match the pages to be crawled in the sitemap.",
+                  "mode": "p",
+                  "style": {
+                    "color": "#666",
+                    "padding": "0px 4px 0px 4px"
+                  }
+                },
+                "x-designable-id": "miln7fqgyri",
+                "x-index": 1
+              },
+              "00kpj6qsghp": {
+                "type": "string",
+                "x-component": "Text",
+                "x-component-props": {
+                  "content": "Interval: Minimum crawl interval (day)",
+                  "mode": "p",
+                  "style": {
+                    "color": "#666",
+                    "padding": "0px 4px 0px 4px"
+                  }
+                },
+                "x-designable-id": "00kpj6qsghp",
+                "x-index": 2
+              },
+              "07jh9naaldu": {
+                "type": "string",
+                "x-component": "Text",
+                "x-component-props": {
+                  "content": "Site Url: To crawl a website, you must ensure that ${url}/sitemap.xml is accessible",
+                  "mode": "p",
+                  "style": {
+                    "color": "#666",
+                    "padding": "0px 4px 0px 4px"
+                  }
+                },
+                "x-designable-id": "07jh9naaldu",
+                "x-index": 3
+              }
+            }
           }
         }
       }
     },
-    "x-designable-id": "uci6n57xqgy"
+    "x-designable-id": "6xxbid1ufp5"
   }
 }

@@ -16,15 +16,7 @@ const { name, version } = require('../../package.json');
 
 dotenv.config();
 
-logger.debug('process.env', process.env);
-logger.debug('env', env);
-
-initCrawler({
-  siteCron: {
-    sites: env.siteCron,
-    runOnInit: env.runCronOnInit,
-  },
-});
+logger.debug('preferences', env.preferences);
 
 export const app = express();
 createLogger.setupAccessLogger(app);
@@ -40,18 +32,6 @@ router.use('/api', routes);
 
 app.use(router);
 app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '365d', index: false }));
-
-// if (process.env.SNAP_KIT_ACCESS_KEY) {
-//   app.use(
-//     createSnapshotMiddleware({
-//       endpoint: process.env.SNAP_KIT_ENDPOINT || env.appUrl,
-//       accessKey: process.env.SNAP_KIT_ACCESS_KEY,
-//       allowCrawler: (req) => {
-//         return req.path === '/';
-//       },
-//     }),
-//   );
-// }
 
 // const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
 // if (isProduction) {
@@ -75,7 +55,25 @@ app.use((err, _req, res, _next) => {
 
 const port = parseInt(process.env.BLOCKLET_PORT!, 10);
 
-export const server = app.listen(port, (err?: any) => {
+export const server = app.listen(port, async (err?: any) => {
   if (err) throw err;
+
   logger.info(`> ${name} v${version} ready on ${port}`);
+
+  try {
+    await initCrawler({
+      siteCron: {
+        enabled: !!env.preferences.cronEnabled,
+        immediate: !!env.preferences.cronImmediate,
+        sites: env.preferences.cronSites,
+        time: env.preferences.cronTime,
+        crawlConcurrency: Math.max(1, env.preferences.crawlConcurrency || 0),
+        sitemapConcurrency: Math.max(1, env.preferences.sitemapConcurrency || 0),
+      },
+    });
+    logger.info('Crawler ready');
+  } catch (err) {
+    logger.error('Crawler init error', err);
+    process.exit(1);
+  }
 });
