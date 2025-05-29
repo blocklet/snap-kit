@@ -18,6 +18,13 @@ function parseSitemapUrl(sitemapItem: SitemapItem) {
 export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
   logger.info(`Start crawl from sitemap ${url}`, { pathname });
 
+  const key = `${url}-${pathname}`;
+
+  if (crawlBlockletRunningMap.has(key)) {
+    logger.info(`Crawl from sitemap ${url} ${pathname} is already running, skip`);
+    return [];
+  }
+
   const sitemapList = await getSitemapList(url);
   const pathnameRegex = new RegExp(pathname);
 
@@ -29,13 +36,15 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
 
   logger.info(`Found ${sitemapItems.length} sitemap items which match ${pathname} from ${url}`);
 
-  const key = `${url}-${pathname}`;
+  let processCount = 0;
   crawlBlockletRunningMap.set(key, true);
 
   try {
     const jobIds = await pMap(
       sitemapItems,
       async ({ url, sitemapItem }) => {
+        processCount++;
+
         const snapshot = await Snapshot.findOne({ where: { url: formatUrl(url) } });
 
         if (snapshot?.lastModified) {
@@ -51,6 +60,8 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
             return null;
           }
         }
+
+        logger.debug(`Sitemap process ${processCount} / ${sitemapItems.length}`);
 
         return crawlUrl({
           url,

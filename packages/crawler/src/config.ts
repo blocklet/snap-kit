@@ -39,9 +39,9 @@ export const config: Config = {
   siteCron: {
     sites: [],
     enabled: true,
-    time: '0 0 */12 * * *',
+    time: '0 0 0 * * *',
     immediate: false,
-    crawlConcurrency: 1,
+    crawlConcurrency: 2,
     sitemapConcurrency: 30,
   },
 };

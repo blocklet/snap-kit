@@ -67,8 +67,8 @@ export const server = app.listen(port, async (err?: any) => {
         immediate: !!env.preferences.cronImmediate,
         sites: env.preferences.cronSites,
         time: env.preferences.cronTime,
-        crawlConcurrency: env.preferences.crawlConcurrency,
-        sitemapConcurrency: env.preferences.sitemapConcurrency,
+        crawlConcurrency: Math.max(1, env.preferences.crawlConcurrency || 0),
+        sitemapConcurrency: Math.max(1, env.preferences.sitemapConcurrency || 0),
       },
     });
     logger.info('Crawler ready');

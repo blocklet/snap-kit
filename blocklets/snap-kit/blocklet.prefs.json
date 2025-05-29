@@ -72,7 +72,7 @@
                   "labelCol": 6,
                   "wrapperCol": 12
                 },
-                "default": "0 0 */12 * * *",
+                "default": "0 0 0 * * *",
                 "required": false,
                 "name": "cronTime",
                 "x-designable-id": "lupxjlnitl5",
@@ -90,7 +90,7 @@
                   "wrapperCol": 12,
                   "labelAlign": "left"
                 },
-                "default": "1",
+                "default": "2",
                 "required": false,
                 "name": "crawlConcurrency",
                 "x-designable-id": "4bc5ffswcke",
@@ -307,6 +307,6 @@
         }
       }
     },
-    "x-designable-id": "981yfmq059a"
+    "x-designable-id": "6xxbid1ufp5"
   }
 }
