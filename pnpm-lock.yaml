@@ -198,9 +198,6 @@ importers:
       fs-extra:
         specifier: ^11.2.0
         version: 11.3.0
-      generic-pool:
-        specifier: ^3.9.0
-        version: 3.9.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -210,15 +207,9 @@ importers:
       p-map:
         specifier: ^7.0.3
         version: 7.0.3
-      redis:
-        specifier: ^4.7.0
-        version: 4.7.1
       robots-parser:
         specifier: ^3.0.1
         version: 3.0.1
-      sequelize:
-        specifier: ^6.37.7
-        version: 6.37.7(sqlite3@5.1.7)
       sitemap:
         specifier: ^7.1.2
         version: 7.1.2
@@ -274,18 +265,12 @@ importers:
       '@abtnode/cron':
         specifier: ^1.16.43
         version: 1.16.43
-      '@abtnode/models':
-        specifier: ^1.16.43
-        version: 1.16.43(@types/node@20.17.48)(encoding@0.1.13)
       '@arcblock/crawler':
         specifier: workspace:*
         version: link:../crawler
       '@blocklet/logger':
         specifier: ^1.16.43
         version: 1.16.43(encoding@0.1.13)
-      '@blocklet/puppeteer':
-        specifier: ^22.11.3
-        version: 22.11.3
       '@blocklet/sdk':
         specifier: ^1.16.43
         version: 1.16.43(encoding@0.1.13)
@@ -298,33 +283,12 @@ importers:
       axios:
         specifier: ^1.7.9
         version: 1.9.0
-      fs-extra:
-        specifier: ^11.2.0
-        version: 11.3.0
-      generic-pool:
-        specifier: ^3.9.0
-        version: 3.9.0
-      lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
       lru-cache:
         specifier: ^10.4.3
         version: 10.4.3
       queue:
         specifier: ^7.0.0
         version: 7.0.0
-      redis:
-        specifier: ^4.7.0
-        version: 4.7.1
-      robots-parser:
-        specifier: ^3.0.1
-        version: 3.0.1
-      sequelize:
-        specifier: ^6.37.7
-        version: 6.37.7(sqlite3@5.1.7)
-      sitemap:
-        specifier: ^7.1.2
-        version: 7.1.2
       sqlite3:
         specifier: ^5.1.7
         version: 5.1.7
@@ -332,21 +296,9 @@ importers:
         specifier: ^1.5.4
         version: 1.6.1
     devDependencies:
-      '@blocklet/js-sdk':
-        specifier: ^1.16.39
-        version: 1.16.43
-      '@types/dotenv-flow':
-        specifier: ^3.3.3
-        version: 3.3.3
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.22
-      '@types/fs-extra':
-        specifier: ^11.0.4
-        version: 11.0.4
-      '@types/lodash':
-        specifier: ^4.17.16
-        version: 4.17.16
       '@types/node':
         specifier: ^20.17.19
         version: 20.17.48
@@ -362,9 +314,6 @@ importers:
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
-      puppeteer:
-        specifier: ^24.8.2
-        version: 24.8.2(typescript@5.8.3)
       tsx:
         specifier: ^4.19.3
         version: 4.19.4
@@ -1188,35 +1137,6 @@ packages:
     resolution: {integrity: sha512-bJ0UBsk0ESOs6RFcLXOt99a3yTDcOKlzfjad+rhFwdaG1Lu/Wzq58GHYCDTlZ9z6mldf4g+NTb+TXEfe0PpnsQ==}
     engines: {node: '>=18'}
     hasBin: true
-
-  '@redis/bloom@1.2.0':
-    resolution: {integrity: sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg==}
-    peerDependencies:
-      '@redis/client': ^1.0.0
-
-  '@redis/client@1.6.1':
-    resolution: {integrity: sha512-/KCsg3xSlR+nCK8/8ZYSknYxvXHwubJrU82F3Lm1Fp6789VQ0/3RJKfsmRXjqfaTA++23CvC3hqmqe/2GEt6Kw==}
-    engines: {node: '>=14'}
-
-  '@redis/graph@1.1.1':
-    resolution: {integrity: sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw==}
-    peerDependencies:
-      '@redis/client': ^1.0.0
-
-  '@redis/json@1.0.7':
-    resolution: {integrity: sha512-6UyXfjVaTBTJtKNG4/9Z8PSpKE6XgSyEb8iwaqDcy+uKrd/DGYHTWkUdnQDyzm727V7p21WUMhsqz5oy65kPcQ==}
-    peerDependencies:
-      '@redis/client': ^1.0.0
-
-  '@redis/search@1.2.0':
-    resolution: {integrity: sha512-tYoDBbtqOVigEDMAcTGsRlMycIIjwMCgD8eR2t0NANeQmgK/lvxNAvYyb6bZDD4frHRhIHkJu2TBRvB0ERkOmw==}
-    peerDependencies:
-      '@redis/client': ^1.0.0
-
-  '@redis/time-series@1.1.0':
-    resolution: {integrity: sha512-c1Q99M5ljsIuc4YdaCwfUEXsofakb9c8+Zse2qxTadu8TalLXuAESzLvFAvNVbkmSlvlzIQOLpBCmWI9wTOt+g==}
-    peerDependencies:
-      '@redis/client': ^1.0.0
 
   '@remix-run/router@1.23.0':
     resolution: {integrity: sha512-O3rHJzAQKamUz1fvE0Qaw0xSFqsA/yafi2iqeE0pvdFtCO1viYx8QL6f3Ln/aCCTLxs68SLf0KPM9eSeM8yBnA==}
@@ -2358,10 +2278,6 @@ packages:
   clone-response@1.0.3:
     resolution: {integrity: sha512-ROoL94jJH2dUVML2Y/5PEDNaSHgeOdSDicUyS7izcF63G6sTc/FTjLub4b8Il9S8S0beOfYt0TaA5qvFK+w0wA==}
 
-  cluster-key-slot@1.1.2:
-    resolution: {integrity: sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==}
-    engines: {node: '>=0.10.0'}
-
   color-convert@1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
 
@@ -3439,10 +3355,6 @@ packages:
     resolution: {integrity: sha512-f9m+BEN5jkg6a0fZjleidjN51VE1X+mPFQ2DJ0uv1V39oCLCbsGe6yjbBnp7eK7z/+GAon99a3nHuqbuuthyPg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
     deprecated: This package is no longer supported.
-
-  generic-pool@3.9.0:
-    resolution: {integrity: sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==}
-    engines: {node: '>= 4'}
 
   gensync@1.0.0-beta.2:
     resolution: {integrity: sha512-3hN7NaskYvMDLQY55gnW3NQ+mesEAepTqlg+VEbj7zzqEMBVNhzcGYYeqFo/TlYz6eQiFcp1HcsCZO+nGgS8zg==}
@@ -5298,9 +5210,6 @@ packages:
   rechoir@0.6.2:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
     engines: {node: '>= 0.10'}
-
-  redis@4.7.1:
-    resolution: {integrity: sha512-S1bJDnqLftzHXHP8JsT5II/CtHWQrASX5K96REjWjlmWKrviSOLWmM7QnRLstAWsu1VBBV1ffV6DzCvxNP0UJQ==}
 
   reflect-metadata@0.1.14:
     resolution: {integrity: sha512-ZhYeb6nRaXCfhnndflDK8qI6ZQ/YcWZCISRAWICW9XYqMUwjZM9Z0DveWX/ABN01oxSHwVxKQmxeYZSsm0jh5A==}
@@ -8173,32 +8082,6 @@ snapshots:
       - bare-buffer
       - supports-color
 
-  '@redis/bloom@1.2.0(@redis/client@1.6.1)':
-    dependencies:
-      '@redis/client': 1.6.1
-
-  '@redis/client@1.6.1':
-    dependencies:
-      cluster-key-slot: 1.1.2
-      generic-pool: 3.9.0
-      yallist: 4.0.0
-
-  '@redis/graph@1.1.1(@redis/client@1.6.1)':
-    dependencies:
-      '@redis/client': 1.6.1
-
-  '@redis/json@1.0.7(@redis/client@1.6.1)':
-    dependencies:
-      '@redis/client': 1.6.1
-
-  '@redis/search@1.2.0(@redis/client@1.6.1)':
-    dependencies:
-      '@redis/client': 1.6.1
-
-  '@redis/time-series@1.1.0(@redis/client@1.6.1)':
-    dependencies:
-      '@redis/client': 1.6.1
-
   '@remix-run/router@1.23.0': {}
 
   '@rollup/plugin-inject@5.0.5(rollup@4.41.0)':
@@ -9543,8 +9426,6 @@ snapshots:
   clone-response@1.0.3:
     dependencies:
       mimic-response: 1.0.1
-
-  cluster-key-slot@1.1.2: {}
 
   color-convert@1.9.3:
     dependencies:
@@ -10914,8 +10795,6 @@ snapshots:
       strip-ansi: 6.0.1
       wide-align: 1.1.5
     optional: true
-
-  generic-pool@3.9.0: {}
 
   gensync@1.0.0-beta.2: {}
 
@@ -12973,15 +12852,6 @@ snapshots:
   rechoir@0.6.2:
     dependencies:
       resolve: 1.22.10
-
-  redis@4.7.1:
-    dependencies:
-      '@redis/bloom': 1.2.0(@redis/client@1.6.1)
-      '@redis/client': 1.6.1
-      '@redis/graph': 1.1.1(@redis/client@1.6.1)
-      '@redis/json': 1.0.7(@redis/client@1.6.1)
-      '@redis/search': 1.2.0(@redis/client@1.6.1)
-      '@redis/time-series': 1.1.0(@redis/client@1.6.1)
 
   reflect-metadata@0.1.14: {}
 

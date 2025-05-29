@@ -103,7 +103,7 @@ export class CacheManager {
 
       return snapshotData;
     } catch (error) {
-      logger.error('Failed to fetch content by SnapKit', { url, error, data: error?.response?.data, accessKey });
+      logger.error('Failed to fetch content by SnapKit', { url, error, data: error?.response?.data });
       return null;
     }
   }
