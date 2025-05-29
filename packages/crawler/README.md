@@ -61,6 +61,8 @@ If not referenced by a Blocklet, some dependent Blocklet environment variables n
 
 - `BLOCKLET_DATA_DIR`: (Required) The directory to save webpage screenshots and HTML source files obtained by the crawler.
 
+- `BLOCKLET_LOG_DIR`: (Required) Directory path for storing @blocklet/logger logs
+
 ## SQLite
 
 When `initCrawler` is called, it attempts to create an SQLite database at `BLOCKLET_DATA_DIR`. This database is used to cache HTML content and screenshot. Please ensure that the deployment environment supports SQLite.
