@@ -1,3 +1,7 @@
+## 1.1.3 (2025-5-29)
+
+- chore: remove unused dependencies
+
 ## 1.1.2 (2025-5-28)
 
 - feat(crawler): support crawl title and description from page
