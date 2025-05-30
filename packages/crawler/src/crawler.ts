@@ -139,13 +139,6 @@ async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Arr
   };
 }
 
-function formatHtml(htmlString: string) {
-  if (htmlString.includes('<h2>Unexpected Application Error!</h2>')) {
-    return '';
-  }
-  return htmlString;
-}
-
 export const getPageContent = async ({
   url,
   includeScreenshot = true,
@@ -234,6 +227,14 @@ export const getPageContent = async ({
         };
       });
 
+      // check if the page is an error page
+      const isErrorPage = ['<h2>Unexpected Application Error!</h2>', 'Current route occurred an error'].some(
+        (errorHtml) => data.html.includes(errorHtml),
+      );
+      if (isErrorPage) {
+        throw new Error('Page is an error page');
+      }
+
       meta.title = data.title;
       meta.description = data.description;
 
@@ -250,8 +251,6 @@ export const getPageContent = async ({
   } finally {
     await page.close();
   }
-
-  html = formatHtml(html || '');
 
   return {
     html,
