@@ -37,6 +37,7 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
   logger.info(`Found ${sitemapItems.length} sitemap items which match ${pathname} from ${url}`);
 
   let processCount = 0;
+  let crawlCount = 0;
   crawlBlockletRunningMap.set(key, true);
 
   try {
@@ -68,6 +69,8 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
           url,
         });
 
+        crawlCount++;
+
         return crawlUrl({
           url,
           lastModified: sitemapItem.lastmod,
@@ -77,6 +80,13 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
       },
       { concurrency: config.siteCron.sitemapConcurrency },
     );
+
+    logger.info('Enqueued jobs from sitemap finished', {
+      url,
+      pathname,
+      processCount,
+      crawlCount,
+    });
 
     return jobIds;
   } catch (error) {
