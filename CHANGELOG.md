@@ -1,3 +1,7 @@
+## 1.1.4 (2025-5-30)
+
+- feat: support custom headers for crawler requests
+
 ## 1.1.3 (2025-5-29)
 
 - chore: remove unused dependencies

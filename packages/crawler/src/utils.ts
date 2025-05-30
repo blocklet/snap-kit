@@ -142,7 +142,7 @@ export const isSelfCrawler = (req: Request) => {
  * Check if the request is a static file
  */
 export function isStaticFile(req: Request) {
-  const excludeUrlPattern = new RegExp(`\\.(${staticFileExtensions.join('|')})$`, 'i');
+  const excludeUrlPattern = new RegExp(`\\.(${staticFileExtensions.join('|')})([\\?#]|$)`, 'i');
   return excludeUrlPattern.test(req.path);
 }
 

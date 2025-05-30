@@ -15,6 +15,7 @@ router.use(middlewares.session({ accessKey: true }));
  */
 const crawlSchema = Joi.object({
   url: Joi.string().uri().required(),
+  headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
   timeout: Joi.number().integer().min(10).max(120).default(120),
   sync: Joi.boolean().default(false),
 });
@@ -80,6 +81,7 @@ const snapSchema = Joi.object({
   quality: Joi.number().integer().min(1).max(100).default(80),
   timeout: Joi.number().integer().min(10).max(120).default(120),
   fullPage: Joi.boolean().default(false),
+  headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
   sync: Joi.boolean().default(false),
 });
 router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {

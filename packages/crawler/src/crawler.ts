@@ -139,13 +139,6 @@ async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Arr
   };
 }
 
-function formatHtml(htmlString: string) {
-  if (htmlString.includes('<h2>Unexpected Application Error!</h2>')) {
-    return '';
-  }
-  return htmlString;
-}
-
 export const getPageContent = async ({
   url,
   includeScreenshot = true,
@@ -155,22 +148,15 @@ export const getPageContent = async ({
   quality = 80,
   timeout = 90 * 1000,
   fullPage = false,
-}: {
-  url: string;
-  includeScreenshot?: boolean;
-  includeHtml?: boolean;
-  width?: number;
-  height?: number;
-  quality?: number;
-  timeout?: number;
-  fullPage?: boolean;
-}) => {
-  logger.debug('getPageContent', { url, includeScreenshot, includeHtml, width, height, quality, timeout, fullPage });
-
+  headers,
+}: JobState) => {
   const page = await initPage();
 
   if (width && height) {
     await page.setViewport({ width, height, deviceScaleFactor: 2 });
+  }
+  if (headers) {
+    await page.setExtraHTTPHeaders(headers);
   }
 
   let html: string | null = null;
@@ -185,8 +171,6 @@ export const getPageContent = async ({
     }
 
     const statusCode = response.status();
-
-    logger.debug('getPageContent.response', { response, statusCode });
 
     if (![200, 304].includes(statusCode)) {
       throw new Error(`Request failed with status ${statusCode}, in ${url}`);
@@ -243,6 +227,14 @@ export const getPageContent = async ({
         };
       });
 
+      // check if the page is an error page
+      const isErrorPage = ['<h2>Unexpected Application Error!</h2>', 'Current route occurred an error'].some(
+        (errorHtml) => data.html.includes(errorHtml),
+      );
+      if (isErrorPage) {
+        throw new Error('Page is an error page');
+      }
+
       meta.title = data.title;
       meta.description = data.description;
 
@@ -260,8 +252,6 @@ export const getPageContent = async ({
     await page.close();
   }
 
-  html = formatHtml(html || '');
-
   return {
     html,
     screenshot,
@@ -274,6 +264,7 @@ export const getPageContent = async ({
  * @param params
  * @param callback callback when job finished
  */
+// eslint-disable-next-line require-await
 export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
   params = {
     ...params,
@@ -281,23 +272,13 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
   };
 
   // skip duplicate job
-  const { job: duplicateJob } =
-    (await Job.findJob({
-      url: params.url,
-      includeScreenshot: params.includeScreenshot,
-      includeHtml: params.includeHtml,
-      quality: params.quality,
-      width: params.width,
-      height: params.height,
-      fullPage: params.fullPage,
-    })) || {};
-
-  if (duplicateJob) {
+  const existsJob = await Job.isExists(params);
+  if (existsJob) {
     logger.info(`Crawl job already exists for ${params.url}, skip`);
-    return duplicateJob.id;
+    return existsJob.id;
   }
 
-  logger.info('create crawl job', params);
+  logger.info('enqueue crawl job', params);
 
   const jobId = randomUUID();
   const job = crawlQueue.push({ ...params, id: jobId });

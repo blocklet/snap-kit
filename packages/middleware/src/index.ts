@@ -12,7 +12,10 @@ function getFullUrl(req: Request) {
     ? joinURL(req.headers['x-path-prefix'] as string, req.originalUrl)
     : req.originalUrl;
 
-  return joinURL(env.appUrl || req.get('host')!, blockletPathname);
+  return joinURL(
+    env.appUrl || req.get('host')!,
+    blockletPathname == null || blockletPathname === 'undefined' ? '/' : blockletPathname,
+  );
 }
 
 export function createSnapshotMiddleware({
