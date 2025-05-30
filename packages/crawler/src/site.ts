@@ -61,7 +61,12 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
           }
         }
 
-        logger.debug(`Sitemap process ${processCount} / ${sitemapItems.length}`);
+        logger.debug(`Sitemap process ${processCount} / ${sitemapItems.length}`, {
+          snapshotExists: !!snapshot,
+          lastModified: snapshot?.lastModified,
+          sitemapLastmod: sitemapItem.lastmod,
+          url,
+        });
 
         return crawlUrl({
           url,

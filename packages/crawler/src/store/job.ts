@@ -1,4 +1,5 @@
 import sequelize, { DataTypes, Model, Sequelize } from '@sequelize/core';
+import isEqual from 'lodash/isEqual';
 
 export interface JobState {
   id?: string;
@@ -12,6 +13,7 @@ export interface JobState {
   timeout?: number;
   fullPage?: boolean;
   lastModified?: string;
+  headers?: Record<string, string>;
 }
 
 export interface JobModel {
@@ -103,5 +105,24 @@ export class Job extends Model<JobModel> implements JobModel {
     });
 
     return job?.toJSON() || null;
+  }
+
+  static async isExists(condition: Partial<JobState> & { url: string }) {
+    const jobs = await Job.findAll({
+      where: sequelize.where(sequelize.fn('json_extract', sequelize.col('job'), '$.url'), condition.url),
+    });
+
+    if (!jobs?.length) {
+      return null;
+    }
+
+    const existsJob = jobs.find((job) => {
+      const jobModel = job.get('job');
+      return Object.keys(condition).every((key) => {
+        return isEqual(condition[key], jobModel[key]);
+      });
+    });
+
+    return existsJob?.get();
   }
 }

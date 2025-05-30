@@ -19,6 +19,7 @@ export interface SnapshotModel {
     includeHtml?: boolean;
     quality?: number;
     fullPage?: boolean;
+    headers?: Record<string, string>;
   };
 }
 
