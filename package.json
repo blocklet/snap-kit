@@ -8,7 +8,8 @@
     "lint": "pnpm -r lint",
     "lint:fix": "pnpm -r lint:fix",
     "bundle": "pnpm -r bundle",
-    "bump-version": "zx scripts/bump-version.mjs"
+    "bump-version": "zx scripts/bump-version.mjs",
+    "update:deps": "npx -y taze -r -w -f -n '/@abtnode|@aigne|@arcblock|@blocklet|@did-connect|@did-pay|@did-space|@nft-store|@nft-studio|@ocap/' && pnpm install && pnpm dedupe"
   },
   "lint-staged": {
     "*.{mjs,js,jsx,ts,tsx}": [
