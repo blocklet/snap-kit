@@ -1,6 +1,7 @@
 ## 1.1.5 (2025-6-6)
 
 - chore: update deps
+- feat: support localStorage and cookies in crawler for improve blocklets render
 
 ## 1.1.4 (2025-5-30)
 
