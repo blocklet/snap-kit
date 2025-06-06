@@ -1,3 +1,7 @@
+## 1.1.5 (2025-6-6)
+
+- chore: update deps
+
 ## 1.1.4 (2025-5-30)
 
 - feat: support custom headers for crawler requests
