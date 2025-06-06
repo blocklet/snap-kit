@@ -49,7 +49,15 @@ export function createCrawlQueue() {
 
       try {
         // get page content later
-        const result = await getPageContent(job);
+        const result = await getPageContent({
+          localStorage: {
+            // for blocklet theme
+            blocklet_theme_prefer: 'light',
+            // for blocklet domain warning
+            'domain-warning-skip': Date.now().toString(),
+          },
+          ...job,
+        });
 
         if (!result || (!result.html && !result.screenshot)) {
           logger.error(`failed to crawl ${job.url}, empty content`, job);
@@ -149,14 +157,29 @@ export const getPageContent = async ({
   timeout = 90 * 1000,
   fullPage = false,
   headers,
+  cookies = [],
+  localStorage,
 }: JobState) => {
   const page = await initPage();
 
   if (width && height) {
     await page.setViewport({ width, height, deviceScaleFactor: 2 });
   }
+
   if (headers) {
     await page.setExtraHTTPHeaders(headers);
+  }
+
+  if (cookies?.length) {
+    await page.setCookie(...cookies);
+  }
+
+  if (localStorage) {
+    await page.evaluateOnNewDocument((items) => {
+      Object.entries(items).forEach(([key, value]) => {
+        window.localStorage.setItem(key, value);
+      });
+    }, localStorage);
   }
 
   let html: string | null = null;
