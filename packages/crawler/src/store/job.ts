@@ -1,3 +1,4 @@
+import { CookieParam } from '@blocklet/puppeteer';
 import sequelize, { DataTypes, Model, Sequelize } from '@sequelize/core';
 import isEqual from 'lodash/isEqual';
 
@@ -14,6 +15,8 @@ export interface JobState {
   fullPage?: boolean;
   lastModified?: string;
   headers?: Record<string, string>;
+  cookies?: CookieParam[];
+  localStorage?: Record<string, string>;
 }
 
 export interface JobModel {

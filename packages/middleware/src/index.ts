@@ -21,7 +21,7 @@ function getFullUrl(req: Request) {
 export function createSnapshotMiddleware({
   endpoint,
   accessKey,
-  cacheMax = 500,
+  cacheMax = 0,
   updateInterval = 1000 * 60 * 60 * 24,
   failedUpdateInterval = 1000 * 60 * 60 * 24,
   updatedConcurrency = 10,

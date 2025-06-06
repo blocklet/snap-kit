@@ -122,6 +122,11 @@ const staticFileExtensions = [
   'xls',
   'xml',
   'zip',
+  'ts',
+  'json',
+  'md',
+  'yml',
+  'yaml',
 ];
 
 export const sleep = (ms: number) => {

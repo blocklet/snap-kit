@@ -1,5 +1,4 @@
 import { initCrawler } from '@arcblock/crawler';
-// import { createSnapshotMiddleware } from '@arcblock/crawler-middleware';
 import createLogger from '@blocklet/logger';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';

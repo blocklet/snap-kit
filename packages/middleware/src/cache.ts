@@ -24,7 +24,7 @@ export type CacheManagerOptions = {
 export class CacheManager {
   private options: Required<CacheManagerOptions>;
 
-  private cache: LRUCache<string, SnapshotModel>;
+  private cache: LRUCache<string, SnapshotModel> | null = null;
 
   private initializedPromise: Promise<any[]>;
 
@@ -32,13 +32,16 @@ export class CacheManager {
 
   constructor(options: CacheManagerOptions) {
     this.options = {
-      cacheMax: 500,
+      cacheMax: 0,
       updateInterval: 1000 * 60 * 60 * 24,
       failedUpdateInterval: 1000 * 60 * 60 * 24,
       updatedConcurrency: 10,
       ...options,
     };
-    this.cache = new LRUCache({ max: this.options.cacheMax || 500 });
+
+    if (this.options.cacheMax > 0) {
+      this.cache = new LRUCache({ max: this.options.cacheMax || 500 });
+    }
 
     this.updateQueue = new Queue({
       autostart: true,
@@ -53,14 +56,14 @@ export class CacheManager {
   }
 
   public async getSnapshot(url: string) {
-    const cachedSnapshot = this.cache.get(url);
+    const cachedSnapshot = this.cache?.get(url);
     if (cachedSnapshot) {
       return cachedSnapshot;
     }
 
     const snapshot = await Snapshot.findOne({ where: { url } });
     if (snapshot) {
-      this.cache.set(url, snapshot);
+      this.cache?.set(url, snapshot);
       return snapshot;
     }
 
@@ -69,7 +72,7 @@ export class CacheManager {
 
   public async setSnapshot(url: string, snapshot: SnapshotModel) {
     await Snapshot.create(snapshot);
-    this.cache.set(url, snapshot);
+    this.cache?.set(url, snapshot);
   }
 
   public async fetchSnapKit(url: string) {
@@ -127,7 +130,7 @@ export class CacheManager {
         lastModified: snapshot?.lastModified,
       });
       // update cache
-      this.cache.set(url, updatedSnapshot);
+      this.cache?.set(url, updatedSnapshot);
     } catch (error) {
       logger.error('Failed to update snapshot', { url, error });
     }
