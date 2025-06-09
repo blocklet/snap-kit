@@ -20,7 +20,7 @@ export function createCrawlQueue() {
 
   crawlQueue = createQueue({
     store: new SequelizeStore(db, 'crawler'),
-    concurrency: config.siteCron.crawlConcurrency,
+    concurrency: config.concurrency,
     onJob: async (job: JobState) => {
       logger.info('Starting to execute crawl job', job);
 
@@ -47,23 +47,22 @@ export function createCrawlQueue() {
       //   logger.error('failed to close browser when queue index reached autoCloseBrowserCount:', error);
       // }
 
+      const formattedJob: JobState = {
+        ...job,
+        cookies: (config.cookies || []).concat(job.cookies || []),
+        localStorage: (config.localStorage || []).concat(job.localStorage || []),
+        url: formatUrl(job.url),
+      };
+
       try {
         // get page content later
-        const result = await getPageContent({
-          localStorage: {
-            // for blocklet theme
-            blocklet_theme_prefer: 'light',
-            // for blocklet domain warning
-            'domain-warning-skip': Date.now().toString(),
-          },
-          ...job,
-        });
+        const result = await getPageContent(formattedJob);
 
         if (!result || (!result.html && !result.screenshot)) {
-          logger.error(`failed to crawl ${job.url}, empty content`, job);
+          logger.error(`failed to crawl ${formattedJob.url}, empty content`, formattedJob);
 
           const snapshot = convertJobToSnapshot({
-            job,
+            job: formattedJob,
             snapshot: {
               status: 'failed',
               error: 'Failed to crawl content',
@@ -81,7 +80,7 @@ export function createCrawlQueue() {
         // const lastModified = job.lastmodMap?.get(url) || new Date().toISOString();
 
         const snapshot = convertJobToSnapshot({
-          job,
+          job: formattedJob,
           snapshot: {
             status: 'success',
             screenshot: screenshotPath?.replace(config.dataDir, ''),
@@ -92,10 +91,10 @@ export function createCrawlQueue() {
         await Snapshot.upsert(snapshot);
         return snapshot;
       } catch (error) {
-        logger.error(`Failed to crawl ${job.url}`, { error, job });
+        logger.error(`Failed to crawl ${formattedJob.url}`, { error, formattedJob });
 
         const snapshot = convertJobToSnapshot({
-          job,
+          job: formattedJob,
           snapshot: {
             status: 'failed',
             error: 'Internal error',
@@ -157,7 +156,7 @@ export const getPageContent = async ({
   timeout = 90 * 1000,
   fullPage = false,
   headers,
-  cookies = [],
+  cookies,
   localStorage,
 }: JobState) => {
   const page = await initPage();
@@ -170,14 +169,25 @@ export const getPageContent = async ({
     await page.setExtraHTTPHeaders(headers);
   }
 
-  if (cookies?.length) {
-    await page.setCookie(...cookies);
+  // handle cookies
+  if (cookies) {
+    const { hostname } = new URL(url);
+    const cookieParams = cookies.map((item) => ({
+      ...item,
+      expires: item.expires ? new Date(item.expires).getTime() : undefined,
+      domain: item.domain || hostname,
+      path: item.path || '/',
+    }));
+    logger.info('cookie params', cookieParams);
+    await page.setCookie(...cookieParams);
   }
 
+  // handle localStorage
   if (localStorage) {
     await page.evaluateOnNewDocument((items) => {
-      Object.entries(items).forEach(([key, value]) => {
-        window.localStorage.setItem(key, value);
+      items.forEach((item) => {
+        const value = item.value === 'now()' ? new Date().toISOString() : item.value;
+        window.localStorage.setItem(item.key, value);
       });
     }, localStorage);
   }
@@ -289,11 +299,6 @@ export const getPageContent = async ({
  */
 // eslint-disable-next-line require-await
 export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
-  params = {
-    ...params,
-    url: formatUrl(params.url),
-  };
-
   // skip duplicate job
   const existsJob = await Job.isExists(params);
   if (existsJob) {

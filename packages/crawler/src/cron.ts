@@ -7,6 +7,7 @@ let cron = null as any;
 
 export function initCron() {
   if (cron) return;
+  if (!config.siteCron) return;
 
   logger.info('Init cron', { config: config.siteCron });
 
@@ -18,6 +19,8 @@ export function initCron() {
         time: config.siteCron.time,
         options: { runOnInit: config.siteCron.immediate },
         fn: async () => {
+          if (!config.siteCron?.enabled) return;
+
           logger.info('Start cron to crawl site', { sites: config.siteCron.sites });
           for (const site of config.siteCron.sites) {
             try {

@@ -20,6 +20,8 @@ export interface SnapshotModel {
     quality?: number;
     fullPage?: boolean;
     headers?: Record<string, string>;
+    cookies?: Record<string, string>;
+    localStorage?: Record<string, string>;
   };
 }
 

@@ -16,7 +16,7 @@ export interface JobState {
   lastModified?: string;
   headers?: Record<string, string>;
   cookies?: CookieParam[];
-  localStorage?: Record<string, string>;
+  localStorage?: { key: string; value: string }[];
 }
 
 export interface JobModel {

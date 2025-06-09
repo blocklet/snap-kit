@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import merge from 'lodash/merge';
 
 import { Config, config, logger } from './config';
@@ -11,9 +12,9 @@ export * from './site';
 export * from './services/snapshot';
 export * as utils from './utils';
 
-type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
-
-export async function initCrawler(params: DeepPartial<Pick<Config, 'puppeteerPath' | 'siteCron'>>) {
+export async function initCrawler(
+  params: Pick<Config, 'puppeteerPath' | 'siteCron' | 'cookies' | 'localStorage' | 'siteCron' | 'concurrency'>,
+) {
   merge(config, params);
 
   logger.info('Init crawler', { params, config });
@@ -22,7 +23,8 @@ export async function initCrawler(params: DeepPartial<Pick<Config, 'puppeteerPat
     await initDatabase();
     await ensureBrowser();
     await createCrawlQueue();
-    if (config.siteCron.enabled) {
+
+    if (config.siteCron?.enabled) {
       await initCron();
     }
   } catch (err) {

@@ -37,6 +37,12 @@ export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<ke
     const html = await fs.readFile(path.join(config.dataDir, data.html));
     data.html = html.toString();
   }
+  // remove sensitive options that should not be returned
+  if (data.options) {
+    delete data.options.cookies;
+    delete data.options.localStorage;
+    delete data.options.headers;
+  }
 
   if (columns?.length) {
     data = pick(data, columns);
