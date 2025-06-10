@@ -43,8 +43,7 @@ await initCrawler({
     immediate: !!env.preferences.cronImmediate,
     sites: env.preferences.cronSites,
     time: env.preferences.cronTime,
-    crawlConcurrency: env.preferences.crawlConcurrency,
-    sitemapConcurrency: env.preferences.sitemapConcurrency,
+    concurrency: env.preferences.concurrency,
   },
 });
 ```

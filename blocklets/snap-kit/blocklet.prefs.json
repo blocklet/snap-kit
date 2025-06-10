@@ -303,10 +303,332 @@
                 "x-index": 3
               }
             }
+          },
+          "hbp46bza4ox": {
+            "type": "void",
+            "x-component": "FormTab.TabPane",
+            "x-component-props": {
+              "tab": "Cookies"
+            },
+            "x-designable-id": "hbp46bza4ox",
+            "x-index": 2,
+            "properties": {
+              "cookies": {
+                "type": "array",
+                "x-decorator": "FormItem",
+                "x-component": "ArrayTable",
+                "x-validator": [],
+                "x-component-props": {
+                  "showHeader": true
+                },
+                "x-decorator-props": {},
+                "name": "cookies",
+                "title": "",
+                "x-designable-id": "6eczg2hgz8t",
+                "x-index": 0,
+                "items": {
+                  "type": "object",
+                  "x-designable-id": "39s2nsjc786",
+                  "properties": {
+                    "ayz27maqrmh": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Name"
+                      },
+                      "x-designable-id": "ayz27maqrmh",
+                      "x-index": 0,
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "title": "",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {},
+                          "x-decorator-props": {},
+                          "name": "name",
+                          "required": true,
+                          "x-designable-id": "7y6wkm1ajd0",
+                          "x-index": 0
+                        }
+                      }
+                    },
+                    "whc9ip1ptjx": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Value"
+                      },
+                      "x-designable-id": "whc9ip1ptjx",
+                      "x-index": 1,
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "title": "",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {
+                            "placeholder": ""
+                          },
+                          "x-decorator-props": {},
+                          "default": "",
+                          "name": "value",
+                          "required": true,
+                          "x-designable-id": "ymd7wc6cytr",
+                          "x-index": 0,
+                          "description": ""
+                        }
+                      }
+                    },
+                    "nkp1hs0avsc": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Expires(date)"
+                      },
+                      "x-designable-id": "nkp1hs0avsc",
+                      "x-index": 2,
+                      "properties": {
+                        "expires": {
+                          "type": "string",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": "date",
+                          "x-component-props": {
+                            "placeholder": "default is session cookie"
+                          },
+                          "x-decorator-props": {},
+                          "name": "expires",
+                          "default": "",
+                          "description": "",
+                          "x-designable-id": "b7d3tguw250",
+                          "x-index": 0
+                        }
+                      }
+                    },
+                    "y52grrb0mr0": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Domain"
+                      },
+                      "x-designable-id": "y52grrb0mr0",
+                      "x-index": 3,
+                      "properties": {
+                        "domain": {
+                          "type": "string",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {
+                            "placeholder": "Default is the same as the page"
+                          },
+                          "x-decorator-props": {},
+                          "name": "domain",
+                          "default": "",
+                          "description": "",
+                          "x-designable-id": "vpbhp3trjbu",
+                          "x-index": 0
+                        }
+                      }
+                    },
+                    "ovi3aunskey": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Path"
+                      },
+                      "x-designable-id": "ovi3aunskey",
+                      "x-index": 4,
+                      "properties": {
+                        "path": {
+                          "type": "string",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {
+                            "placeholder": "default is /"
+                          },
+                          "x-decorator-props": {},
+                          "name": "path",
+                          "default": "/",
+                          "description": "",
+                          "x-designable-id": "10h921m9byw",
+                          "x-index": 0
+                        }
+                      }
+                    },
+                    "rjkzwe5njlb": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Action"
+                      },
+                      "x-designable-id": "rjkzwe5njlb",
+                      "x-index": 5,
+                      "properties": {
+                        "4c3xx1wudzv": {
+                          "type": "void",
+                          "x-component": "ArrayTable.Remove",
+                          "x-designable-id": "4c3xx1wudzv",
+                          "x-index": 0
+                        },
+                        "7ce2f5o9fdl": {
+                          "type": "void",
+                          "x-component": "ArrayTable.MoveDown",
+                          "x-designable-id": "7ce2f5o9fdl",
+                          "x-index": 1
+                        },
+                        "n1jfz9r7ixh": {
+                          "type": "void",
+                          "x-component": "ArrayTable.MoveUp",
+                          "x-designable-id": "n1jfz9r7ixh",
+                          "x-index": 2
+                        }
+                      }
+                    }
+                  }
+                },
+                "properties": {
+                  "p7gnqszvtel": {
+                    "type": "void",
+                    "title": "Addition",
+                    "x-component": "ArrayTable.Addition",
+                    "x-component-props": {},
+                    "x-designable-id": "p7gnqszvtel",
+                    "x-index": 0
+                  }
+                }
+              }
+            }
+          },
+          "6m1f2oh03en": {
+            "type": "void",
+            "x-component": "FormTab.TabPane",
+            "x-component-props": {
+              "tab": "LocalStorage"
+            },
+            "x-designable-id": "6m1f2oh03en",
+            "x-index": 3,
+            "properties": {
+              "localStorage": {
+                "type": "array",
+                "x-decorator": "FormItem",
+                "x-component": "ArrayTable",
+                "x-validator": [],
+                "x-component-props": {
+                  "showHeader": true
+                },
+                "x-decorator-props": {},
+                "name": "localStorage",
+                "title": "",
+                "x-designable-id": "e8yhd19v3oh",
+                "x-index": 0,
+                "items": {
+                  "type": "object",
+                  "x-designable-id": "g1gwvsa3h7l",
+                  "properties": {
+                    "lv8onhh4zce": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Key"
+                      },
+                      "x-designable-id": "lv8onhh4zce",
+                      "x-index": 0,
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "title": "",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {},
+                          "x-decorator-props": {},
+                          "name": "key",
+                          "required": true,
+                          "x-designable-id": "9gbzcy18sn8",
+                          "x-index": 0
+                        }
+                      }
+                    },
+                    "2ne6o3ifiig": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Value"
+                      },
+                      "x-designable-id": "2ne6o3ifiig",
+                      "x-index": 1,
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "title": "",
+                          "x-decorator": "FormItem",
+                          "x-component": "Input",
+                          "x-validator": [],
+                          "x-component-props": {
+                            "placeholder": ""
+                          },
+                          "x-decorator-props": {},
+                          "default": "",
+                          "name": "value",
+                          "required": true,
+                          "x-designable-id": "47ksibkqxox",
+                          "x-index": 0,
+                          "description": ""
+                        }
+                      }
+                    },
+                    "rkmfcvjybx6": {
+                      "type": "void",
+                      "x-component": "ArrayTable.Column",
+                      "x-component-props": {
+                        "title": "Action"
+                      },
+                      "x-designable-id": "rkmfcvjybx6",
+                      "x-index": 2,
+                      "properties": {
+                        "bd23n1upy1t": {
+                          "type": "void",
+                          "x-component": "ArrayTable.Remove",
+                          "x-designable-id": "bd23n1upy1t",
+                          "x-index": 0
+                        },
+                        "93dga6mpwgs": {
+                          "type": "void",
+                          "x-component": "ArrayTable.MoveDown",
+                          "x-designable-id": "93dga6mpwgs",
+                          "x-index": 1
+                        },
+                        "13via19ruvi": {
+                          "type": "void",
+                          "x-component": "ArrayTable.MoveUp",
+                          "x-designable-id": "13via19ruvi",
+                          "x-index": 2
+                        }
+                      }
+                    }
+                  }
+                },
+                "properties": {
+                  "ui85430q496": {
+                    "type": "void",
+                    "title": "Addition",
+                    "x-component": "ArrayTable.Addition",
+                    "x-component-props": {},
+                    "x-designable-id": "ui85430q496",
+                    "x-index": 0
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
-    "x-designable-id": "6xxbid1ufp5"
+    "x-designable-id": "6mzz991f2to"
   }
 }

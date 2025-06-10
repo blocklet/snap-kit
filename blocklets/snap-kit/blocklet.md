@@ -12,12 +12,22 @@ Crawl a webpage and extract its HTML content.
 
 ##### Parameters
 
-| Parameter | Type    | Required | Default | Description                                            |
-| --------- | ------- | -------- | ------- | ------------------------------------------------------ |
-| url       | string  | Yes      | -       | The URL to crawl (must be a valid URI)                 |
-| timeout   | number  | No       | 120     | Timeout in seconds (10-120)                            |
-| sync      | boolean | No       | false   | Whether to wait for crawl completion before responding |
-| header    | json    | No       | -       | Request headers when accessing the page                |
+| Parameter    | Type    | Required | Default | Description                                            |
+| ------------ | ------- | -------- | ------- | ------------------------------------------------------ |
+| url          | string  | Yes      | -       | The URL to crawl (must be a valid URI)                 |
+| timeout      | number  | No       | 120     | Timeout in seconds (10-120)                            |
+| sync         | boolean | No       | false   | Whether to wait for crawl completion before responding |
+| header       | json    | No       | -       | Request headers when accessing the page                |
+| cookies      | array   | No       | -       | Request cookies when accessing the page                |
+| localStorage | array   | No       | -       | set localStorage when accessing the page               |
+
+cookies: 
+
+`Array<{ name: string, value: string, domain?: string, expires?: string, path?: string }>`
+
+localStorage: 
+
+`Array<{ key: string, value: string }>`
 
 ##### Response
 
@@ -86,16 +96,18 @@ Capture a screenshot of a webpage.
 
 ##### Parameters
 
-| Parameter | Type    | Required | Default | Description                                              |
-| --------- | ------- | -------- | ------- | -------------------------------------------------------- |
-| url       | string  | Yes      | -       | The URL to capture (must be a valid URI)                 |
-| width     | number  | No       | 1440    | Width of the viewport (min: 375px)                       |
-| height    | number  | No       | 900     | Height of the viewport (min: 500px)                      |
-| quality   | number  | No       | 80      | Screenshot quality (1-100)                               |
-| timeout   | number  | No       | 120     | Timeout in seconds (10-120)                              |
-| fullPage  | boolean | No       | false   | Whether to capture the full page or just the viewport    |
-| sync      | boolean | No       | false   | Whether to wait for capture completion before responding |
-| header    | json    | No       | -       | Request headers when accessing the page                  |
+| Parameter    | Type    | Required | Default | Description                                              |
+| ------------ | ------- | -------- | ------- | -------------------------------------------------------- |
+| url          | string  | Yes      | -       | The URL to capture (must be a valid URI)                 |
+| width        | number  | No       | 1440    | Width of the viewport (min: 375px)                       |
+| height       | number  | No       | 900     | Height of the viewport (min: 500px)                      |
+| quality      | number  | No       | 80      | Screenshot quality (1-100)                               |
+| timeout      | number  | No       | 120     | Timeout in seconds (10-120)                              |
+| fullPage     | boolean | No       | false   | Whether to capture the full page or just the viewport    |
+| sync         | boolean | No       | false   | Whether to wait for capture completion before responding |
+| header       | json    | No       | -       | Request headers when accessing the page                  |
+| cookies      | array   | No       | -       | Request cookies when accessing the page                  |
+| localStorage | array   | No       | -       | set localStorage when accessing the page                 |
 
 ##### Response
 

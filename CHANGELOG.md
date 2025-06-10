@@ -1,3 +1,7 @@
+## 1.1.6 (2025-6-10)
+
+- feat: support cookies/localStorage setting in blocklet studio and api
+
 ## 1.1.5 (2025-6-6)
 
 - chore: update deps

@@ -1,3 +1,4 @@
+import { CookieParam } from '@blocklet/puppeteer';
 import { DataTypes, FindOptions, Model, Sequelize } from '@sequelize/core';
 
 export interface SnapshotModel {
@@ -20,6 +21,8 @@ export interface SnapshotModel {
     quality?: number;
     fullPage?: boolean;
     headers?: Record<string, string>;
+    cookies?: CookieParam[];
+    localStorage?: { key: string; value: string }[];
   };
 }
 
