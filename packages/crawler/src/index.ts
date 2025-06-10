@@ -13,7 +13,7 @@ export * from './services/snapshot';
 export * as utils from './utils';
 
 export async function initCrawler(
-  params: Pick<Config, 'puppeteerPath' | 'siteCron' | 'cookies' | 'localStorage' | 'siteCron' | 'concurrency'>,
+  params: Pick<Config, 'puppeteerPath' | 'siteCron' | 'cookies' | 'localStorage' | 'concurrency'>,
 ) {
   merge(config, params);
 

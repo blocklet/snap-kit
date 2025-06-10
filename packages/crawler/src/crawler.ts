@@ -178,7 +178,6 @@ export const getPageContent = async ({
       domain: item.domain || hostname,
       path: item.path || '/',
     }));
-    logger.info('cookie params', cookieParams);
     await page.setCookie(...cookieParams);
   }
 
