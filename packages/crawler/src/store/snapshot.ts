@@ -9,6 +9,7 @@ export interface SnapshotModel {
   screenshot?: string | null;
   error?: string;
   lastModified?: string;
+  from?: 'sitemap' | 'url';
   meta?: {
     title?: string;
     description?: string;
@@ -40,6 +41,8 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
   public error?: SnapshotModel['error'];
 
   public lastModified?: SnapshotModel['lastModified'];
+
+  public from?: SnapshotModel['from'];
 
   public meta?: SnapshotModel['meta'];
 
@@ -76,6 +79,10 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
         },
         lastModified: {
           type: DataTypes.STRING,
+          allowNull: true,
+        },
+        from: {
+          type: DataTypes.ENUM('sitemap', 'url'),
           allowNull: true,
         },
         meta: {

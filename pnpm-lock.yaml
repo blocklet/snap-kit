@@ -219,6 +219,9 @@ importers:
       ufo:
         specifier: ^1.5.4
         version: 1.6.1
+      umzug:
+        specifier: ^3.8.2
+        version: 3.8.2(@types/node@20.17.48)
     devDependencies:
       '@types/dotenv-flow':
         specifier: ^3.3.3
@@ -5958,6 +5961,10 @@ packages:
 
   umzug@3.4.0:
     resolution: {integrity: sha512-bTen9ElCBoWU1mhcaXqVZWXxB1PojsBQBs/4vW0YV8f5CfhuhkfRjQZj6SCb6IuHWPkccDzF+T+RGZCYUiXaKg==}
+    engines: {node: '>=12'}
+
+  umzug@3.8.2:
+    resolution: {integrity: sha512-BEWEF8OJjTYVC56GjELeHl/1XjFejrD7aHzn+HldRJTx+pL1siBrKHZC8n4K/xL3bEzVA9o++qD1tK2CpZu4KA==}
     engines: {node: '>=12'}
 
   unbox-primitive@1.1.0:
@@ -13308,6 +13315,16 @@ snapshots:
       glob: 8.1.0
       pony-cause: 2.1.11
       type-fest: 3.13.1
+    transitivePeerDependencies:
+      - '@types/node'
+
+  umzug@3.8.2(@types/node@20.17.48):
+    dependencies:
+      '@rushstack/ts-command-line': 4.23.7(@types/node@20.17.48)
+      emittery: 0.13.1
+      fast-glob: 3.3.3
+      pony-cause: 2.1.11
+      type-fest: 4.41.0
     transitivePeerDependencies:
       - '@types/node'
 

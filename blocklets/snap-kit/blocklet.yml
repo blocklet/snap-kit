@@ -44,6 +44,7 @@ requirements:
   os: '*'
   cpu: '*'
 scripts:
+  preStart: node api/hooks/pre-start.js
   dev: npm run start
 capabilities:
   navigation: true

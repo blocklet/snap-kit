@@ -72,7 +72,8 @@
     "robots-parser": "^3.0.1",
     "sitemap": "^7.1.2",
     "sqlite3": "^5.1.7",
-    "ufo": "^1.5.4"
+    "ufo": "^1.5.4",
+    "umzug": "^3.8.2"
   },
   "devDependencies": {
     "@types/dotenv-flow": "^3.3.3",
