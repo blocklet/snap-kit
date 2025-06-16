@@ -1,3 +1,10 @@
+## 1.2.0 (2025-6-16)
+
+- feat: remove stale snapshots when scheduled crawler completed
+- feat: support waitTime option to customize page crawl delay
+- feat: support migration for db
+- feat: separate queues for API and scheduled
+
 ## 1.1.6 (2025-6-10)
 
 - feat: support cookies/localStorage setting in blocklet studio and api
