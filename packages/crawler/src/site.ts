@@ -78,7 +78,7 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
           includeHtml: true,
         });
       },
-      { concurrency: config.siteCron.sitemapConcurrency },
+      { concurrency: config.siteCron?.concurrency || 30 },
     );
 
     logger.info('Enqueued jobs from sitemap finished', {

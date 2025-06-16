@@ -1,3 +1,4 @@
+import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -26,7 +27,7 @@ export function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapsho
 }
 
 export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<keyof SnapshotModel>) {
-  let data = Object.assign({}, snapshot);
+  let data = cloneDeep(snapshot);
 
   // format screenshot path to full url
   if (data.screenshot) {
@@ -36,6 +37,12 @@ export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<ke
   if (data.html) {
     const html = await fs.readFile(path.join(config.dataDir, data.html));
     data.html = html.toString();
+  }
+  // remove sensitive options that should not be returned
+  if (data.options) {
+    delete data.options.cookies;
+    delete data.options.localStorage;
+    delete data.options.headers;
   }
 
   if (columns?.length) {

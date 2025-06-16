@@ -61,14 +61,16 @@ export const server = app.listen(port, async (err?: any) => {
 
   try {
     await initCrawler({
+      concurrency: Math.max(1, env.preferences.concurrency || 0),
       siteCron: {
         enabled: !!env.preferences.cronEnabled,
         immediate: !!env.preferences.cronImmediate,
         sites: env.preferences.cronSites,
         time: env.preferences.cronTime,
-        crawlConcurrency: Math.max(1, env.preferences.crawlConcurrency || 0),
-        sitemapConcurrency: Math.max(1, env.preferences.sitemapConcurrency || 0),
+        concurrency: Math.max(1, env.preferences.sitemapConcurrency || 0),
       },
+      cookies: env.preferences.cookies,
+      localStorage: env.preferences.localStorage,
     });
     logger.info('Crawler ready');
   } catch (err) {

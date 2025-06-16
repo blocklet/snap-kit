@@ -17,6 +17,8 @@ const crawlSchema = Joi.object({
   url: Joi.string().uri().required(),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
   timeout: Joi.number().integer().min(10).max(120).default(120),
+  cookies: Joi.array().items(Joi.object({ name: Joi.string().required(), value: Joi.string().required() })),
+  localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
   sync: Joi.boolean().default(false),
 });
 router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
@@ -82,6 +84,8 @@ const snapSchema = Joi.object({
   timeout: Joi.number().integer().min(10).max(120).default(120),
   fullPage: Joi.boolean().default(false),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
+  cookies: Joi.array().items(Joi.object({ name: Joi.string().required(), value: Joi.string().required() })),
+  localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
   sync: Joi.boolean().default(false),
 });
 router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
