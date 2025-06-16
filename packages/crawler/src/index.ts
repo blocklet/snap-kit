@@ -2,7 +2,6 @@
 import merge from 'lodash/merge';
 
 import { Config, config, logger } from './config';
-import { createCrawlQueue } from './crawler';
 import { initCron } from './cron';
 import { ensureBrowser } from './puppeteer';
 
@@ -21,7 +20,6 @@ export async function initCrawler(
 
   try {
     await ensureBrowser();
-    await createCrawlQueue();
 
     if (config.siteCron?.enabled) {
       await initCron();

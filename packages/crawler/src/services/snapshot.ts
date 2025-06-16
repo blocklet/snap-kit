@@ -1,12 +1,12 @@
+import { WhereOptions } from '@sequelize/core';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { joinURL } from 'ufo';
 
-import { config } from '../config';
-import { Job, JobState } from '../store/job';
-import { Snapshot, SnapshotModel } from '../store/snapshot';
+import { config, logger } from '../config';
+import { Job, JobState, Snapshot, SnapshotModel } from '../store';
 import { formatUrl } from '../utils';
 
 export function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapshot?: Partial<SnapshotModel> }) {
@@ -14,6 +14,7 @@ export function convertJobToSnapshot({ job, snapshot }: { job: JobState; snapsho
     jobId: job.jobId || job.id,
     url: job.url,
     lastModified: job.lastModified || new Date().toISOString(),
+    replace: job.replace,
     options: {
       width: job.width,
       height: job.height,
@@ -78,7 +79,38 @@ export async function getLatestSnapshot(url: string) {
       url: formatUrl(url),
       status: 'success',
     },
+    order: [
+      ['lastModified', 'DESC'],
+      ['updatedAt', 'DESC'],
+    ],
   });
 
   return snapshot ? formatSnapshot(snapshot) : null;
+}
+
+export async function deleteSnapshots(where: WhereOptions<SnapshotModel>) {
+  const snapshots = await Snapshot.findAll({
+    where,
+    order: [
+      ['lastModified', 'DESC'],
+      ['updatedAt', 'DESC'],
+    ],
+  });
+
+  const jobIds = await Promise.all(
+    snapshots.map(async (snapshot) => {
+      try {
+        await Promise.all([
+          snapshot.html && fs.unlink(path.join(config.dataDir, snapshot.html)),
+          snapshot.screenshot && fs.unlink(path.join(config.dataDir, snapshot.screenshot)),
+        ]);
+        await snapshot.destroy();
+        return snapshot.jobId;
+      } catch (error) {
+        logger.error('Failed to delete snapshot', { error, snapshot });
+      }
+    }),
+  );
+
+  return jobIds.filter(Boolean);
 }

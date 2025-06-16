@@ -3,7 +3,7 @@ import { SequelizeStorage, Umzug } from 'umzug';
 
 import { sequelize } from './index';
 import * as migration20250615 from './migrations/20250615-genesis';
-import * as migration20250616 from './migrations/20250616-from';
+import * as migration20250616Replace from './migrations/20250616-replace';
 
 const umzug = new Umzug({
   migrations: [
@@ -13,9 +13,9 @@ const umzug = new Umzug({
       down: ({ context }) => migration20250615.down({ context }),
     },
     {
-      name: '20250616-from',
-      up: ({ context }) => migration20250616.up({ context }),
-      down: ({ context }) => migration20250616.down({ context }),
+      name: '20250616-replace',
+      up: ({ context }) => migration20250616Replace.up({ context }),
+      down: ({ context }) => migration20250616Replace.down({ context }),
     },
   ],
   context: sequelize.getQueryInterface(),

@@ -6,20 +6,20 @@ import path from 'path';
 
 import { config, logger } from './config';
 import { initPage } from './puppeteer';
-import { convertJobToSnapshot, formatSnapshot } from './services/snapshot';
-import { Job, JobState } from './store/job';
-import { Snapshot, SnapshotModel } from './store/snapshot';
+import { convertJobToSnapshot, deleteSnapshots, formatSnapshot } from './services/snapshot';
+import { Job, JobState, Snapshot, SnapshotModel } from './store';
 import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5, sleep } from './utils';
 
 const { BaseState } = require('@abtnode/models');
 
-let crawlQueue;
+// eslint-disable-next-line import/no-mutable-exports
+const crawlQueue = createCrawlQueue('urlCrawler');
 
-export function createCrawlQueue() {
+export function createCrawlQueue(queue: string) {
   const db = new BaseState(Job);
 
-  crawlQueue = createQueue({
-    store: new SequelizeStore(db, 'crawler'),
+  return createQueue({
+    store: new SequelizeStore(db, queue),
     concurrency: config.concurrency,
     onJob: async (job: JobState) => {
       logger.info('Starting to execute crawl job', job);
@@ -72,12 +72,26 @@ export function createCrawlQueue() {
           return snapshot;
         }
 
+        // delete old snapshot
+        if (formattedJob.replace) {
+          try {
+            const deletedJobIds = await deleteSnapshots({
+              url: formattedJob.url,
+              replace: true,
+            });
+            if (deletedJobIds) {
+              logger.info('Deleted old snapshot', { deletedJobIds });
+            }
+          } catch (error) {
+            logger.error('Failed to delete old snapshot', { error, formattedJob });
+          }
+        }
+
         // save html and screenshot to data dir
         const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
           screenshot: result.screenshot,
           html: result.html,
         });
-        // const lastModified = job.lastmodMap?.get(url) || new Date().toISOString();
 
         const snapshot = convertJobToSnapshot({
           job: formattedJob,
@@ -89,6 +103,7 @@ export function createCrawlQueue() {
           },
         });
         await Snapshot.upsert(snapshot);
+
         return snapshot;
       } catch (error) {
         logger.error(`Failed to crawl ${formattedJob.url}`, { error, formattedJob });
@@ -273,7 +288,7 @@ export const getPageContent = async ({
         (errorHtml) => data.html.includes(errorHtml),
       );
       if (isErrorPage) {
-        throw new Error('Page is an error page');
+        throw new Error(`${url} is an error page`);
       }
 
       meta.title = data.title;

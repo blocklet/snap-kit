@@ -29,4 +29,7 @@ sequelize.query('pragma journal_size_limit = 67108864;');
 Job.initModel(sequelize);
 Snapshot.initModel(sequelize);
 
-export { sequelize, Job, Snapshot };
+export { sequelize };
+
+export * from './job';
+export * from './snapshot';
