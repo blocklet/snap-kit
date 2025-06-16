@@ -16,6 +16,7 @@ Crawl a webpage and extract its HTML content.
 | ------------ | ------- | -------- | ------- | ------------------------------------------------------ |
 | url          | string  | Yes      | -       | The URL to crawl (must be a valid URI)                 |
 | timeout      | number  | No       | 120     | Timeout in seconds (10-120)                            |
+| waitTime     | number  | No       | 0       | At least the time to wait for the page (0-120)         |
 | sync         | boolean | No       | false   | Whether to wait for crawl completion before responding |
 | header       | json    | No       | -       | Request headers when accessing the page                |
 | cookies      | array   | No       | -       | Request cookies when accessing the page                |
@@ -103,6 +104,7 @@ Capture a screenshot of a webpage.
 | height       | number  | No       | 900     | Height of the viewport (min: 500px)                      |
 | quality      | number  | No       | 80      | Screenshot quality (1-100)                               |
 | timeout      | number  | No       | 120     | Timeout in seconds (10-120)                              |
+| waitTime     | number  | No       | 0       | At least the time to wait for the page (0-120)           |
 | fullPage     | boolean | No       | false   | Whether to capture the full page or just the viewport    |
 | sync         | boolean | No       | false   | Whether to wait for capture completion before responding |
 | header       | json    | No       | -       | Request headers when accessing the page                  |

@@ -46,12 +46,10 @@ export async function up({ context }) {
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      index: true,
     },
     updatedAt: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
-      index: true,
     },
   });
 

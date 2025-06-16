@@ -9,7 +9,7 @@ import { initPage } from './puppeteer';
 import { convertJobToSnapshot, formatSnapshot } from './services/snapshot';
 import { Job, JobState } from './store/job';
 import { Snapshot, SnapshotModel } from './store/snapshot';
-import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5 } from './utils';
+import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5, sleep } from './utils';
 
 const { BaseState } = require('@abtnode/models');
 
@@ -154,6 +154,7 @@ export const getPageContent = async ({
   height = 900,
   quality = 80,
   timeout = 90 * 1000,
+  waitTime = 0,
   fullPage = false,
   headers,
   cookies,
@@ -210,9 +211,17 @@ export const getPageContent = async ({
 
     // await for networkidle0
     // https://pptr.dev/api/puppeteer.page.waitfornetworkidle
-    await page.waitForNetworkIdle({
-      idleTime: 1.5 * 1000,
-    });
+    try {
+      await Promise.all([
+        page.waitForNetworkIdle({
+          idleTime: 1.5 * 1000,
+          timeout,
+        }),
+        sleep(waitTime),
+      ]);
+    } catch (err) {
+      logger.warn(`Failed to wait for network idle in ${url}:`, err);
+    }
 
     // get screenshot
     if (includeScreenshot) {
