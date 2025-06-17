@@ -24,7 +24,15 @@ const crawlSchema = Joi.object({
 });
 router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlSchema.validateAsync(req.body);
-  let timer;
+
+  res.setTimeout(params.timeout * 1000, () => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        code: 'error',
+        message: 'Request timeout',
+      });
+    }
+  });
 
   const jobId = await crawlUrl(
     {
@@ -35,7 +43,6 @@ router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, 
       includeScreenshot: false,
     },
     (snapshot) => {
-      clearTimeout(timer);
       if (params.sync && !res.headersSent) {
         delete snapshot?.screenshot;
 
@@ -52,15 +59,7 @@ router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, 
       code: 'ok',
       data: { jobId },
     });
-    return;
   }
-
-  timer = setTimeout(() => {
-    res.status(408).json({
-      code: 'error',
-      message: 'Request timeout',
-    });
-  }, params.timeout * 1000);
 });
 
 /**
@@ -93,7 +92,7 @@ const snapSchema = Joi.object({
   width: Joi.number().integer().min(375).default(1440),
   height: Joi.number().integer().min(500).default(900),
   quality: Joi.number().integer().min(1).max(100).default(80),
-  timeout: Joi.number().integer().min(10).max(120).default(120),
+  timeout: Joi.number().integer().min(0).max(120).default(120),
   waitTime: Joi.number().integer().min(0).max(120).default(0),
   fullPage: Joi.boolean().default(false),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
@@ -103,7 +102,15 @@ const snapSchema = Joi.object({
 });
 router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await snapSchema.validateAsync(req.body);
-  let timer;
+
+  res.setTimeout(params.timeout * 1000, () => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        code: 'error',
+        message: 'Request timeout',
+      });
+    }
+  });
 
   const jobId = await crawlUrl(
     {
@@ -114,7 +121,6 @@ router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, r
       includeScreenshot: true,
     },
     (snapshot) => {
-      clearTimeout(timer);
       if (params.sync && !res.headersSent) {
         delete snapshot?.html;
 
@@ -132,13 +138,6 @@ router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, r
       data: { jobId },
     });
   }
-
-  timer = setTimeout(() => {
-    res.status(408).json({
-      code: 'error',
-      message: 'Request timeout',
-    });
-  }, params.timeout * 1000);
 });
 
 /**

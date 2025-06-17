@@ -7,7 +7,7 @@ import path from 'path';
 import { config, logger } from './config';
 import { initPage } from './puppeteer';
 import { convertJobToSnapshot, deleteSnapshots, formatSnapshot } from './services/snapshot';
-import { Job, JobState, Snapshot, SnapshotModel } from './store';
+import { Job, JobState, Snapshot, SnapshotModel, sequelize } from './store';
 import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5, sleep } from './utils';
 
 const { BaseState } = require('@abtnode/models');
@@ -71,38 +71,44 @@ export function createCrawlQueue(queue: string) {
           await Snapshot.upsert(snapshot);
           return snapshot;
         }
-
-        // delete old snapshot
-        if (formattedJob.replace) {
-          try {
-            const deletedJobIds = await deleteSnapshots({
-              url: formattedJob.url,
-              replace: true,
-            });
-            if (deletedJobIds) {
-              logger.info('Deleted old snapshot', { deletedJobIds });
+        const snapshot = await sequelize.transaction(async (txn) => {
+          // delete old snapshot
+          if (formattedJob.replace) {
+            try {
+              const deletedJobIds = await deleteSnapshots(
+                {
+                  url: formattedJob.url,
+                  replace: true,
+                },
+                { txn },
+              );
+              if (deletedJobIds) {
+                logger.info('Deleted old snapshot', { deletedJobIds });
+              }
+            } catch (error) {
+              logger.error('Failed to delete old snapshot', { error, formattedJob });
             }
-          } catch (error) {
-            logger.error('Failed to delete old snapshot', { error, formattedJob });
           }
-        }
 
-        // save html and screenshot to data dir
-        const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
-          screenshot: result.screenshot,
-          html: result.html,
-        });
+          // save html and screenshot to data dir
+          const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
+            screenshot: result.screenshot,
+            html: result.html,
+          });
 
-        const snapshot = convertJobToSnapshot({
-          job: formattedJob,
-          snapshot: {
-            status: 'success',
-            screenshot: screenshotPath?.replace(config.dataDir, ''),
-            html: htmlPath?.replace(config.dataDir, ''),
-            meta: result.meta,
-          },
+          const snapshot = convertJobToSnapshot({
+            job: formattedJob,
+            snapshot: {
+              status: 'success',
+              screenshot: screenshotPath?.replace(config.dataDir, ''),
+              html: htmlPath?.replace(config.dataDir, ''),
+              meta: result.meta,
+            },
+          });
+          await Snapshot.upsert(snapshot, { transaction: txn });
+
+          return snapshot;
         });
-        await Snapshot.upsert(snapshot);
 
         return snapshot;
       } catch (error) {

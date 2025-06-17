@@ -44,7 +44,7 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
 
   try {
     const jobIds = await pMap(
-      sitemapItems.slice(0, 10),
+      sitemapItems,
       async ({ url, sitemapItem }) => {
         processCount++;
 

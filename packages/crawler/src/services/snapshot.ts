@@ -1,4 +1,4 @@
-import { WhereOptions } from '@sequelize/core';
+import { Transaction, WhereOptions } from '@sequelize/core';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import fs from 'node:fs/promises';
@@ -88,7 +88,7 @@ export async function getLatestSnapshot(url: string) {
   return snapshot ? formatSnapshot(snapshot) : null;
 }
 
-export async function deleteSnapshots(where: WhereOptions<SnapshotModel>) {
+export async function deleteSnapshots(where: WhereOptions<SnapshotModel>, { txn }: { txn?: Transaction } = {}) {
   const snapshots = await Snapshot.findAll({
     where,
     order: [
@@ -104,10 +104,11 @@ export async function deleteSnapshots(where: WhereOptions<SnapshotModel>) {
           snapshot.html && fs.unlink(path.join(config.dataDir, snapshot.html)),
           snapshot.screenshot && fs.unlink(path.join(config.dataDir, snapshot.screenshot)),
         ]);
-        await snapshot.destroy();
+        await snapshot.destroy({ transaction: txn });
         return snapshot.jobId;
       } catch (error) {
         logger.error('Failed to delete snapshot', { error, snapshot });
+        throw error;
       }
     }),
   );

@@ -64,6 +64,7 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
         status: {
           type: DataTypes.ENUM('success', 'failed', 'pending'),
           allowNull: false,
+          index: true,
         },
         html: {
           type: DataTypes.TEXT,
@@ -83,8 +84,9 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
         },
         replace: {
           type: DataTypes.BOOLEAN,
-          allowNull: true,
+          allowNull: false,
           defaultValue: false,
+          index: true,
         },
         meta: {
           type: DataTypes.JSON,
