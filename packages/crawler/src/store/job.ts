@@ -14,6 +14,8 @@ export interface JobState {
   timeout?: number;
   fullPage?: boolean;
   lastModified?: string;
+  waitTime?: number;
+  replace?: boolean;
   headers?: Record<string, string>;
   cookies?: CookieParam[];
   localStorage?: { key: string; value: string }[];

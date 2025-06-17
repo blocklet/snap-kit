@@ -9,6 +9,7 @@ export interface SnapshotModel {
   screenshot?: string | null;
   error?: string;
   lastModified?: string;
+  replace?: boolean;
   meta?: {
     title?: string;
     description?: string;
@@ -41,6 +42,8 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
 
   public lastModified?: SnapshotModel['lastModified'];
 
+  public replace?: SnapshotModel['replace'];
+
   public meta?: SnapshotModel['meta'];
 
   public options!: SnapshotModel['options'];
@@ -61,6 +64,7 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
         status: {
           type: DataTypes.ENUM('success', 'failed', 'pending'),
           allowNull: false,
+          index: true,
         },
         html: {
           type: DataTypes.TEXT,
@@ -77,6 +81,12 @@ export class Snapshot extends Model<SnapshotModel> implements SnapshotModel {
         lastModified: {
           type: DataTypes.STRING,
           allowNull: true,
+        },
+        replace: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+          index: true,
         },
         meta: {
           type: DataTypes.JSON,

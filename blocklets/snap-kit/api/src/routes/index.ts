@@ -17,6 +17,7 @@ const crawlSchema = Joi.object({
   url: Joi.string().uri().required(),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
   timeout: Joi.number().integer().min(10).max(120).default(120),
+  waitTime: Joi.number().integer().min(0).max(120).default(0),
   cookies: Joi.array().items(Joi.object({ name: Joi.string().required(), value: Joi.string().required() })),
   localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
   sync: Joi.boolean().default(false),
@@ -24,10 +25,20 @@ const crawlSchema = Joi.object({
 router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlSchema.validateAsync(req.body);
 
+  res.setTimeout(params.timeout * 1000, () => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        code: 'error',
+        message: 'Request timeout',
+      });
+    }
+  });
+
   const jobId = await crawlUrl(
     {
       ...params,
       timeout: params.timeout * 1000,
+      waitTime: params.waitTime * 1000,
       includeHtml: true,
       includeScreenshot: false,
     },
@@ -81,7 +92,8 @@ const snapSchema = Joi.object({
   width: Joi.number().integer().min(375).default(1440),
   height: Joi.number().integer().min(500).default(900),
   quality: Joi.number().integer().min(1).max(100).default(80),
-  timeout: Joi.number().integer().min(10).max(120).default(120),
+  timeout: Joi.number().integer().min(0).max(120).default(120),
+  waitTime: Joi.number().integer().min(0).max(120).default(0),
   fullPage: Joi.boolean().default(false),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
   cookies: Joi.array().items(Joi.object({ name: Joi.string().required(), value: Joi.string().required() })),
@@ -91,10 +103,20 @@ const snapSchema = Joi.object({
 router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await snapSchema.validateAsync(req.body);
 
+  res.setTimeout(params.timeout * 1000, () => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        code: 'error',
+        message: 'Request timeout',
+      });
+    }
+  });
+
   const jobId = await crawlUrl(
     {
       ...params,
       timeout: params.timeout * 1000,
+      waitTime: params.waitTime * 1000,
       includeHtml: false,
       includeScreenshot: true,
     },

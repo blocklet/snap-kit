@@ -2,15 +2,14 @@
 import merge from 'lodash/merge';
 
 import { Config, config, logger } from './config';
-import { createCrawlQueue } from './crawler';
 import { initCron } from './cron';
 import { ensureBrowser } from './puppeteer';
-import { initDatabase } from './store';
 
 export * from './crawler';
 export * from './site';
 export * from './services/snapshot';
 export * as utils from './utils';
+export { migrate } from './store/migrate';
 
 export async function initCrawler(
   params: Pick<Config, 'puppeteerPath' | 'siteCron' | 'cookies' | 'localStorage' | 'concurrency'>,
@@ -20,9 +19,7 @@ export async function initCrawler(
   logger.info('Init crawler', { params, config });
 
   try {
-    await initDatabase();
     await ensureBrowser();
-    await createCrawlQueue();
 
     if (config.siteCron?.enabled) {
       await initCron();

@@ -6,20 +6,20 @@ import path from 'path';
 
 import { config, logger } from './config';
 import { initPage } from './puppeteer';
-import { convertJobToSnapshot, formatSnapshot } from './services/snapshot';
-import { Job, JobState } from './store/job';
-import { Snapshot, SnapshotModel } from './store/snapshot';
-import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5 } from './utils';
+import { convertJobToSnapshot, deleteSnapshots, formatSnapshot } from './services/snapshot';
+import { Job, JobState, Snapshot, SnapshotModel, sequelize } from './store';
+import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5, sleep } from './utils';
 
 const { BaseState } = require('@abtnode/models');
 
-let crawlQueue;
+// eslint-disable-next-line import/no-mutable-exports
+const crawlQueue = createCrawlQueue('urlCrawler');
 
-export function createCrawlQueue() {
+export function createCrawlQueue(queue: string) {
   const db = new BaseState(Job);
 
-  crawlQueue = createQueue({
-    store: new SequelizeStore(db, 'crawler'),
+  return createQueue({
+    store: new SequelizeStore(db, queue),
     concurrency: config.concurrency,
     onJob: async (job: JobState) => {
       logger.info('Starting to execute crawl job', job);
@@ -71,24 +71,45 @@ export function createCrawlQueue() {
           await Snapshot.upsert(snapshot);
           return snapshot;
         }
+        const snapshot = await sequelize.transaction(async (txn) => {
+          // delete old snapshot
+          if (formattedJob.replace) {
+            try {
+              const deletedJobIds = await deleteSnapshots(
+                {
+                  url: formattedJob.url,
+                  replace: true,
+                },
+                { txn },
+              );
+              if (deletedJobIds) {
+                logger.info('Deleted old snapshot', { deletedJobIds });
+              }
+            } catch (error) {
+              logger.error('Failed to delete old snapshot', { error, formattedJob });
+            }
+          }
 
-        // save html and screenshot to data dir
-        const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
-          screenshot: result.screenshot,
-          html: result.html,
-        });
-        // const lastModified = job.lastmodMap?.get(url) || new Date().toISOString();
+          // save html and screenshot to data dir
+          const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
+            screenshot: result.screenshot,
+            html: result.html,
+          });
 
-        const snapshot = convertJobToSnapshot({
-          job: formattedJob,
-          snapshot: {
-            status: 'success',
-            screenshot: screenshotPath?.replace(config.dataDir, ''),
-            html: htmlPath?.replace(config.dataDir, ''),
-            meta: result.meta,
-          },
+          const snapshot = convertJobToSnapshot({
+            job: formattedJob,
+            snapshot: {
+              status: 'success',
+              screenshot: screenshotPath?.replace(config.dataDir, ''),
+              html: htmlPath?.replace(config.dataDir, ''),
+              meta: result.meta,
+            },
+          });
+          await Snapshot.upsert(snapshot, { transaction: txn });
+
+          return snapshot;
         });
-        await Snapshot.upsert(snapshot);
+
         return snapshot;
       } catch (error) {
         logger.error(`Failed to crawl ${formattedJob.url}`, { error, formattedJob });
@@ -154,6 +175,7 @@ export const getPageContent = async ({
   height = 900,
   quality = 80,
   timeout = 90 * 1000,
+  waitTime = 0,
   fullPage = false,
   headers,
   cookies,
@@ -210,9 +232,17 @@ export const getPageContent = async ({
 
     // await for networkidle0
     // https://pptr.dev/api/puppeteer.page.waitfornetworkidle
-    await page.waitForNetworkIdle({
-      idleTime: 1.5 * 1000,
-    });
+    try {
+      await Promise.all([
+        page.waitForNetworkIdle({
+          idleTime: 1.5 * 1000,
+          timeout,
+        }),
+        sleep(waitTime),
+      ]);
+    } catch (err) {
+      logger.warn(`Failed to wait for network idle in ${url}:`, err);
+    }
 
     // get screenshot
     if (includeScreenshot) {
@@ -264,7 +294,7 @@ export const getPageContent = async ({
         (errorHtml) => data.html.includes(errorHtml),
       );
       if (isErrorPage) {
-        throw new Error('Page is an error page');
+        throw new Error(`${url} is an error page`);
       }
 
       meta.title = data.title;
