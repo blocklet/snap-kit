@@ -22,11 +22,11 @@ Crawl a webpage and extract its HTML content.
 | cookies      | array   | No       | -       | Request cookies when accessing the page                |
 | localStorage | array   | No       | -       | set localStorage when accessing the page               |
 
-cookies: 
+cookies:
 
 `Array<{ name: string, value: string, domain?: string, expires?: string, path?: string }>`
 
-localStorage: 
+localStorage:
 
 `Array<{ key: string, value: string }>`
 
@@ -147,6 +147,110 @@ For synchronous requests (`sync: true`):
 #### GET /api/snap
 
 Retrieves the screenshot of a previous capture job.
+
+##### Parameters
+
+| Parameter | Type   | Required | Default | Description        |
+| --------- | ------ | -------- | ------- | ------------------ |
+| jobId     | string | Yes      | -       | ID of the snap job |
+
+##### Response
+
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "screenshot": "image path",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
+
+### POST /api/carbon
+
+Capture a screenshot of code by carbon.
+
+##### Parameters
+
+| Parameter | Type    | Required | Default | Description                                              |
+| --------- | ------- | -------- | ------- | -------------------------------------------------------- |
+| timeout   | number  | No       | 120     | Timeout in seconds (10-120)                              |
+| sync      | boolean | No       | false   | Whether to wait for capture completion before responding |
+| code      | string  | Yes      | ''      | The code you need to take a screenshot                   |
+
+Carbon params:
+
+Edit and copy the screenshot parameters you need here (https://carbon.now.sh/)
+
+```javascript
+{
+  bg: Joi.string().default('rgba(171, 184, 195, 1)'),
+  t: Joi.string().default('one-dark'),
+  wt: Joi.string().default('none'),
+  l: Joi.string().default('auto'),
+  width: Joi.number().default(680),
+  ds: Joi.string().default('true'),
+  dsyoff: Joi.string().default('20px'),
+  dsblur: Joi.string().default('68px'),
+  wc: Joi.string().default('true'),
+  wa: Joi.string().default('true'),
+  pv: Joi.string().default('21px'),
+  ph: Joi.string().default('19px'),
+  ln: Joi.string().default('false'),
+  fl: Joi.string().default('1'),
+  fm: Joi.string().default('Hack'),
+  fs: Joi.string().default('14px'),
+  lh: Joi.string().default('133%'),
+  si: Joi.string().default('false'),
+  es: Joi.string().default('2x'),
+  wm: Joi.string().default('false'),
+}
+```
+
+##### Response
+
+For asynchronous requests (`sync: false`):
+
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id"
+  }
+}
+```
+
+For synchronous requests (`sync: true`):
+
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "screenshot": "image path",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
+
+#### GET /api/carbon
+
+Retrieves the screenshot of a previous carbon job.
 
 ##### Parameters
 
