@@ -1,25 +1,16 @@
 /* global domtoimage */
-import { getBrowser } from '../puppeteer';
+import { Page } from '@blocklet/puppeteer';
+
+import { logger } from '../config';
+import { JobState } from '../store';
 
 // TODO expose local version of dom-to-image
 const DOM_TO_IMAGE_URL = 'https://unpkg.com/dom-to-image@2.6.0/dist/dom-to-image.min.js';
-// const NOTO_COLOR_EMOJI_URL = 'https://raw.githack.com/googlei18n/noto-emoji/master/fonts/NotoColorEmoji.ttf';
 
-export async function createCarbonImage(params: any) {
-  // try {
-  //   await chrome.font(NOTO_COLOR_EMOJI_URL);
-  // } catch (e) {
-  //   console.error(e);
-  // }
-
-  const browser = await getBrowser();
-
+export async function createCarbonImage(page: Page, params?: JobState) {
   try {
-    const page = await browser.newPage();
-
-    await page.goto(params.url);
     await page.addScriptTag({ url: DOM_TO_IMAGE_URL });
-    await page.waitForSelector('.export-container', { visible: true, timeout: params.timeout });
+    await page.waitForSelector('.export-container', { visible: true, timeout: params?.timeout || 120 });
 
     const targetElement = await page.$('.export-container');
 
@@ -75,10 +66,7 @@ export async function createCarbonImage(params: any) {
 
     return Buffer.from(dataUrl.split(',')[1], 'base64');
   } catch (e) {
-    // eslint-disable-next-line
-    console.error(e);
-    return null;
-  } finally {
-    await browser.close();
+    logger.error('failed to crawl from carbon', { error: e });
+    throw e;
   }
 }

@@ -1,4 +1,4 @@
-import { crawlUrl, getLatestSnapshot, getSnapshot } from '@arcblock/crawler';
+import { crawlCode, crawlUrl, getLatestSnapshot, getSnapshot } from '@arcblock/crawler';
 import { Joi } from '@arcblock/validator';
 import { Router } from 'express';
 import qs from 'querystring';
@@ -167,7 +167,7 @@ const carbonSchema = Joi.object({
   t: Joi.string().default('one-dark'),
   wt: Joi.string().default('none'),
   l: Joi.string().default('auto'),
-  width: Joi.string().default('680'),
+  width: Joi.number().default(680),
   ds: Joi.string().default('true'),
   dsyoff: Joi.string().default('20px'),
   dsblur: Joi.string().default('68px'),
@@ -186,13 +186,13 @@ const carbonSchema = Joi.object({
   code: Joi.string().required(),
   sync: Joi.boolean().default(false),
   timeout: Joi.number().integer().min(0).max(120).default(120),
-  waitTime: Joi.number().integer().min(0).max(120).default(0),
 });
 
 router.post('/carbon', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await carbonSchema.validateAsync(req.body);
+  const { sync, timeout, ...carbonParams } = params;
 
-  params.url = `https://carbon.now.sh/?${qs.stringify(params)}`;
+  const url = `https://carbon.now.sh/?${qs.stringify(carbonParams)}`;
 
   res.setTimeout(params.timeout * 1000, () => {
     if (!res.headersSent) {
@@ -203,13 +203,11 @@ router.post('/carbon', middlewares.auth({ methods: ['accessKey'] }), async (req,
     }
   });
 
-  const jobId = await crawlUrl(
+  const jobId = await crawlCode(
     {
-      ...params,
+      url,
+      sync,
       timeout: params.timeout * 1000,
-      waitTime: params.waitTime * 1000,
-      includeHtml: false,
-      includeScreenshot: true,
     },
     (snapshot) => {
       if (params.sync && !res.headersSent) {
