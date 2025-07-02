@@ -99,6 +99,7 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
           const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
             screenshot: result.screenshot,
             html: result.html,
+            format: formattedJob.format,
           });
 
           const snapshot = convertJobToSnapshot({
@@ -143,7 +144,15 @@ export async function getDataDir() {
   return { htmlDir, screenshotDir };
 }
 
-async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Array | null; html?: string | null }) {
+async function saveSnapshotToLocal({
+  screenshot,
+  html,
+  format = 'webp',
+}: {
+  screenshot?: Uint8Array | null;
+  html?: string | null;
+  format?: 'png' | 'jpeg' | 'webp';
+}) {
   const { htmlDir, screenshotDir } = await getDataDir();
 
   let screenshotPath: string | null = null;
@@ -151,7 +160,7 @@ async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Arr
 
   if (screenshot) {
     const hash = md5(screenshot);
-    screenshotPath = path.join(screenshotDir, `${hash}.webp`);
+    screenshotPath = path.join(screenshotDir, `${hash}.${format}`);
 
     logger.debug('saveSnapshotToLocal.screenshot', { screenshotPath });
 
@@ -180,6 +189,7 @@ export const getPageContent = async (
     width = 1440,
     height = 900,
     quality = 80,
+    format = 'webp',
     timeout = 90 * 1000,
     waitTime = 0,
     fullPage = false,
@@ -272,7 +282,7 @@ export const getPageContent = async (
       try {
         screenshot = handler?.handleScreenshot
           ? await handler.handleScreenshot(page)
-          : await page.screenshot({ fullPage, quality, type: 'webp' });
+          : await page.screenshot({ fullPage, quality, type: format });
       } catch (err) {
         logger.error('Failed to get screenshot:', err);
         throw err;

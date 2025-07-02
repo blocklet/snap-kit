@@ -103,6 +103,7 @@ Capture a screenshot of a webpage.
 | width        | number  | No       | 1440    | Width of the viewport (min: 375px)                       |
 | height       | number  | No       | 900     | Height of the viewport (min: 500px)                      |
 | quality      | number  | No       | 80      | Screenshot quality (1-100)                               |
+| format       | string  | No       | webp    | Image format: 'png', 'jpeg', or 'webp'                   |
 | timeout      | number  | No       | 120     | Timeout in seconds (10-120)                              |
 | waitTime     | number  | No       | 0       | At least the time to wait for the page (0-120)           |
 | fullPage     | boolean | No       | false   | Whether to capture the full page or just the viewport    |
@@ -185,6 +186,7 @@ Capture a screenshot of code by carbon.
 | timeout   | number  | No       | 120     | Timeout in seconds (10-120)                              |
 | sync      | boolean | No       | false   | Whether to wait for capture completion before responding |
 | code      | string  | Yes      | ''      | The code you need to take a screenshot                   |
+| format    | string  | No       | png     | Image format: 'png' or 'jpeg' (webp not supported)      |
 
 Carbon params:
 
@@ -280,14 +282,74 @@ Retrieves the screenshot of a previous carbon job.
 
 If the job result is not found, the `data` field will be `null`.
 
+## Image Format Support
+
+Snap Kit supports different image formats depending on the API endpoint:
+
+### /api/snap
+- **PNG**: Lossless compression, best for text and graphics
+- **JPEG**: Lossy compression with quality control (1-100), smaller file sizes
+- **WebP**: Modern format with better compression, default format
+
+### /api/carbon  
+- **PNG**: Lossless compression, default format for code screenshots
+- **JPEG**: Lossy compression with quality control
+- **WebP**: Not supported (falls back to PNG)
+
+**Note**: The `quality` parameter only applies to JPEG format. For PNG and WebP formats, the quality parameter is ignored.
+
 ## Authentication
 
 All APIs require authentication using an access key. Send your access key in the request headers according to the Blocklet SDK authentication method.
 
 https://www.arcblock.io/docs/blocklet-developer/en/access-key
 
-### Example
+### Examples
 
+#### Capture a PNG screenshot
+```bash
+curl --request POST \
+  --url 'https://snap.createblocklet.dev/api/snap' \
+  --header 'Authorization: Bearer ACCESS-KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "url": "https://example.com",
+    "format": "png",
+    "width": 1920,
+    "height": 1080,
+    "sync": true
+  }'
+```
+
+#### Capture a JPEG screenshot with quality control
+```bash
+curl --request POST \
+  --url 'https://snap.createblocklet.dev/api/snap' \
+  --header 'Authorization: Bearer ACCESS-KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "url": "https://example.com",
+    "format": "jpeg",
+    "quality": 90,
+    "sync": true
+  }'
+```
+
+#### Generate a code screenshot in JPEG format
+```bash
+curl --request POST \
+  --url 'https://snap.createblocklet.dev/api/carbon' \
+  --header 'Authorization: Bearer ACCESS-KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "code": "console.log(\"Hello World\");",
+    "format": "jpeg",
+    "t": "one-dark",
+    "sync": true
+  }'
+```
+
+#### Get crawl result
 ```bash
 curl --request GET \
   --url 'https://snap.createblocklet.dev/api/crawl?jobId=fecdff7e-a633-4bbb-8c2a-8e635802522e' \

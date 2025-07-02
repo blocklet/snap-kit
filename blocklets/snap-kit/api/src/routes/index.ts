@@ -93,6 +93,7 @@ const snapSchema = Joi.object({
   width: Joi.number().integer().min(375).default(1440),
   height: Joi.number().integer().min(500).default(900),
   quality: Joi.number().integer().min(1).max(100).default(80),
+  format: Joi.string().valid('png', 'jpeg', 'webp').default('webp'),
   timeout: Joi.number().integer().min(0).max(120).default(120),
   waitTime: Joi.number().integer().min(0).max(120).default(0),
   fullPage: Joi.boolean().default(false),
@@ -184,6 +185,7 @@ const carbonSchema = Joi.object({
   es: Joi.string().default('2x'),
   wm: Joi.string().default('false'),
   code: Joi.string().required(),
+  format: Joi.string().valid('png', 'jpeg').default('png'),
   sync: Joi.boolean().default(false),
   timeout: Joi.number().integer().min(0).max(120).default(120),
 });
@@ -208,6 +210,7 @@ router.post('/carbon', middlewares.auth({ methods: ['accessKey'] }), async (req,
       url,
       sync,
       timeout: params.timeout * 1000,
+      format: params.format,
     },
     (snapshot) => {
       if (params.sync && !res.headersSent) {

@@ -11,6 +11,7 @@ export interface JobState {
   width?: number;
   height?: number;
   quality?: number;
+  format?: 'png' | 'jpeg' | 'webp';
   timeout?: number;
   fullPage?: boolean;
   lastModified?: string;
