@@ -1,122 +1,357 @@
-# Getting Started with Create Blocklet
+# Snap Kit
 
-This project was bootstrapped with [Create Blocklet](https://github.com/blocklet/create-blocklet).
+Puppeteer-based service designed for seamless web automation. It enables you to effortlessly capture high-fidelity web page screenshots and efficiently scrape web content for precise data extraction.
 
-This blocklet is a dapp project, which means this is a full-stack application. It's contained both `server` and `client` code.
+## How to use Snap Kit?
 
-## File Structure
+After installing the Blocklet, Snap Kit provides four APIs:
 
-- public/ - static files
-  - favicon.ico - favicon
-  - favicon.svg - favicon
-  - index.html - main html file, template for react
-- screenshots/ - Screenshots
-- api/
-  - src/ - Api side code
-    - hooks/ - blocklet lifecycle hooks
-    - libs/ - Api side libraries
-    - middlewares/ - Api side middlewares
-    - routes/ - Api side routes
-    - index.ts - Api side entry point
-- src/ - Client side code (A standard react app structure)
-- .env - Environment variables
-- .env.local - Local environment variables
-- .eslintrc.js - ESLint configuration
-- .gitignore - Git ignore file
-- .prettierrc - Prettier configuration
-- blocklet.md - Blocklet README
-- blocklet.yml - Blocklet configuration
-- LICENSE - License file
-- logo.png - Blocklet logo file
-- package.json - Npm package file
-- README.md - A guide for this blocklet
-- version - Version file
+### POST /api/crawl
 
-## Development
+Crawl a webpage and extract its HTML content.
 
-1. Make sure you have [@blocklet/cli](https://www.npmjs.com/package/@blocklet/cli) installed
+##### Parameters
 
-   Blocklet needs blocklet server as a dependency. So you need to install it first.
-   `npm install -g @blocklet/cli`
-   See details in [ https://www.arcblock.io/docs/blocklet-developer/install-blocklet-cli#start-blocklet-server]( https://www.arcblock.io/docs/blocklet-developer/install-blocklet-cli#start-blocklet-server)
+| Parameter    | Type    | Required | Default | Description                                            |
+| ------------ | ------- | -------- | ------- | ------------------------------------------------------ |
+| url          | string  | Yes      | -       | The URL to crawl (must be a valid URI)                 |
+| timeout      | number  | No       | 120     | Timeout in seconds (10-120)                            |
+| waitTime     | number  | No       | 0       | At least the time to wait for the page (0-120)         |
+| sync         | boolean | No       | false   | Whether to wait for crawl completion before responding |
+| header       | json    | No       | -       | Request headers when accessing the page                |
+| cookies      | array   | No       | -       | Request cookies when accessing the page                |
+| localStorage | array   | No       | -       | set localStorage when accessing the page               |
 
-2. Init blocklet server & start blocklet server
+cookies:
 
-   Before starting an blocklet server, you need to init blocklet server.
-   `blocklet server init`
-   `blocklet server start`
-   See details in [https://www.arcblock.io/docs/blocklet-developer/install-blocklet-cli#start-blocklet-server](https://www.arcblock.io/docs/blocklet-developer/install-blocklet-cli#start-blocklet-server)
-   
-3. Go to the project directory `cd [name]`
-4. Install dependencies: `npm install` or `yarn`
-5. Start development server: `blocklet dev`
+`Array<{ name: string, value: string, domain?: string, expires?: string, path?: string }>`
 
-## Bundle
+localStorage:
 
-After developing a blocklet, you may need to bundle it. Use `npm run bundle` command.
+`Array<{ key: string, value: string }>`
 
-## Deploy
+##### Response
 
-- If you want to deploy this blocklet to local blocklet server, you can use `blocklet deploy .blocklet/bundle --app-id {appId}` command(Make sure the blocklet is bundled before deployment).
-  - appId is the id of the container you want to run on your server, you can see it in your server's dashboard
-- If you want to deploy this blocklet to remote blocklet server, you can use the command below.
+For asynchronous requests (`sync: false`):
 
-  ```shell
-  blocklet deploy .blocklet/bundle --endpoint {your blocklet server url} --access-key {blocklet server access key} --access-secret {blocklet server access secret}
-  ```
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id"
+  }
+}
+```
 
-## Upload to blocklet store
+For synchronous requests (`sync: true`):
 
-- If you want to upload the blocklet to any store for other users to download and use, you can following the following instructions.
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "html": "<!DOCTYPE html>...",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
 
-  Bump version at first.
+### GET /api/crawl
 
-  ```shell
-  npm run bump-version
-  ```
+Retrieves the HTML content of a previous crawling job.
 
-  Connect to a store, You may need some testnet tokens to deploy your blocklet, you can get some from https://faucet.abtnetwork.io/
+##### Parameters
 
-  ```shell
-  blocklet connect https://test.store.blocklet.dev/
-  ```
+| Parameter | Type   | Required | Default | Description         |
+| --------- | ------ | -------- | ------- | ------------------- |
+| jobId     | string | Yes      | -       | ID of the crawl job |
 
-  Upload a new version to a store.
+##### Response
 
-  > Make sure the blocklet is bundled before upload.
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "html": "<!DOCTYPE html>...",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
 
-  ```shell
-  blocklet upload
-  ```
+### POST /api/snap
 
-  Or you can simply use `npm run upload` command.
+Capture a screenshot of a webpage.
 
-- You also can upload a new version to a store by Github CI.
-  Bump version at first.
+##### Parameters
 
-  ```shell
-  npm run bump-version
-  ```
+| Parameter    | Type    | Required | Default | Description                                              |
+| ------------ | ------- | -------- | ------- | -------------------------------------------------------- |
+| url          | string  | Yes      | -       | The URL to capture (must be a valid URI)                 |
+| width        | number  | No       | 1440    | Width of the viewport (min: 375px)                       |
+| height       | number  | No       | 900     | Height of the viewport (min: 500px)                      |
+| quality      | number  | No       | 80      | Screenshot quality (1-100)                               |
+| format       | string  | No       | webp    | Image format: 'png', 'jpeg', or 'webp'                   |
+| timeout      | number  | No       | 120     | Timeout in seconds (10-120)                              |
+| waitTime     | number  | No       | 0       | At least the time to wait for the page (0-120)           |
+| fullPage     | boolean | No       | false   | Whether to capture the full page or just the viewport    |
+| sync         | boolean | No       | false   | Whether to wait for capture completion before responding |
+| header       | json    | No       | -       | Request headers when accessing the page                  |
+| cookies      | array   | No       | -       | Request cookies when accessing the page                  |
+| localStorage | array   | No       | -       | set localStorage when accessing the page                 |
 
-  Push your code to Github main/master branch, or make a pull request to the main/master branch.
-  The CI workflow will automatically upload a new version to a store.
+##### Response
 
-## Q & A
+For asynchronous requests (`sync: false`):
 
-1. Q: How to change a blocklet's logo?
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id"
+  }
+}
+```
 
-   Change the `logo.png` file root folder.
+For synchronous requests (`sync: true`):
 
-   Or you can change the `logo` field in the `blocklet.yml` file.
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "screenshot": "image path",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
 
-   > Make sure you have added the logo path to the `blocklet.yml` file `files` field.
+#### GET /api/snap
 
-## Learn More
+Retrieves the screenshot of a previous capture job.
 
-- Full specification of `blocklet.yml`: [https://github.com/blocklet/blocklet-specification/blob/main/docs/meta.md](https://github.com/blocklet/blocklet-specification/blob/main/docs/meta.md)
-- Full document of Blocklet Server & blocklet development: [https://www.arcblock.io/docs/blocklet-developer](https://www.arcblock.io/docs/blocklet-developer)
+##### Parameters
 
-## License
+| Parameter | Type   | Required | Default | Description        |
+| --------- | ------ | -------- | ------- | ------------------ |
+| jobId     | string | Yes      | -       | ID of the snap job |
 
-The code is licensed under the Apache 2.0 license found in the
-[LICENSE](LICENSE) file.
+##### Response
+
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "screenshot": "image path",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
+
+### POST /api/carbon
+
+Capture a screenshot of code by carbon.
+
+##### Parameters
+
+| Parameter | Type    | Required | Default | Description                                              |
+| --------- | ------- | -------- | ------- | -------------------------------------------------------- |
+| timeout   | number  | No       | 120     | Timeout in seconds (10-120)                              |
+| sync      | boolean | No       | false   | Whether to wait for capture completion before responding |
+| code      | string  | Yes      | ''      | The code you need to take a screenshot                   |
+| format    | string  | No       | png     | Image format: 'png' or 'jpeg' (webp not supported)      |
+
+Carbon params:
+
+Edit and copy the screenshot parameters you need here (https://carbon.now.sh/)
+
+```javascript
+{
+  bg: Joi.string().default('rgba(171, 184, 195, 1)'),
+  t: Joi.string().default('one-dark'),
+  wt: Joi.string().default('none'),
+  l: Joi.string().default('auto'),
+  width: Joi.number().default(680),
+  ds: Joi.string().default('true'),
+  dsyoff: Joi.string().default('20px'),
+  dsblur: Joi.string().default('68px'),
+  wc: Joi.string().default('true'),
+  wa: Joi.string().default('true'),
+  pv: Joi.string().default('21px'),
+  ph: Joi.string().default('19px'),
+  ln: Joi.string().default('false'),
+  fl: Joi.string().default('1'),
+  fm: Joi.string().default('Hack'),
+  fs: Joi.string().default('14px'),
+  lh: Joi.string().default('133%'),
+  si: Joi.string().default('false'),
+  es: Joi.string().default('2x'),
+  wm: Joi.string().default('false'),
+}
+```
+
+##### Response
+
+For asynchronous requests (`sync: false`):
+
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id"
+  }
+}
+```
+
+For synchronous requests (`sync: true`):
+
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "screenshot": "image path",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
+
+#### GET /api/carbon
+
+Retrieves the screenshot of a previous carbon job.
+
+##### Parameters
+
+| Parameter | Type   | Required | Default | Description        |
+| --------- | ------ | -------- | ------- | ------------------ |
+| jobId     | string | Yes      | -       | ID of the snap job |
+
+##### Response
+
+```json
+{
+  "code": "ok",
+  "data": {
+    "jobId": "job_id",
+    "url": "https://example.com",
+    "screenshot": "image path",
+    "status": "success | failed | pending",
+    "error": "error message when the status is failed",
+    "options": {}, // similar to request parameters
+    "meta": {
+      "title": "document title",
+      "description": "document description"
+    }
+  }
+}
+```
+
+If the job result is not found, the `data` field will be `null`.
+
+## Image Format Support
+
+Snap Kit supports different image formats depending on the API endpoint:
+
+### /api/snap
+- **PNG**: Lossless compression, best for text and graphics
+- **JPEG**: Lossy compression with quality control (1-100), smaller file sizes
+- **WebP**: Modern format with better compression, default format
+
+### /api/carbon  
+- **PNG**: Lossless compression, default format for code screenshots
+- **JPEG**: Lossy compression with quality control
+- **WebP**: Not supported (falls back to PNG)
+
+**Note**: The `quality` parameter only applies to JPEG format. For PNG and WebP formats, the quality parameter is ignored.
+
+## Authentication
+
+All APIs require authentication using an access key. Send your access key in the request headers according to the Blocklet SDK authentication method.
+
+https://www.arcblock.io/docs/blocklet-developer/en/access-key
+
+### Examples
+
+#### Capture a PNG screenshot
+```bash
+curl --request POST \
+  --url 'https://snap.createblocklet.dev/api/snap' \
+  --header 'Authorization: Bearer ACCESS-KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "url": "https://example.com",
+    "format": "png",
+    "width": 1920,
+    "height": 1080,
+    "sync": true
+  }'
+```
+
+#### Capture a JPEG screenshot with quality control
+```bash
+curl --request POST \
+  --url 'https://snap.createblocklet.dev/api/snap' \
+  --header 'Authorization: Bearer ACCESS-KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "url": "https://example.com",
+    "format": "jpeg",
+    "quality": 90,
+    "sync": true
+  }'
+```
+
+#### Generate a code screenshot in JPEG format
+```bash
+curl --request POST \
+  --url 'https://snap.createblocklet.dev/api/carbon' \
+  --header 'Authorization: Bearer ACCESS-KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "code": "console.log(\"Hello World\");",
+    "format": "jpeg",
+    "t": "one-dark",
+    "sync": true
+  }'
+```
+
+#### Get crawl result
+```bash
+curl --request GET \
+  --url 'https://snap.createblocklet.dev/api/crawl?jobId=fecdff7e-a633-4bbb-8c2a-8e635802522e' \
+  --header 'Authorization: Bearer ACCESS-KEY'
+```
