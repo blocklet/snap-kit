@@ -11,11 +11,14 @@ export interface JobState {
   width?: number;
   height?: number;
   quality?: number;
+  format?: 'png' | 'jpeg' | 'webp';
   timeout?: number;
   fullPage?: boolean;
   lastModified?: string;
   waitTime?: number;
   replace?: boolean;
+  sync?: boolean;
+  ignoreRobots?: boolean;
   headers?: Record<string, string>;
   cookies?: CookieParam[];
   localStorage?: { key: string; value: string }[];

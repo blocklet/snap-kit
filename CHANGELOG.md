@@ -1,3 +1,8 @@
+## 1.3.0 (2025-7-2)
+
+- chore: upgrade react/vite
+- feat(api): support crawl image from carbon.now.sh
+
 ## 1.2.0 (2025-6-16)
 
 - feat: remove stale snapshots when scheduled crawler completed

@@ -1,11 +1,13 @@
 import createQueue from '@abtnode/queue';
 import SequelizeStore from '@abtnode/queue/lib/store/sequelize';
+import { Page } from '@blocklet/puppeteer';
 import { randomUUID } from 'crypto';
 import fs from 'fs-extra';
 import path from 'path';
 
 import { config, logger } from './config';
 import { initPage } from './puppeteer';
+import { createCarbonImage } from './services/carbon';
 import { convertJobToSnapshot, deleteSnapshots, formatSnapshot } from './services/snapshot';
 import { Job, JobState, Snapshot, SnapshotModel, sequelize } from './store';
 import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5, sleep } from './utils';
@@ -14,8 +16,17 @@ const { BaseState } = require('@abtnode/models');
 
 // eslint-disable-next-line import/no-mutable-exports
 const crawlQueue = createCrawlQueue('urlCrawler');
+const syncQueue = createCrawlQueue('syncCrawler');
+const codeQueue = createCrawlQueue('codeCrawler', {
+  handleScreenshot: createCarbonImage,
+});
 
-export function createCrawlQueue(queue: string) {
+type PageHandler = {
+  handleScreenshot?: (page: Page, params?: JobState) => Promise<Buffer | null>;
+  handleHtml?: (page: Page, params?: JobState) => Promise<string | null>;
+};
+
+export function createCrawlQueue(queue: string, handler?: PageHandler) {
   const db = new BaseState(Job);
 
   return createQueue({
@@ -24,28 +35,22 @@ export function createCrawlQueue(queue: string) {
     onJob: async (job: JobState) => {
       logger.info('Starting to execute crawl job', job);
 
-      const canCrawl = await isAcceptCrawler(job.url);
-      if (!canCrawl) {
-        logger.error(`failed to crawl ${job.url}, denied by robots.txt`, job);
-        const snapshot = convertJobToSnapshot({
-          job,
-          snapshot: {
-            status: 'failed',
-            error: 'Denied by robots.txt',
-          },
-        });
-        await Snapshot.upsert(snapshot);
-        return snapshot;
+      // check robots.txt
+      if (!job.ignoreRobots) {
+        const canCrawl = await isAcceptCrawler(job.url);
+        if (!canCrawl) {
+          logger.error(`failed to crawl ${job.url}, denied by robots.txt`, job);
+          const snapshot = convertJobToSnapshot({
+            job,
+            snapshot: {
+              status: 'failed',
+              error: 'Denied by robots.txt',
+            },
+          });
+          await Snapshot.upsert(snapshot);
+          return snapshot;
+        }
       }
-
-      // if index reach autoCloseBrowserCount, close browser
-      // try {
-      //   if (index >= autoCloseBrowserCount) {
-      //     await closeBrowser({ trimCache: false });
-      //   }
-      // } catch (error) {
-      //   logger.error('failed to close browser when queue index reached autoCloseBrowserCount:', error);
-      // }
 
       const formattedJob: JobState = {
         ...job,
@@ -56,7 +61,7 @@ export function createCrawlQueue(queue: string) {
 
       try {
         // get page content later
-        const result = await getPageContent(formattedJob);
+        const result = await getPageContent(formattedJob, handler);
 
         if (!result || (!result.html && !result.screenshot)) {
           logger.error(`failed to crawl ${formattedJob.url}, empty content`, formattedJob);
@@ -94,6 +99,7 @@ export function createCrawlQueue(queue: string) {
           const { screenshotPath, htmlPath } = await saveSnapshotToLocal({
             screenshot: result.screenshot,
             html: result.html,
+            format: formattedJob.format,
           });
 
           const snapshot = convertJobToSnapshot({
@@ -138,7 +144,15 @@ export async function getDataDir() {
   return { htmlDir, screenshotDir };
 }
 
-async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Array | null; html?: string | null }) {
+async function saveSnapshotToLocal({
+  screenshot,
+  html,
+  format = 'webp',
+}: {
+  screenshot?: Uint8Array | null;
+  html?: string | null;
+  format?: 'png' | 'jpeg' | 'webp';
+}) {
   const { htmlDir, screenshotDir } = await getDataDir();
 
   let screenshotPath: string | null = null;
@@ -146,7 +160,7 @@ async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Arr
 
   if (screenshot) {
     const hash = md5(screenshot);
-    screenshotPath = path.join(screenshotDir, `${hash}.webp`);
+    screenshotPath = path.join(screenshotDir, `${hash}.${format}`);
 
     logger.debug('saveSnapshotToLocal.screenshot', { screenshotPath });
 
@@ -167,20 +181,24 @@ async function saveSnapshotToLocal({ screenshot, html }: { screenshot?: Uint8Arr
   };
 }
 
-export const getPageContent = async ({
-  url,
-  includeScreenshot = true,
-  includeHtml = true,
-  width = 1440,
-  height = 900,
-  quality = 80,
-  timeout = 90 * 1000,
-  waitTime = 0,
-  fullPage = false,
-  headers,
-  cookies,
-  localStorage,
-}: JobState) => {
+export const getPageContent = async (
+  {
+    url,
+    includeScreenshot = true,
+    includeHtml = true,
+    width = 1440,
+    height = 900,
+    quality = 80,
+    format = 'webp',
+    timeout = 90 * 1000,
+    waitTime = 0,
+    fullPage = false,
+    headers,
+    cookies,
+    localStorage,
+  }: JobState,
+  handler?: PageHandler,
+) => {
   const page = await initPage();
 
   if (width && height) {
@@ -262,7 +280,9 @@ export const getPageContent = async ({
       }
 
       try {
-        screenshot = await page.screenshot({ fullPage, quality, type: 'webp' });
+        screenshot = handler?.handleScreenshot
+          ? await handler.handleScreenshot(page)
+          : await page.screenshot({ fullPage, quality, type: format });
       } catch (err) {
         logger.error('Failed to get screenshot:', err);
         throw err;
@@ -301,7 +321,7 @@ export const getPageContent = async ({
       meta.description = data.description;
 
       if (includeHtml) {
-        html = data.html;
+        html = handler?.handleHtml ? await handler.handleHtml(page) : data.html;
       }
     } catch (err) {
       logger.error('Failed to get html:', err);
@@ -327,10 +347,14 @@ export const getPageContent = async ({
  * @param callback callback when job finished
  */
 // eslint-disable-next-line require-await
-export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
+export async function enqueue(
+  queue,
+  params: Omit<JobState, 'jobId'>,
+  callback?: (snapshot: SnapshotModel | null) => void,
+) {
   // skip duplicate job
   const existsJob = await Job.isExists(params);
-  if (existsJob) {
+  if (existsJob && !params.sync) {
     logger.info(`Crawl job already exists for ${params.url}, skip`);
     return existsJob.id;
   }
@@ -338,7 +362,7 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
   logger.info('enqueue crawl job', params);
 
   const jobId = randomUUID();
-  const job = crawlQueue.push({ ...params, id: jobId });
+  const job = queue.push({ ...params, id: jobId });
 
   job.on('finished', async ({ result }) => {
     logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, { job: params, result });
@@ -351,4 +375,12 @@ export async function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snap
   });
 
   return jobId;
+}
+
+export function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
+  return enqueue(params.sync ? syncQueue : crawlQueue, params, callback);
+}
+
+export function crawlCode(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
+  return enqueue(codeQueue, { ignoreRobots: true, includeHtml: false, includeScreenshot: true, ...params }, callback);
 }
