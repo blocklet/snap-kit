@@ -62,15 +62,17 @@ export async function createCarbonImage(page: Page, params?: JobState) {
           height,
         };
 
-        // @ts-ignore: domtoimage is injected by addScriptTag
         switch (imageFormat) {
           case 'jpeg':
+            // @ts-ignore: domtoimage is injected by addScriptTag
             return domtoimage.toJpeg(target, config);
           case 'webp':
             // dom-to-image doesn't support webp directly, fall back to png
+            // @ts-ignore: domtoimage is injected by addScriptTag
             return domtoimage.toPng(target, config);
           case 'png':
           default:
+            // @ts-ignore: domtoimage is injected by addScriptTag
             return domtoimage.toPng(target, config);
         }
       },
