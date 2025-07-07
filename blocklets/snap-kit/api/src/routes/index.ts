@@ -185,7 +185,7 @@ const carbonSchema = Joi.object({
   es: Joi.string().default('2x'),
   wm: Joi.string().default('false'),
   code: Joi.string().required(),
-  format: Joi.string().valid('png', 'jpeg').default('png'),
+  format: Joi.string().valid('png', 'jpeg', 'webp').default('png'),
   sync: Joi.boolean().default(false),
   timeout: Joi.number().integer().min(0).max(120).default(120),
 });
