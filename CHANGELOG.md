@@ -1,3 +1,7 @@
+## 1.3.1 (2025-7-7)
+
+- feat(api): take carbon screenshot by Puppeteer API
+
 ## 1.3.0 (2025-7-2)
 
 - chore: upgrade react/vite
