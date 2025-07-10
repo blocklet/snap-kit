@@ -1,3 +1,7 @@
+## 1.3.2 (2025-7-10)
+
+- chore: update deps
+
 ## 1.3.1 (2025-7-7)
 
 - feat(api): take carbon screenshot by Puppeteer API
