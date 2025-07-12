@@ -1,15 +1,13 @@
 import uniq from 'lodash/uniq';
 import { randomUUID } from 'node:crypto';
-import pMap from 'p-map';
 import { SitemapItem } from 'sitemap';
 
 import { Site, config, logger } from './config';
-import { createCrawlQueue } from './crawler';
+import { cronQueue } from './crawler';
 import { Snapshot } from './store';
 import { formatUrl, getSitemapList } from './utils';
 
 const crawlBlockletRunningMap = new Map();
-const crawlQueue = createCrawlQueue('cronJobs');
 
 function parseSitemapUrl(sitemapItem: SitemapItem) {
   const links = sitemapItem.links?.map((item) => item.url) || [];
@@ -18,6 +16,7 @@ function parseSitemapUrl(sitemapItem: SitemapItem) {
 }
 
 export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
+  const { default: pMap } = await import('p-map');
   logger.info(`Start crawl from sitemap ${url}`, { pathname });
 
   const key = `${url}-${pathname}`;
@@ -75,7 +74,7 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
 
         const jobId = randomUUID();
 
-        crawlQueue.push({
+        cronQueue.push({
           id: jobId,
           url,
           lastModified: sitemapItem.lastmod,

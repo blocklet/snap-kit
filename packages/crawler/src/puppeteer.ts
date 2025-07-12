@@ -50,6 +50,7 @@ export async function ensureBrowser() {
 
   if (!executablePath || !fs.existsSync(executablePath)) {
     logger.info('start download browser', puppeteerConfig);
+    // @ts-ignore
     const { downloadBrowser } = await (async () => {
       try {
         // @ts-ignore

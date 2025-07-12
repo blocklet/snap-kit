@@ -1,6 +1,5 @@
-import { utils } from '@arcblock/crawler';
+import { axios } from '@arcblock/crawler/utils';
 import { LRUCache } from 'lru-cache';
-import Queue from 'queue';
 import { joinURL } from 'ufo';
 
 import { logger } from './env';
@@ -43,12 +42,15 @@ export class CacheManager {
       this.cache = new LRUCache({ max: this.options.cacheMax || 500 });
     }
 
+    this.initializedPromise = Promise.all([initDatabase(), this.initializeQueue()]);
+  }
+
+  private async initializeQueue() {
+    const { default: Queue } = await import('queue');
     this.updateQueue = new Queue({
       autostart: true,
       concurrency: this.options.updatedConcurrency,
     });
-
-    this.initializedPromise = Promise.all([initDatabase()]);
   }
 
   public async waitReady() {
@@ -82,7 +84,7 @@ export class CacheManager {
     logger.debug('Fetching snapshot from SnapKit', { url, api });
 
     try {
-      const { data } = await utils.axios.get(api, {
+      const { data } = await axios.get(api, {
         params: {
           url,
         },

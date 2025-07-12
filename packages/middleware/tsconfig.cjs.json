@@ -3,7 +3,8 @@
   "include": ["src"],
   "exclude": ["node_modules", "tests"],
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "node16",
+    "moduleResolution": "node16",
     "outDir": "lib/cjs"
   }
 }
