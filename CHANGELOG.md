@@ -1,3 +1,7 @@
+## 1.3.2 (2025-7-13)
+
+- fix: middleware init error
+
 ## 1.3.1 (2025-7-7)
 
 - feat(api): take carbon screenshot by Puppeteer API

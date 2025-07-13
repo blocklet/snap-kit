@@ -1,3 +1,4 @@
+/* eslint-disable import/no-mutable-exports */
 import createQueue from '@abtnode/queue';
 import SequelizeStore from '@abtnode/queue/lib/store/sequelize';
 import { Page } from '@blocklet/puppeteer';
@@ -14,12 +15,21 @@ import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5, sleep } from './u
 
 const { BaseState } = require('@abtnode/models');
 
-// eslint-disable-next-line import/no-mutable-exports
-const crawlQueue = createCrawlQueue('urlCrawler');
-const syncQueue = createCrawlQueue('syncCrawler');
-const codeQueue = createCrawlQueue('codeCrawler', {
-  handleScreenshot: createCarbonImage,
-});
+let crawlQueue;
+let syncQueue;
+let codeQueue;
+let cronQueue;
+
+export { crawlQueue, syncQueue, codeQueue, cronQueue };
+
+export function initQueue() {
+  crawlQueue = createCrawlQueue('urlCrawler');
+  syncQueue = createCrawlQueue('syncCrawler');
+  codeQueue = createCrawlQueue('codeCrawler', {
+    handleScreenshot: createCarbonImage,
+  });
+  cronQueue = createCrawlQueue('cronJobs');
+}
 
 type PageHandler = {
   handleScreenshot?: (page: Page, params?: JobState) => Promise<Buffer | null>;

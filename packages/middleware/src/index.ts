@@ -1,11 +1,9 @@
-import { utils } from '@arcblock/crawler';
+import { isSelfCrawler, isSpider, isStaticFile } from '@arcblock/crawler/utils';
 import { NextFunction, Request, Response } from 'express';
 import { joinURL } from 'ufo';
 
 import { CacheManager } from './cache';
 import { env, logger } from './env';
-
-const { isSelfCrawler, isSpider, isStaticFile } = utils;
 
 function getFullUrl(req: Request) {
   const blockletPathname = req.headers['x-path-prefix']
