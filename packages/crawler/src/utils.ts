@@ -78,7 +78,7 @@ const botUserAgents = [
   /\bMidjourney/i, // Midjourney
   /\bDALL-E/i, // DALL-E
   /\bMeta-External/i, // Meta external agents
-  /\bGoogle/i, // Google agents
+  /\bGoogle-/i, // Google agents
   /\bLLM/i, // LLM
   /\bBytespider/i, // ByteDance spider
   /\bBaiduspider/i, // Baidu spider
