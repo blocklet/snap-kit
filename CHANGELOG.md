@@ -1,3 +1,8 @@
+## 1.3.3 (2025-8-14)
+
+- fix: remove noscript tags from page
+- chore: add more bots regex to crawler
+
 ## 1.3.2 (2025-7-13)
 
 - fix: middleware init error
