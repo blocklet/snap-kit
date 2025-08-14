@@ -312,6 +312,13 @@ export const getPageContent = async (
         const title = document.title || '';
         const description = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
 
+        // remove document all <noscript> tags
+        document.querySelectorAll('noscript')?.forEach((el: HTMLElement) => {
+          if (el?.remove) {
+            el.remove();
+          }
+        });
+
         return {
           html: document.documentElement.outerHTML,
           title,

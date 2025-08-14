@@ -57,24 +57,36 @@ const botUserAgents = [
   /GPTBot/i,
   /Applebot/i,
 
-  // AI bots
-  /Anthropic-ai/i,
-  /Claude-Web/i,
-  /anthropic-ai-scraper/i,
-  /Google-Extended/i,
-  /GoogleOther/i,
-  /CCBot\/\d/i,
-  /Bytespider/i,
-  /BingBot/i,
-  /Baiduspider/i,
-  /Sogou/i,
-  /Perplexity/i,
-  /Cohere-ai/i,
-  /xlts-bot/i,
-  /THAAS/i,
-  /YisouSpider/i,
-  /AlibabaGroup/i,
-  /adaptive-edge-crawler/i,
+  // AI bots - condensed patterns
+  /-AI\b/i, // Matches any string ending with "-AI"
+  /-Bot\b/i, // Matches any string ending with "-Bot"
+  /-Agent\b/i, // Matches any string ending with "-Agent"
+  /-User\b/i, // Matches any string ending with "-User"
+  /\bAI\b/i, // Matches standalone "AI" word
+  /\bGPT/i, // GPT variants
+  /\bClaude/i, // Claude variants
+  /\bBard\b/i, // Google Bard
+  /\bGemini\b/i, // Google Gemini
+  /\bLlama\b/i, // Meta Llama
+  /\bChatGPT/i, // ChatGPT variants
+  /\bOpenAI/i, // OpenAI
+  /\bAnthropic/i, // Anthropic
+  /\bPerplexity/i, // Perplexity
+  /\bCohere/i, // Cohere
+  /\bHuggingFace/i, // Hugging Face
+  /\bStability/i, // Stability AI
+  /\bMidjourney/i, // Midjourney
+  /\bDALL-E/i, // DALL-E
+  /\bMeta-External/i, // Meta external agents
+  /\bGoogle/i, // Google agents
+  /\bLLM/i, // LLM
+  /\bBytespider/i, // ByteDance spider
+  /\bBaiduspider/i, // Baidu spider
+  /\bYandexBot/i, // Yandex bot
+  /\bDuckDuckBot/i, // DuckDuckGo bot
+  /\bLinkedInBot/i, // LinkedIn bot
+  /\bTwitterbot/i, // Twitter bot
+  /\bCCBot/i, // Common Crawl bot
 ];
 
 /**
