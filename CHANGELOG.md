@@ -1,3 +1,7 @@
+## 1.3.4 (2025-9-7)
+
+- fix: add error logs for reading file
+
 ## 1.3.3 (2025-8-14)
 
 - fix: remove noscript tags from page
