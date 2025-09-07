@@ -45,6 +45,7 @@ export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<ke
         dataDir: config.dataDir,
         snapshot,
       });
+      data.html = '';
     }
   }
   // remove sensitive options that should not be returned
