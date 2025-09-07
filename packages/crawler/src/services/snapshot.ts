@@ -36,8 +36,17 @@ export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<ke
   }
   // format html path to string
   if (data.html) {
-    const html = await fs.readFile(path.join(config.dataDir, data.html));
-    data.html = html.toString();
+    try {
+      const html = await fs.readFile(path.join(config.dataDir, data.html));
+      data.html = html.toString();
+    } catch (err) {
+      logger.error('Failed to read html', {
+        err,
+        dataDir: config.dataDir,
+        snapshot,
+      });
+      data.html = '';
+    }
   }
   // remove sensitive options that should not be returned
   if (data.options) {
@@ -100,10 +109,15 @@ export async function deleteSnapshots(where: WhereOptions<SnapshotModel>, { txn 
   const jobIds = await Promise.all(
     snapshots.map(async (snapshot) => {
       try {
-        await Promise.all([
-          snapshot.html && fs.unlink(path.join(config.dataDir, snapshot.html)),
-          snapshot.screenshot && fs.unlink(path.join(config.dataDir, snapshot.screenshot)),
-        ]);
+        try {
+          await Promise.all([
+            snapshot.html && fs.unlink(path.join(config.dataDir, snapshot.html)),
+            snapshot.screenshot && fs.unlink(path.join(config.dataDir, snapshot.screenshot)),
+          ]);
+        } catch (err) {
+          logger.error('Failed to delete snapshot', { err, snapshot, dataDir: config.dataDir });
+        }
+
         await snapshot.destroy({ transaction: txn });
         return snapshot.jobId;
       } catch (error) {
