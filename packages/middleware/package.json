@@ -56,7 +56,7 @@
     "@blocklet/sdk": "^1.16.46",
     "@sequelize/core": "7.0.0-alpha.46",
     "@sequelize/sqlite3": "7.0.0-alpha.46",
-    "axios": "^1.7.9",
+    "axios": "^1.12.0",
     "lru-cache": "^10.4.3",
     "queue": "^7.0.0",
     "sqlite3": "^5.1.7",
