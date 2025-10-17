@@ -1,0 +1,44 @@
+sitemap:
+  - title: "Snap Kit: Web Automation & Screenshot API"
+    path: /home
+    locales:
+      en:
+        title: "Snap Kit: Web Automation & Screenshot API"
+        description: Instantly capture high-fidelity screenshots, scrape web content,
+          and generate beautiful code snapshots with Snap Kit's powerful
+          Puppeteer-based API. Built for developers who need speed, scale, and
+          precision.
+        image: mediakit://snap-kit-hero-abstract'.png
+        style:
+          maxWidth: custom:1440px
+          paddingY: normal
+          paddingX: normal
+        backgroundColor: ""
+        header:
+          sticky: true
+    meta:
+      file: home.yaml
+      id: 616571b7c79a8472
+      createdAt: 2025-10-17T09:00:22.967Z
+      updatedAt: 2025-10-17T09:00:22.967Z
+      publishedAt: 2025-10-17T09:00:22.967Z
+      isPublic: true
+navigations:
+  - id: 106a6c241b8797f5
+    section: header
+    visible: true
+    title:
+      en: Home
+    link:
+      en: /
+    description:
+      en: Explore Snap Kit's features and API
+  - id: f5c5d15c42b3cf01
+    section: footer
+    visible: true
+    title:
+      en: Home
+    link:
+      en: /
+    description:
+      en: Explore Snap Kit's features and API

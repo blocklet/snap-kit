@@ -1,0 +1,18 @@
+- title: "Snap Kit: Web Automation & Screenshot API"
+  description: A comprehensive single-page site for Snap Kit, a Puppeteer-based
+    service for web automation. The page introduces the tool's value, then
+    details its core features. It provides extensive API documentation for
+    crawling content (`/api/crawl`), capturing webpage screenshots
+    (`/api/snap`), and generating code snapshots (`/api/carbon`), complete with
+    request parameters and response examples. It also includes practical `curl`
+    examples and clear authentication instructions to help developers get
+    started quickly.
+  path: /home
+  navigation:
+    title: Home
+    description: Explore Snap Kit's features and API
+  parentId: "null"
+  sourceIds:
+    - blocklets/snap-kit/README.md
+    - blocklets/snap-kit/blocklet.yml
+    - README.md
