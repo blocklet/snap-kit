@@ -1,7 +1,7 @@
 id: 616571b7c79a8472
-createdAt: 2025-10-17T09:00:22.967Z
-updatedAt: 2025-10-17T09:00:22.967Z
-publishedAt: 2025-10-17T09:00:22.967Z
+createdAt: 2025-10-24T10:10:43.871Z
+updatedAt: 2025-10-24T10:10:43.871Z
+publishedAt: 2025-10-24T10:10:43.871Z
 isPublic: true
 locales:
   en:
@@ -11,127 +11,75 @@ locales:
       paddingY: normal
       paddingX: normal
     title: "Snap Kit: Web Automation & Screenshot API"
-    description: Instantly capture high-fidelity screenshots, scrape web content,
-      and generate beautiful code snapshots with Snap Kit's powerful
-      Puppeteer-based API. Built for developers who need speed, scale, and
-      precision.
-    image: mediakit://snap-kit-hero-abstract'.png
+    description: Your ultimate Puppeteer-based toolkit for seamless web automation!
+      Snap Kit empowers developers to capture high-fidelity screenshots, scrape
+      web content with precision, and generate beautiful code snapshots via a
+      powerful, easy-to-use API.
+    image: mediakit://snap-kit-hero-main-visual.png
     header:
       sticky: true
 sections:
-  e1c97b3710d489a2:
-    id: e1c97b3710d489a2
-    name: Feature Grid_left
+  1d62422cf99dcc0a:
+    id: 1d62422cf99dcc0a
+    name: Full Background Hero_center
     component: layout-block
     sections:
-      78e3421030dcbdd5:
-        id: 78e3421030dcbdd5
-        name: Content
+      caa62d0e3601b0f2:
+        id: caa62d0e3601b0f2
+        name: CTA
         component: layout-block
         sections:
-          2595d95961e10014:
-            id: 2595d95961e10014
-            name: CTA
-            component: layout-block
-            sections:
-              087e8576fefadf0f:
-                id: 087e8576fefadf0f
-                name: Description
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0J44322kDYc-
-                sectionIds: []
-              5455a7046747c6d7:
-                id: 5455a7046747c6d7
-                name: Action
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: a44r0SiGV9AFn2Fj
-                sectionIds: []
-            sectionIds:
-              - 087e8576fefadf0f
-              - 5455a7046747c6d7
+          680339c14b4aaf87:
+            id: 680339c14b4aaf87
+            name: Description
+            component: custom-component
             config:
-              gridSettings:
-                desktop:
-                  087e8576fefadf0f:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-                  5455a7046747c6d7:
-                    x: 0
-                    y: 1
-                    w: 12
-                    h: 1
-              paddingY: normal
-              gap: normal
-              maxWidth: full
-              paddingX: none
-          ccdf0179b25ef747:
-            id: ccdf0179b25ef747
-            name: Image
-            component: layout-block
-            sections:
-              f98b98ffd13b8a1d:
-                id: f98b98ffd13b8a1d
-                name: Media
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0JPjPs122kaaa-
-                sectionIds: []
-            sectionIds:
-              - f98b98ffd13b8a1d
+              useCache: true
+              componentId: xoHu0J44322kDYc-
+            sectionIds: []
+          ad57901aa51a6fd7:
+            id: ad57901aa51a6fd7
+            name: Action
+            component: custom-component
             config:
-              borderRadius: small
-              gridSettings:
-                desktop:
-                  f98b98ffd13b8a1d:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-              background: background.paper
-              paddingX: small
-              paddingY: small
+              useCache: true
+              componentId: a44r0SiGV9AFn2Fj
+            sectionIds: []
         sectionIds:
-          - 2595d95961e10014
-          - ccdf0179b25ef747
+          - 680339c14b4aaf87
+          - ad57901aa51a6fd7
         config:
-          borderRadius: small
-          paddingX: none
-          paddingY: normal
-          maxWidth: full
           gridSettings:
             desktop:
-              2595d95961e10014:
+              680339c14b4aaf87:
                 x: 0
                 y: 0
-                w: 5
+                w: 7
                 h: 1
-              ccdf0179b25ef747:
-                x: 6
-                y: 0
-                w: 6
+              ad57901aa51a6fd7:
+                x: 0
+                y: 1
+                w: 12
                 h: 1
-          gap: normal
+          paddingY: large
+          gap: large
+          maxWidth: full
+          paddingX: none
+          alignContent: center
     sectionIds:
-      - 78e3421030dcbdd5
+      - caa62d0e3601b0f2
     config:
       gridSettings:
         desktop:
-          78e3421030dcbdd5:
+          caa62d0e3601b0f2:
             x: 0
             y: 0
             w: 12
             h: 1
-      gap: normal
-      paddingY: normal
-      background: transparent
-      border: none
+      background: mediakit://snap-kit-hero-main-visual.png
+      paddingY: custom:80px
+      backgroundFullWidth: true
+      gap: none
       paddingX: none
   671827b9508f92f3:
     id: 671827b9508f92f3
@@ -453,568 +401,139 @@ sections:
       gap: normal
       paddingY: none
       paddingX: none
-  0bd9c287b4dac2cd:
-    id: 0bd9c287b4dac2cd
-    name: Testimonials/Reviews
+  5f14927719c542c3:
+    id: 5f14927719c542c3
+    name: Card01
     component: layout-block
     sections:
-      3671fed2c6e10a65:
-        id: 3671fed2c6e10a65
-        name: Title
+      ab5b42fb4510ff3e:
+        id: ab5b42fb4510ff3e
+        name: RichText
+        component: custom-component
+        config:
+          useCache: true
+          componentId: xoHu0J44322kDYc-
+        sectionIds: []
+      8f3842eca05b45a2:
+        id: 8f3842eca05b45a2
+        name: Section Layout
         component: layout-block
         sections:
-          10c868964f4822ae:
-            id: 10c868964f4822ae
-            name: LayoutTitle
+          352c83f76a988a1d:
+            id: 352c83f76a988a1d
+            name: Code
             component: custom-component
             config:
               useCache: true
-              componentId: xoHu0J44322kDYc-
+              componentId: 2EHGy3vwxlS9JGr2
             sectionIds: []
         sectionIds:
-          - 10c868964f4822ae
-        config:
-          gap: small
-          paddingX: none
-          alignContent: start
-          gridSettings:
-            desktop:
-              10c868964f4822ae:
-                x: 0
-                y: 0
-                w: 12
-                h: 1
-            mobile:
-              10c868964f4822ae:
-                id: 10c868964f4822ae
-      9c29689559529814:
-        id: 9c29689559529814
-        name: Cards
-        component: layout-block
-        sections:
-          2b87b65d9de3fd3f:
-            id: 2b87b65d9de3fd3f
-            name: Cards-1
-            component: layout-block
-            sections:
-              2eb044a93ad602ba:
-                id: 2eb044a93ad602ba
-                name: RichText
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0J44322kDYc-
-                sectionIds: []
-              1c7a86683e8edb88:
-                id: 1c7a86683e8edb88
-                name: Section Layout
-                component: layout-block
-                sections:
-                  68defab8e7f7aa20:
-                    id: 68defab8e7f7aa20
-                    name: Code
-                    component: custom-component
-                    config:
-                      useCache: true
-                      componentId: 2EHGy3vwxlS9JGr2
-                    sectionIds: []
-                sectionIds:
-                  - 68defab8e7f7aa20
-                config:
-                  gridSettings:
-                    desktop:
-                      68defab8e7f7aa20:
-                        x: 0
-                        y: 0
-                        w: 12
-                        h: 1
-                  borderRadius: small
-                  border: terminal
-            sectionIds:
-              - 2eb044a93ad602ba
-              - 1c7a86683e8edb88
-            config:
-              gridSettings:
-                desktop:
-                  2eb044a93ad602ba:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-                  1c7a86683e8edb88:
-                    x: 0
-                    y: 1
-                    w: 12
-                    h: 1
-              paddingX: custom:32px
-              gap: normal
-              paddingY: custom:32px
-              background: background.paper
-              border: solid
-              borderRadius: small
-              alignContent: space-between
-          765b175b45d4d54d:
-            id: 765b175b45d4d54d
-            name: Cards-2
-            component: layout-block
-            sections:
-              fc089fe336677523:
-                id: fc089fe336677523
-                name: RichText
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0J44322kDYc-
-                sectionIds: []
-              731554d1b185bfb6:
-                id: 731554d1b185bfb6
-                name: Section Layout
-                component: layout-block
-                sections:
-                  7134d2bc2ec175ad:
-                    id: 7134d2bc2ec175ad
-                    name: Code
-                    component: custom-component
-                    config:
-                      useCache: true
-                      componentId: 2EHGy3vwxlS9JGr2
-                    sectionIds: []
-                sectionIds:
-                  - 7134d2bc2ec175ad
-                config:
-                  gridSettings:
-                    desktop:
-                      7134d2bc2ec175ad:
-                        x: 0
-                        y: 0
-                        w: 12
-                        h: 1
-                  borderRadius: small
-                  border: terminal
-            sectionIds:
-              - fc089fe336677523
-              - 731554d1b185bfb6
-            config:
-              gridSettings:
-                desktop:
-                  fc089fe336677523:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-                  731554d1b185bfb6:
-                    x: 0
-                    y: 1
-                    w: 12
-                    h: 1
-              paddingX: custom:32px
-              gap: normal
-              paddingY: custom:32px
-              background: background.paper
-              border: solid
-              borderRadius: small
-              alignContent: space-between
-          b79375ced166d5b6:
-            id: b79375ced166d5b6
-            name: Cards-3
-            component: layout-block
-            sections:
-              0c19c72289b9df50:
-                id: 0c19c72289b9df50
-                name: RichText
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0J44322kDYc-
-                sectionIds: []
-              2975795d31ca1004:
-                id: 2975795d31ca1004
-                name: Section Layout
-                component: layout-block
-                sections:
-                  c4a1f266816eb1a1:
-                    id: c4a1f266816eb1a1
-                    name: Code
-                    component: custom-component
-                    config:
-                      useCache: true
-                      componentId: 2EHGy3vwxlS9JGr2
-                    sectionIds: []
-                sectionIds:
-                  - c4a1f266816eb1a1
-                config:
-                  gridSettings:
-                    desktop:
-                      c4a1f266816eb1a1:
-                        x: 0
-                        y: 0
-                        w: 12
-                        h: 1
-                  borderRadius: small
-                  border: terminal
-            sectionIds:
-              - 0c19c72289b9df50
-              - 2975795d31ca1004
-            config:
-              gridSettings:
-                desktop:
-                  0c19c72289b9df50:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-                  2975795d31ca1004:
-                    x: 0
-                    y: 1
-                    w: 12
-                    h: 1
-              paddingX: custom:32px
-              gap: normal
-              paddingY: custom:32px
-              background: background.paper
-              border: solid
-              borderRadius: small
-              alignContent: space-between
-        sectionIds:
-          - 2b87b65d9de3fd3f
-          - 765b175b45d4d54d
-          - b79375ced166d5b6
+          - 352c83f76a988a1d
         config:
           gridSettings:
             desktop:
-              2b87b65d9de3fd3f:
+              352c83f76a988a1d:
                 x: 0
                 y: 0
                 w: 12
                 h: 1
-              765b175b45d4d54d:
-                x: 0
-                y: 1
-                w: 12
-                h: 1
-              b79375ced166d5b6:
-                x: 0
-                y: 2
-                w: 12
-                h: 1
-            mobile:
-              2b87b65d9de3fd3f:
-                x: 0
-                y: 0
-                w: 12
-                h: 1
-              765b175b45d4d54d:
-                x: 0
-                y: 1
-                w: 12
-                h: 1
-              b79375ced166d5b6:
-                x: 0
-                y: 2
-                w: 12
-                h: 1
-          gap: normal
-          paddingX: none
+          borderRadius: small
+          border: terminal
     sectionIds:
-      - 3671fed2c6e10a65
-      - 9c29689559529814
+      - ab5b42fb4510ff3e
+      - 8f3842eca05b45a2
     config:
       gridSettings:
         desktop:
-          9c29689559529814:
+          ab5b42fb4510ff3e:
             x: 0
-            y: 1
-            w: 12
+            y: 0
+            w: 5
             h: 1
-          3671fed2c6e10a65:
+          8f3842eca05b45a2:
+            x: 5
+            y: 0
+            w: 7
+            h: 1
+        mobile:
+          ab5b42fb4510ff3e:
             x: 0
             y: 0
             w: 12
             h: 1
-      gap: normal
-      paddingY: none
-      paddingX: none
-  dd6c4ba4f1e73c06:
-    id: dd6c4ba4f1e73c06
-    name: Testimonials/Reviews
-    component: layout-block
-    sections:
-      459a5cc4b163205e:
-        id: 459a5cc4b163205e
-        name: Title
-        component: layout-block
-        sections:
-          5b658d0ac413cd4c:
-            id: 5b658d0ac413cd4c
-            name: LayoutTitle
-            component: custom-component
-            config:
-              useCache: true
-              componentId: xoHu0J44322kDYc-
-            sectionIds: []
-        sectionIds:
-          - 5b658d0ac413cd4c
-        config:
-          gap: small
-          paddingX: none
-          alignContent: start
-          gridSettings:
-            desktop:
-              5b658d0ac413cd4c:
-                x: 0
-                y: 0
-                w: 12
-                h: 1
-            mobile:
-              5b658d0ac413cd4c:
-                id: 5b658d0ac413cd4c
-      049488309074c8a6:
-        id: 049488309074c8a6
-        name: Cards
-        component: layout-block
-        sections:
-          f71851cc0e9e2639:
-            id: f71851cc0e9e2639
-            name: Cards-1
-            component: layout-block
-            sections:
-              f19eeffa4f87a133:
-                id: f19eeffa4f87a133
-                name: RichText
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0J44322kDYc-
-                sectionIds: []
-              ed0657fbb138ba6b:
-                id: ed0657fbb138ba6b
-                name: Section Layout
-                component: layout-block
-                sections:
-                  c3e98bb9966017d0:
-                    id: c3e98bb9966017d0
-                    name: Code
-                    component: custom-component
-                    config:
-                      useCache: true
-                      componentId: 2EHGy3vwxlS9JGr2
-                    sectionIds: []
-                sectionIds:
-                  - c3e98bb9966017d0
-                config:
-                  gridSettings:
-                    desktop:
-                      c3e98bb9966017d0:
-                        x: 0
-                        y: 0
-                        w: 12
-                        h: 1
-                  borderRadius: small
-                  border: terminal
-            sectionIds:
-              - f19eeffa4f87a133
-              - ed0657fbb138ba6b
-            config:
-              gridSettings:
-                desktop:
-                  f19eeffa4f87a133:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-                  ed0657fbb138ba6b:
-                    x: 0
-                    y: 1
-                    w: 12
-                    h: 1
-              paddingX: custom:32px
-              gap: normal
-              paddingY: custom:32px
-              background: background.paper
-              border: solid
-              borderRadius: small
-              alignContent: space-between
-          8a1f260effbaa20f:
-            id: 8a1f260effbaa20f
-            name: Cards-2
-            component: layout-block
-            sections:
-              443849fc0d9165b3:
-                id: 443849fc0d9165b3
-                name: RichText
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0J44322kDYc-
-                sectionIds: []
-              0549fd7302047d56:
-                id: 0549fd7302047d56
-                name: Section Layout
-                component: layout-block
-                sections:
-                  217e237668c22eb3:
-                    id: 217e237668c22eb3
-                    name: Code
-                    component: custom-component
-                    config:
-                      useCache: true
-                      componentId: 2EHGy3vwxlS9JGr2
-                    sectionIds: []
-                sectionIds:
-                  - 217e237668c22eb3
-                config:
-                  gridSettings:
-                    desktop:
-                      217e237668c22eb3:
-                        x: 0
-                        y: 0
-                        w: 12
-                        h: 1
-                  borderRadius: small
-                  border: terminal
-            sectionIds:
-              - 443849fc0d9165b3
-              - 0549fd7302047d56
-            config:
-              gridSettings:
-                desktop:
-                  443849fc0d9165b3:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-                  0549fd7302047d56:
-                    x: 0
-                    y: 1
-                    w: 12
-                    h: 1
-              paddingX: custom:32px
-              gap: normal
-              paddingY: custom:32px
-              background: background.paper
-              border: solid
-              borderRadius: small
-              alignContent: space-between
-          170e2e1d671a4295:
-            id: 170e2e1d671a4295
-            name: Cards-3
-            component: layout-block
-            sections:
-              e7934367514b3dec:
-                id: e7934367514b3dec
-                name: RichText
-                component: custom-component
-                config:
-                  useCache: true
-                  componentId: xoHu0J44322kDYc-
-                sectionIds: []
-              ff529eb589e9e7fb:
-                id: ff529eb589e9e7fb
-                name: Section Layout
-                component: layout-block
-                sections:
-                  fab46630b3a8d7c3:
-                    id: fab46630b3a8d7c3
-                    name: Code
-                    component: custom-component
-                    config:
-                      useCache: true
-                      componentId: 2EHGy3vwxlS9JGr2
-                    sectionIds: []
-                sectionIds:
-                  - fab46630b3a8d7c3
-                config:
-                  gridSettings:
-                    desktop:
-                      fab46630b3a8d7c3:
-                        x: 0
-                        y: 0
-                        w: 12
-                        h: 1
-                  borderRadius: small
-                  border: terminal
-            sectionIds:
-              - e7934367514b3dec
-              - ff529eb589e9e7fb
-            config:
-              gridSettings:
-                desktop:
-                  e7934367514b3dec:
-                    x: 0
-                    y: 0
-                    w: 12
-                    h: 1
-                  ff529eb589e9e7fb:
-                    x: 0
-                    y: 1
-                    w: 12
-                    h: 1
-              paddingX: custom:32px
-              gap: normal
-              paddingY: custom:32px
-              background: background.paper
-              border: solid
-              borderRadius: small
-              alignContent: space-between
-        sectionIds:
-          - f71851cc0e9e2639
-          - 8a1f260effbaa20f
-          - 170e2e1d671a4295
-        config:
-          gridSettings:
-            desktop:
-              f71851cc0e9e2639:
-                x: 0
-                y: 0
-                w: 12
-                h: 1
-              8a1f260effbaa20f:
-                x: 0
-                y: 1
-                w: 12
-                h: 1
-              170e2e1d671a4295:
-                x: 0
-                y: 2
-                w: 12
-                h: 1
-            mobile:
-              f71851cc0e9e2639:
-                x: 0
-                y: 0
-                w: 12
-                h: 1
-              8a1f260effbaa20f:
-                x: 0
-                y: 1
-                w: 12
-                h: 1
-              170e2e1d671a4295:
-                x: 0
-                y: 2
-                w: 12
-                h: 1
-          gap: normal
-          paddingX: none
-    sectionIds:
-      - 459a5cc4b163205e
-      - 049488309074c8a6
-    config:
-      gridSettings:
-        desktop:
-          049488309074c8a6:
+          8f3842eca05b45a2:
             x: 0
             y: 1
             w: 12
             h: 1
-          459a5cc4b163205e:
-            x: 0
-            y: 0
-            w: 12
-            h: 1
+      paddingX: none
       gap: normal
       paddingY: none
+      background: transparent
+      border: none
+      borderRadius: none
+      alignContent: center
+  39aa2de56acad889:
+    id: 39aa2de56acad889
+    name: Card01
+    component: layout-block
+    sections:
+      0beb0276d388eb3c:
+        id: 0beb0276d388eb3c
+        name: RichText
+        component: custom-component
+        config:
+          useCache: true
+          componentId: xoHu0J44322kDYc-
+        sectionIds: []
+      d562906363ed8310:
+        id: d562906363ed8310
+        name: Section Layout
+        component: layout-block
+        sections:
+          02ad5617d7f5af52:
+            id: 02ad5617d7f5af52
+            name: Code
+            component: custom-component
+            config:
+              useCache: true
+              componentId: 2EHGy3vwxlS9JGr2
+            sectionIds: []
+        sectionIds:
+          - 02ad5617d7f5af52
+        config:
+          gridSettings:
+            desktop:
+              02ad5617d7f5af52:
+                x: 0
+                y: 0
+                w: 12
+                h: 1
+          borderRadius: small
+          border: terminal
+    sectionIds:
+      - 0beb0276d388eb3c
+      - d562906363ed8310
+    config:
+      gridSettings:
+        desktop:
+          0beb0276d388eb3c:
+            x: 7
+            y: 0
+            w: 5
+            h: 1
+          d562906363ed8310:
+            x: 0
+            y: 0
+            w: 7
+            h: 1
       paddingX: none
+      gap: normal
+      paddingY: none
+      background: transparent
+      border: none
+      borderRadius: none
+      alignContent: center
   ec73d39956f69fe3:
     id: ec73d39956f69fe3
     name: Card01
@@ -1087,21 +606,374 @@ sections:
       border: none
       borderRadius: none
       alignContent: center
-  bf0d51655e4bfa15:
-    id: bf0d51655e4bfa15
+  cf6ecfd558c8e466:
+    id: cf6ecfd558c8e466
+    name: Feature Grid (2x2)_2
+    component: layout-block
+    sections:
+      2fed5b65424fc44f:
+        id: 2fed5b65424fc44f
+        name: Title
+        component: layout-block
+        sections:
+          d2e1e66a22867eb0:
+            id: d2e1e66a22867eb0
+            name: RichText
+            component: custom-component
+            config:
+              useCache: true
+              componentId: xoHu0J44322kDYc-
+            sectionIds: []
+        sectionIds:
+          - d2e1e66a22867eb0
+        config:
+          gap: small
+          paddingX: none
+          gridSettings:
+            desktop:
+              d2e1e66a22867eb0:
+                x: 0
+                y: 0
+                w: 12
+                h: 1
+            mobile:
+              d2e1e66a22867eb0:
+                id: d2e1e66a22867eb0
+          alignContent: start
+      9381932ef68c65b7:
+        id: 9381932ef68c65b7
+        name: Cards
+        component: layout-block
+        sections:
+          499e1d93ce22be17:
+            id: 499e1d93ce22be17
+            name: Cards-1
+            component: layout-block
+            sections:
+              c327ad2efb61ea5b:
+                id: c327ad2efb61ea5b
+                name: RichText
+                component: custom-component
+                config:
+                  useCache: true
+                  componentId: xoHu0J44322kDYc-
+                sectionIds: []
+              2dca361aa63406ba:
+                id: 2dca361aa63406ba
+                name: Section Layout
+                component: layout-block
+                sections:
+                  33d1936919c33593:
+                    id: 33d1936919c33593
+                    name: Code
+                    component: custom-component
+                    config:
+                      useCache: true
+                      componentId: 2EHGy3vwxlS9JGr2
+                    sectionIds: []
+                sectionIds:
+                  - 33d1936919c33593
+                config:
+                  gridSettings:
+                    desktop:
+                      33d1936919c33593:
+                        x: 0
+                        y: 0
+                        w: 12
+                        h: 1
+                  borderRadius: small
+                  border: terminal
+            sectionIds:
+              - c327ad2efb61ea5b
+              - 2dca361aa63406ba
+            config:
+              gridSettings:
+                desktop:
+                  c327ad2efb61ea5b:
+                    x: 0
+                    y: 0
+                    w: 12
+                    h: 1
+                  2dca361aa63406ba:
+                    x: 0
+                    y: 1
+                    w: 12
+                    h: 1
+              paddingX: custom:32px
+              gap: normal
+              paddingY: custom:32px
+              background: background.paper
+              border: solid
+              borderRadius: small
+              alignContent: space-between
+          48ad75162f1d08b0:
+            id: 48ad75162f1d08b0
+            name: Cards-2
+            component: layout-block
+            sections:
+              fc94cdf62c9f3787:
+                id: fc94cdf62c9f3787
+                name: RichText
+                component: custom-component
+                config:
+                  useCache: true
+                  componentId: xoHu0J44322kDYc-
+                sectionIds: []
+              4eb6eec4c63f00b0:
+                id: 4eb6eec4c63f00b0
+                name: Section Layout
+                component: layout-block
+                sections:
+                  68ac41eb7372dd22:
+                    id: 68ac41eb7372dd22
+                    name: Code
+                    component: custom-component
+                    config:
+                      useCache: true
+                      componentId: 2EHGy3vwxlS9JGr2
+                    sectionIds: []
+                sectionIds:
+                  - 68ac41eb7372dd22
+                config:
+                  gridSettings:
+                    desktop:
+                      68ac41eb7372dd22:
+                        x: 0
+                        y: 0
+                        w: 12
+                        h: 1
+                  borderRadius: small
+                  border: terminal
+            sectionIds:
+              - fc94cdf62c9f3787
+              - 4eb6eec4c63f00b0
+            config:
+              gridSettings:
+                desktop:
+                  fc94cdf62c9f3787:
+                    x: 0
+                    y: 0
+                    w: 12
+                    h: 1
+                  4eb6eec4c63f00b0:
+                    x: 0
+                    y: 1
+                    w: 12
+                    h: 1
+              paddingX: custom:32px
+              gap: normal
+              paddingY: custom:32px
+              background: background.paper
+              border: solid
+              borderRadius: small
+              alignContent: space-between
+          1df207398720a0ec:
+            id: 1df207398720a0ec
+            name: Cards-3
+            component: layout-block
+            sections:
+              bf80ef70e63368bd:
+                id: bf80ef70e63368bd
+                name: RichText
+                component: custom-component
+                config:
+                  useCache: true
+                  componentId: xoHu0J44322kDYc-
+                sectionIds: []
+              2db4ddca95dc1458:
+                id: 2db4ddca95dc1458
+                name: Section Layout
+                component: layout-block
+                sections:
+                  ccf2dbe1743d4a04:
+                    id: ccf2dbe1743d4a04
+                    name: Code
+                    component: custom-component
+                    config:
+                      useCache: true
+                      componentId: 2EHGy3vwxlS9JGr2
+                    sectionIds: []
+                sectionIds:
+                  - ccf2dbe1743d4a04
+                config:
+                  gridSettings:
+                    desktop:
+                      ccf2dbe1743d4a04:
+                        x: 0
+                        y: 0
+                        w: 12
+                        h: 1
+                  borderRadius: small
+                  border: terminal
+            sectionIds:
+              - bf80ef70e63368bd
+              - 2db4ddca95dc1458
+            config:
+              gridSettings:
+                desktop:
+                  bf80ef70e63368bd:
+                    x: 0
+                    y: 0
+                    w: 12
+                    h: 1
+                  2db4ddca95dc1458:
+                    x: 0
+                    y: 1
+                    w: 12
+                    h: 1
+              paddingX: custom:32px
+              gap: normal
+              paddingY: custom:32px
+              background: background.paper
+              border: solid
+              borderRadius: small
+              alignContent: space-between
+          d75c906f7c632067:
+            id: d75c906f7c632067
+            name: Cards-4
+            component: layout-block
+            sections:
+              bb96febac5d8f4c7:
+                id: bb96febac5d8f4c7
+                name: RichText
+                component: custom-component
+                config:
+                  useCache: true
+                  componentId: xoHu0J44322kDYc-
+                sectionIds: []
+              a76186cf0077df92:
+                id: a76186cf0077df92
+                name: Section Layout
+                component: layout-block
+                sections:
+                  3c3e71fd841cde39:
+                    id: 3c3e71fd841cde39
+                    name: Code
+                    component: custom-component
+                    config:
+                      useCache: true
+                      componentId: 2EHGy3vwxlS9JGr2
+                    sectionIds: []
+                sectionIds:
+                  - 3c3e71fd841cde39
+                config:
+                  gridSettings:
+                    desktop:
+                      3c3e71fd841cde39:
+                        x: 0
+                        y: 0
+                        w: 12
+                        h: 1
+                  borderRadius: small
+                  border: terminal
+            sectionIds:
+              - bb96febac5d8f4c7
+              - a76186cf0077df92
+            config:
+              gridSettings:
+                desktop:
+                  bb96febac5d8f4c7:
+                    x: 0
+                    y: 0
+                    w: 12
+                    h: 1
+                  a76186cf0077df92:
+                    x: 0
+                    y: 1
+                    w: 12
+                    h: 1
+              paddingX: custom:32px
+              gap: normal
+              paddingY: custom:32px
+              background: background.paper
+              border: solid
+              borderRadius: small
+              alignContent: space-between
+        sectionIds:
+          - 499e1d93ce22be17
+          - 48ad75162f1d08b0
+          - 1df207398720a0ec
+          - d75c906f7c632067
+        config:
+          gridSettings:
+            desktop:
+              499e1d93ce22be17:
+                x: 0
+                y: 0
+                w: 6
+                h: 1
+              48ad75162f1d08b0:
+                x: 6
+                y: 0
+                w: 6
+                h: 1
+              1df207398720a0ec:
+                x: 0
+                y: 1
+                w: 6
+                h: 1
+              d75c906f7c632067:
+                x: 6
+                y: 1
+                w: 6
+                h: 1
+            mobile:
+              499e1d93ce22be17:
+                x: 0
+                y: 0
+                w: 12
+                h: 1
+              48ad75162f1d08b0:
+                x: 0
+                y: 1
+                w: 12
+                h: 1
+              1df207398720a0ec:
+                x: 0
+                y: 2
+                w: 12
+                h: 1
+              d75c906f7c632067:
+                x: 0
+                y: 3
+                w: 12
+                h: 1
+          gap: small
+          paddingX: none
+    sectionIds:
+      - 2fed5b65424fc44f
+      - 9381932ef68c65b7
+    config:
+      gridSettings:
+        desktop:
+          9381932ef68c65b7:
+            x: 0
+            y: 1
+            w: 12
+            h: 1
+          2fed5b65424fc44f:
+            x: 0
+            y: 0
+            w: 12
+            h: 1
+      gap: normal
+      paddingY: none
+      paddingX: none
+  0bcbcf4e624e9c91:
+    id: 0bcbcf4e624e9c91
     name: FAQs_2
     component: layout-block
     sections:
-      71bbc55d2063a5ee:
-        id: 71bbc55d2063a5ee
+      398ec5af12f41a0d:
+        id: 398ec5af12f41a0d
         name: Title
         component: custom-component
         config:
           useCache: true
           componentId: xoHu0J44322kDYc-
         sectionIds: []
-      1df34b028214a1af:
-        id: 1df34b028214a1af
+      cbfad43f428da109:
+        id: cbfad43f428da109
         name: FaqComponentV2
         component: custom-component
         config:
@@ -1109,17 +981,17 @@ sections:
           componentId: 4MikfrDpecX9hUD6
         sectionIds: []
     sectionIds:
-      - 71bbc55d2063a5ee
-      - 1df34b028214a1af
+      - 398ec5af12f41a0d
+      - cbfad43f428da109
     config:
       gridSettings:
         desktop:
-          1df34b028214a1af:
+          cbfad43f428da109:
             x: 0
             y: 1
             w: 12
             h: 1
-          71bbc55d2063a5ee:
+          398ec5af12f41a0d:
             x: 0
             y: 0
             w: 12
@@ -1127,78 +999,131 @@ sections:
       paddingX: none
       gap: normal
       paddingY: none
-  d4e95c899f937e99:
-    id: d4e95c899f937e99
-    name: Full Background Hero
+  fbd5a0988ab17ddb:
+    id: fbd5a0988ab17ddb
+    name: CTA_2
     component: layout-block
     sections:
-      baef28d5114ba5ed:
-        id: baef28d5114ba5ed
-        name: CTA
+      21ece00b6107139d:
+        id: 21ece00b6107139d
+        name: Content
         component: layout-block
         sections:
-          f53d255ff05e9101:
-            id: f53d255ff05e9101
-            name: Description
-            component: custom-component
+          3274464191a83813:
+            id: 3274464191a83813
+            name: CTA
+            component: layout-block
+            sections:
+              2ffa981e214b35d3:
+                id: 2ffa981e214b35d3
+                name: Description
+                component: custom-component
+                config:
+                  useCache: true
+                  componentId: xoHu0J44322kDYc-
+                sectionIds: []
+              2298867f9d8bf3f8:
+                id: 2298867f9d8bf3f8
+                name: Action
+                component: custom-component
+                config:
+                  useCache: true
+                  componentId: a44r0SiGV9AFn2Fj
+                sectionIds: []
+            sectionIds:
+              - 2ffa981e214b35d3
+              - 2298867f9d8bf3f8
             config:
-              useCache: true
-              componentId: xoHu0J44322kDYc-
-            sectionIds: []
-          ce8cfaaf77847233:
-            id: ce8cfaaf77847233
-            name: Action
-            component: custom-component
+              gridSettings:
+                desktop:
+                  2ffa981e214b35d3:
+                    x: 0
+                    y: 0
+                    w: 12
+                    h: 1
+                  2298867f9d8bf3f8:
+                    x: 0
+                    y: 1
+                    w: 12
+                    h: 1
+              paddingY: normal
+              gap: normal
+              maxWidth: full
+              paddingX: none
+          60a41c9658be14eb:
+            id: 60a41c9658be14eb
+            name: Image
+            component: layout-block
+            sections:
+              d544c582ccfc528d:
+                id: d544c582ccfc528d
+                name: Media
+                component: custom-component
+                config:
+                  useCache: true
+                  componentId: xoHu0JPjPs122kaaa-
+                sectionIds: []
+            sectionIds:
+              - d544c582ccfc528d
             config:
-              useCache: true
-              componentId: a44r0SiGV9AFn2Fj
-            sectionIds: []
+              borderRadius: small
+              gridSettings:
+                desktop:
+                  d544c582ccfc528d:
+                    x: 0
+                    y: 0
+                    w: 12
+                    h: 1
+              background: transparent
+              paddingX: small
+              paddingY: small
         sectionIds:
-          - f53d255ff05e9101
-          - ce8cfaaf77847233
+          - 3274464191a83813
+          - 60a41c9658be14eb
         config:
+          borderRadius: small
+          paddingX: normal
+          paddingY: normal
+          maxWidth: full
           gridSettings:
             desktop:
-              f53d255ff05e9101:
-                x: 2
-                y: 0
-                w: 8
-                h: 1
-              ce8cfaaf77847233:
+              3274464191a83813:
                 x: 0
-                y: 1
-                w: 12
+                y: 0
+                w: 6
                 h: 1
-          paddingY: large
+              60a41c9658be14eb:
+                x: 6
+                y: 0
+                w: 6
+                h: 1
           gap: large
-          maxWidth: full
-          paddingX: none
-          background: background.paper
-          borderRadius: small
     sectionIds:
-      - baef28d5114ba5ed
+      - 21ece00b6107139d
     config:
       gridSettings:
         desktop:
-          baef28d5114ba5ed:
+          21ece00b6107139d:
             x: 0
             y: 0
             w: 12
             h: 1
-      background: transparent
-      paddingY: none
-      backgroundFullWidth: false
-      paddingX: none
+      gap: normal
+      paddingY: normal
+      background: background.paper
+      border: solid
+      borderRadius: small
 sectionIds:
-  - e1c97b3710d489a2
+  - 1d62422cf99dcc0a
   - 671827b9508f92f3
-  - 0bd9c287b4dac2cd
-  - dd6c4ba4f1e73c06
+  - 5f14927719c542c3
+  - 39aa2de56acad889
   - ec73d39956f69fe3
-  - bf0d51655e4bfa15
-  - d4e95c899f937e99
+  - cf6ecfd558c8e466
+  - 0bcbcf4e624e9c91
+  - fbd5a0988ab17ddb
 dataSource:
-  087e8576fefadf0f:
+  680339c14b4aaf87:
     en:
       properties:
         9ajrz12ik7esfk1z:
@@ -1206,58 +1131,48 @@ dataSource:
             list:
               - id: item-1759121327460-gc8w9kaxt
                 type: text
-                text: Snap Kit is your new secret weapon! A powerful Puppeteer-based API to
-                  capture stunning webpage screenshots, scrape content, and
-                  generate beautiful code snapshots. Let's make things happen!
+                text: Welcome to Snap Kit! Your new go-to, Puppeteer-powered API for grabbing
+                  pixel-perfect webpage screenshots and scraping web content
+                  like a pro. Jump in and see how easy web automation can be!
                 style:
-                  color: ""
+                  color: rgba(255, 255, 255, 0.8)
                   fontSize: 16px
                   variant: body1
         gs1rn5jmxfvpxptx:
           value:
-            text: Automate the Web. Visually.
+            text: Automate the Web, Capture with Precision
             style:
+              color: common.white
               variant: h1
         v5utpm7bu9yvdpnq:
           value: flex-start
         kyg0hdy5uqq4gc1o:
           value: flex-start
-  5455a7046747c6d7:
+  ad57901aa51a6fd7:
     en:
       properties:
         b8x4m3n9kp7qtw5r:
           value:
             - id: btn-default-1
               type: link
-              text: Get Started
-              url: https://www.arcblock.io/docs/blocklet-developer/en/access-key
+              text: Explore the Code
+              url: https://github.com/blocklet/snap-kit
               variant: contained
               size: large
               target: auto
               needLogin: false
             - id: btn-1759121436561-6r9xmg35x
-              text: View on GitHub
+              text: Read the Docs
               variant: outlined
-              borderColor: primary.main
+              borderColor: common.white
               size: large
-              url: https://github.com/blocklet/snap-kit
+              url: https://github.com/blocklet/snap-kit/blob/master/blocklets/snap-kit/README.md
         r8t5y6u7i1o2p3a4:
           value: 16
         v5utpm7bu9yvdpnq:
           value: flex-start
         v9979xeclpsbvn0n:
           value: flex-start
-  f98b98ffd13b8a1d:
-    en:
-      properties:
-        7m5pz8nefl5j9hqq:
-          value:
-            url: mediakit://snap-kit-hero-abstract'.png
-            mediaKitUrl: mediakit://snap-kit-hero-abstract'.png
-            width: 2445
-            height: 1394
-        jjv0hvr8wrixt1f3:
-          value: 1
   d79cdf28faac3108:
     en:
       properties:
@@ -1267,9 +1182,9 @@ dataSource:
           value: center
         gs1rn5jmxfvpxptx:
           value:
-            text: Capture the Web, Your Way
+            text: Everything You Need for Web Automation
             style:
-              variant: h2
+              variant: h1
   8a0319c7be20285c:
     en:
       properties:
@@ -1287,8 +1202,9 @@ dataSource:
             list:
               - id: item-1759143324880-zr95ywd04
                 type: text
-                text: Generate pixel-perfect snapshots of any webpage in PNG, JPEG, or WebP.
-                  Full-page or viewport, you're in control!
+                text: Capture pixel-perfect snapshots of any webpage in PNG, JPEG, or WebP. You
+                  control the viewport, quality, and can even grab the full
+                  page!
                 style:
                   color: ""
                   fontSize: 16px
@@ -1297,7 +1213,7 @@ dataSource:
     en:
       properties:
         5ek4m0kw9cu0ndns:
-          value: lucide:camera
+          value: lucide:image
         gugqsxx3xyveuu8n:
           value: primary.main
         529qbwiam7oypw8e:
@@ -1311,7 +1227,7 @@ dataSource:
           value: flex-start
         gs1rn5jmxfvpxptx:
           value:
-            text: Precise Content Crawling
+            text: Smart Content Extraction
             style:
               variant: h4
         9ajrz12ik7esfk1z:
@@ -1319,8 +1235,9 @@ dataSource:
             list:
               - id: item-1759143324880-zr95ywd04
                 type: text
-                text: Effortlessly extract HTML content from any URL for precise data
-                  extraction, SEO analysis, or content monitoring.
+                text: Effortlessly pull HTML content from any URL. Our crawler handles the heavy
+                  lifting, so you can focus on extracting the precise data you
+                  need.
                 style:
                   color: ""
                   fontSize: 16px
@@ -1329,7 +1246,7 @@ dataSource:
     en:
       properties:
         5ek4m0kw9cu0ndns:
-          value: lucide:scan-text
+          value: lucide:code-2
         gugqsxx3xyveuu8n:
           value: primary.main
         529qbwiam7oypw8e:
@@ -1343,7 +1260,7 @@ dataSource:
           value: flex-start
         gs1rn5jmxfvpxptx:
           value:
-            text: Beautiful Code Snapshots
+            text: Full Request Customization
             style:
               variant: h4
         9ajrz12ik7esfk1z:
@@ -1351,8 +1268,8 @@ dataSource:
             list:
               - id: item-1759143324880-zr95ywd04
                 type: text
-                text: Turn your code snippets into gorgeous, shareable images with the power of
-                  Carbon. Perfect for docs and social media!
+                text: Take full control! Set custom headers, cookies, and even local storage to
+                  simulate user sessions and access content behind logins.
                 style:
                   color: ""
                   fontSize: 16px
@@ -1361,29 +1278,17 @@ dataSource:
     en:
       properties:
         5ek4m0kw9cu0ndns:
-          value: lucide:code-2
+          value: lucide:settings-2
         gugqsxx3xyveuu8n:
           value: primary.main
         529qbwiam7oypw8e:
           value: 40px
-  10c868964f4822ae:
-    en:
-      properties:
-        v5utpm7bu9yvdpnq:
-          value: center
-        kyg0hdy5uqq4gc1o:
-          value: center
-        gs1rn5jmxfvpxptx:
-          value:
-            text: Powerful & Simple API
-            style:
-              variant: h2
-  2eb044a93ad602ba:
+  ab5b42fb4510ff3e:
     en:
       properties:
         gs1rn5jmxfvpxptx:
           value:
-            text: /api/crawl - Extract Web Content
+            text: Crawl & Extract Content with /api/crawl
             style:
               variant: h4
         9ajrz12ik7esfk1z:
@@ -1391,9 +1296,11 @@ dataSource:
             list:
               - id: item-1759185456428-p8i1jjk33
                 type: text
-                text: Fetch the full HTML content of any webpage. Use sync mode for immediate
-                  results or async for non-blocking batch processing. You'll get
-                  clean HTML and metadata every time.
+                text: "Point Snap Kit at any URL and let it grab the full HTML content for you.
+                  Whether you're doing it in real-time with `sync: true` or
+                  firing off a job to check later, extracting web data is now a
+                  breeze. You'll get back the content, page title, and
+                  description, ready for your app."
                 style:
                   color: ""
                   fontSize: 16px
@@ -1402,36 +1309,33 @@ dataSource:
           value: flex-start
         kyg0hdy5uqq4gc1o:
           value: flex-start
-  68defab8e7f7aa20:
+  352c83f76a988a1d:
     en:
       properties:
         a7frn5jmx5vpxpt3:
           value: |-
             {
-              "code": "ok",
-              "data": {
-                "jobId": "job_id",
-                "url": "https://example.com",
-                "html": "<!DOCTYPE html>...",
-                "status": "success",
-                "meta": {
-                  "title": "document title",
-                  "description": "document description"
+              "url": "https://example.com",
+              "sync": true,
+              "cookies": [
+                {
+                  "name": "token",
+                  "value": "user-auth-token"
                 }
-              }
+              ]
             }
         b2jrz12ik7esf93z:
-          value: json
+          value: POST /api/crawl
         d8hvf7cxz93jk5p:
           value: 1rem
         qvxiyadgn5bj6oq8:
           value: false
-  fc089fe336677523:
+  0beb0276d388eb3c:
     en:
       properties:
         gs1rn5jmxfvpxptx:
           value:
-            text: /api/snap - Capture Webpage Screenshots
+            text: Capture Perfect Screenshots with /api/snap
             style:
               variant: h4
         9ajrz12ik7esfk1z:
@@ -1439,9 +1343,10 @@ dataSource:
             list:
               - id: item-1759185456428-p8i1jjk33
                 type: text
-                text: Capture high-quality screenshots with custom dimensions, formats, and
-                  quality settings. It’s fast, flexible, and ready to scale for
-                  all your visual testing and content needs.
+                text: Need a high-quality screenshot? The `/api/snap` endpoint is your best
+                  friend. Specify the URL, format, and dimensions, and get a
+                  perfect capture every time. It's ideal for generating social
+                  media previews, visual testing, or archiving web pages.
                 style:
                   color: ""
                   fontSize: 16px
@@ -1450,228 +1355,33 @@ dataSource:
           value: flex-start
         kyg0hdy5uqq4gc1o:
           value: flex-start
-  7134d2bc2ec175ad:
+  02ad5617d7f5af52:
     en:
       properties:
         a7frn5jmx5vpxpt3:
           value: |-
             {
-              "code": "ok",
-              "data": {
-                "jobId": "job_id",
-                "url": "https://example.com",
-                "screenshot": "image path",
-                "status": "success",
-                "meta": {
-                  "title": "document title",
-                  "description": "document description"
-                }
-              }
+              "url": "https://example.com",
+              "format": "webp",
+              "width": 1920,
+              "height": 1080,
+              "fullPage": true,
+              "sync": true
             }
         b2jrz12ik7esf93z:
-          value: json
+          value: POST /api/snap
         d8hvf7cxz93jk5p:
           value: 1rem
         qvxiyadgn5bj6oq8:
           value: false
-  0c19c72289b9df50:
-    en:
-      properties:
-        gs1rn5jmxfvpxptx:
-          value:
-            text: /api/carbon - Generate Code Snapshots
-            style:
-              variant: h4
-        9ajrz12ik7esfk1z:
-          value:
-            list:
-              - id: item-1759185456428-p8i1jjk33
-                type: text
-                text: Create stunning, presentation-ready images from your source code.
-                  Customize themes, fonts, and more, just like on carbon.now.sh,
-                  to make your code pop in documentation and articles.
-                style:
-                  color: ""
-                  fontSize: 16px
-                  variant: body1
-        v5utpm7bu9yvdpnq:
-          value: flex-start
-        kyg0hdy5uqq4gc1o:
-          value: flex-start
-  c4a1f266816eb1a1:
-    en:
-      properties:
-        a7frn5jmx5vpxpt3:
-          value: |-
-            {
-              "code": "ok",
-              "data": {
-                "jobId": "job_id",
-                "screenshot": "image path",
-                "status": "success",
-                "meta": {
-                  "title": "document title",
-                  "description": "document description"
-                }
-              }
-            }
-        b2jrz12ik7esf93z:
-          value: json
-        d8hvf7cxz93jk5p:
-          value: 1rem
-        qvxiyadgn5bj6oq8:
-          value: false
-  5b658d0ac413cd4c:
-    en:
-      properties:
-        v5utpm7bu9yvdpnq:
-          value: center
-        kyg0hdy5uqq4gc1o:
-          value: center
-        gs1rn5jmxfvpxptx:
-          value:
-            text: "See It in Action: Curl Examples"
-            style:
-              variant: h2
-  f19eeffa4f87a133:
-    en:
-      properties:
-        gs1rn5jmxfvpxptx:
-          value:
-            text: Capture a PNG Screenshot
-            style:
-              variant: h4
-        9ajrz12ik7esfk1z:
-          value:
-            list:
-              - id: item-1759185456428-p8i1jjk33
-                type: text
-                text: A simple POST request to get a high-quality PNG image of a website, synced
-                  immediately so you get the result right away.
-                style:
-                  color: ""
-                  fontSize: 16px
-                  variant: body1
-        v5utpm7bu9yvdpnq:
-          value: flex-start
-        kyg0hdy5uqq4gc1o:
-          value: flex-start
-  c3e98bb9966017d0:
-    en:
-      properties:
-        a7frn5jmx5vpxpt3:
-          value: |-
-            curl --request POST \
-              --url 'https://snap.createblocklet.dev/api/snap' \
-              --header 'Authorization: Bearer ACCESS-KEY' \
-              --header 'Content-Type: application/json' \
-              --data '{
-                "url": "https://example.com",
-                "format": "png",
-                "width": 1920,
-                "height": 1080,
-                "sync": true
-              }'
-        b2jrz12ik7esf93z:
-          value: bash
-        d8hvf7cxz93jk5p:
-          value: 1rem
-        qvxiyadgn5bj6oq8:
-          value: false
-  443849fc0d9165b3:
-    en:
-      properties:
-        gs1rn5jmxfvpxptx:
-          value:
-            text: Capture a JPEG with Quality Control
-            style:
-              variant: h4
-        9ajrz12ik7esfk1z:
-          value:
-            list:
-              - id: item-1759185456428-p8i1jjk33
-                type: text
-                text: Need a smaller file? Grab a JPEG and fine-tune the quality for the perfect
-                  balance between size and clarity.
-                style:
-                  color: ""
-                  fontSize: 16px
-                  variant: body1
-        v5utpm7bu9yvdpnq:
-          value: flex-start
-        kyg0hdy5uqq4gc1o:
-          value: flex-start
-  217e237668c22eb3:
-    en:
-      properties:
-        a7frn5jmx5vpxpt3:
-          value: |-
-            curl --request POST \
-              --url 'https://snap.createblocklet.dev/api/snap' \
-              --header 'Authorization: Bearer ACCESS-KEY' \
-              --header 'Content-Type: application/json' \
-              --data '{
-                "url": "https://example.com",
-                "format": "jpeg",
-                "quality": 90,
-                "sync": true
-              }'
-        b2jrz12ik7esf93z:
-          value: bash
-        d8hvf7cxz93jk5p:
-          value: 1rem
-        qvxiyadgn5bj6oq8:
-          value: false
-  e7934367514b3dec:
-    en:
-      properties:
-        gs1rn5jmxfvpxptx:
-          value:
-            text: Generate a Code Screenshot
-            style:
-              variant: h4
-        9ajrz12ik7esfk1z:
-          value:
-            list:
-              - id: item-1759185456428-p8i1jjk33
-                type: text
-                text: Quickly generate a beautiful image of your code. Here we're using the
-                  'one-dark' theme to create a slick, modern look.
-                style:
-                  color: ""
-                  fontSize: 16px
-                  variant: body1
-        v5utpm7bu9yvdpnq:
-          value: flex-start
-        kyg0hdy5uqq4gc1o:
-          value: flex-start
-  fab46630b3a8d7c3:
-    en:
-      properties:
-        a7frn5jmx5vpxpt3:
-          value: |-
-            curl --request POST \
-              --url 'https://snap.createblocklet.dev/api/carbon' \
-              --header 'Authorization: Bearer ACCESS-KEY' \
-              --header 'Content-Type: application/json' \
-              --data '{
-                "code": "console.log(\"Hello World\");",
-                "format": "jpeg",
-                "t": "one-dark",
-                "sync": true
-              }'
-        b2jrz12ik7esf93z:
-          value: bash
-        d8hvf7cxz93jk5p:
-          value: 1rem
-        qvxiyadgn5bj6oq8:
-          value: false
+        c4kvf6b7zyskk8m:
+          value: true
   9698f8a52c3a584e:
     en:
       properties:
         gs1rn5jmxfvpxptx:
           value:
-            text: Simple & Secure Authentication
+            text: Generate Stunning Code Shots with /api/carbon
             style:
               variant: h4
         9ajrz12ik7esfk1z:
@@ -1679,9 +1389,10 @@ dataSource:
             list:
               - id: item-1759185456428-p8i1jjk33
                 type: text
-                text: All API requests are protected. Just include your access key as a Bearer
-                  token in the Authorization header. It's that easy to get
-                  started securely!
+                text: Turn your plain code into a work of art! The `/api/carbon` endpoint lets
+                  you create gorgeous, shareable images of your code snippets.
+                  Just send your code, pick a theme, and let Snap Kit handle the
+                  magic. Perfect for tutorials and docs!
                 style:
                   color: ""
                   fontSize: 16px
@@ -1695,23 +1406,205 @@ dataSource:
       properties:
         a7frn5jmx5vpxpt3:
           value: |-
-            curl --request GET \
-              --url 'https://snap.createblocklet.dev/api/...' \
-              --header 'Authorization: Bearer YOUR_ACCESS_KEY'
+            {
+              "code": "console.log('Hello, Snap Kit!');",
+              "format": "png",
+              "t": "one-dark",
+              "sync": true
+            }
+        b2jrz12ik7esf93z:
+          value: POST /api/carbon
+        d8hvf7cxz93jk5p:
+          value: 1rem
+        qvxiyadgn5bj6oq8:
+          value: false
+  d2e1e66a22867eb0:
+    en:
+      properties:
+        gs1rn5jmxfvpxptx:
+          value:
+            text: Get Started in Seconds
+            style:
+              variant: h1
+        v5utpm7bu9yvdpnq:
+          value: center
+        kyg0hdy5uqq4gc1o:
+          value: center
+  c327ad2efb61ea5b:
+    en:
+      properties:
+        gs1rn5jmxfvpxptx:
+          value:
+            text: Capture a PNG Screenshot
+            style:
+              variant: h4
+        9ajrz12ik7esfk1z:
+          value:
+            list:
+              - id: item-1759185456428-p8i1jjk33
+                type: text
+                text: A simple request to get a high-quality PNG image of a website. Just swap
+                  in your access key and URL!
+                style:
+                  color: ""
+                  fontSize: 16px
+                  variant: body1
+        v5utpm7bu9yvdpnq:
+          value: flex-start
+        kyg0hdy5uqq4gc1o:
+          value: flex-start
+  33d1936919c33593:
+    en:
+      properties:
+        a7frn5jmx5vpxpt3:
+          value: |-
+            curl --request POST \
+              --url 'https://snap.createblocklet.dev/api/snap' \
+              --header 'Authorization: Bearer YOUR-ACCESS-KEY' \
+              --header 'Content-Type: application/json' \
+              --data '{
+                "url": "https://arcblock.io",
+                "format": "png",
+                "sync": true
+              }'
         b2jrz12ik7esf93z:
           value: bash
         d8hvf7cxz93jk5p:
           value: 1rem
         qvxiyadgn5bj6oq8:
           value: false
-  71bbc55d2063a5ee:
+  fc94cdf62c9f3787:
+    en:
+      properties:
+        gs1rn5jmxfvpxptx:
+          value:
+            text: Generate a Code Screenshot
+            style:
+              variant: h4
+        9ajrz12ik7esfk1z:
+          value:
+            list:
+              - id: item-1759185456428-p8i1jjk33
+                type: text
+                text: Create a beautiful snapshot of your code. This example uses the 'one-dark'
+                  theme.
+                style:
+                  color: ""
+                  fontSize: 16px
+                  variant: body1
+        v5utpm7bu9yvdpnq:
+          value: flex-start
+        kyg0hdy5uqq4gc1o:
+          value: flex-start
+  68ac41eb7372dd22:
+    en:
+      properties:
+        a7frn5jmx5vpxpt3:
+          value: |-
+            curl --request POST \
+              --url 'https://snap.createblocklet.dev/api/carbon' \
+              --header 'Authorization: Bearer YOUR-ACCESS-KEY' \
+              --header 'Content-Type: application/json' \
+              --data '{
+                "code": "console.log(\"Hello World\");",
+                "format": "jpeg",
+                "sync": true
+              }'
+        b2jrz12ik7esf93z:
+          value: bash
+        d8hvf7cxz93jk5p:
+          value: 1rem
+        qvxiyadgn5bj6oq8:
+          value: false
+  bf80ef70e63368bd:
+    en:
+      properties:
+        gs1rn5jmxfvpxptx:
+          value:
+            text: Capture a JPEG with Quality Control
+            style:
+              variant: h4
+        9ajrz12ik7esfk1z:
+          value:
+            list:
+              - id: item-1759185456428-p8i1jjk33
+                type: text
+                text: Need a smaller file? Capture a JPEG and set the quality to find the
+                  perfect balance.
+                style:
+                  color: ""
+                  fontSize: 16px
+                  variant: body1
+        v5utpm7bu9yvdpnq:
+          value: flex-start
+        kyg0hdy5uqq4gc1o:
+          value: flex-start
+  ccf2dbe1743d4a04:
+    en:
+      properties:
+        a7frn5jmx5vpxpt3:
+          value: |-
+            curl --request POST \
+              --url 'https://snap.createblocklet.dev/api/snap' \
+              --header 'Authorization: Bearer YOUR-ACCESS-KEY' \
+              --header 'Content-Type: application/json' \
+              --data '{
+                "url": "https://example.com",
+                "format": "jpeg",
+                "quality": 90,
+                "sync": true
+              }'
+        b2jrz12ik7esf93z:
+          value: bash
+        d8hvf7cxz93jk5p:
+          value: 1rem
+        qvxiyadgn5bj6oq8:
+          value: false
+  bb96febac5d8f4c7:
+    en:
+      properties:
+        gs1rn5jmxfvpxptx:
+          value:
+            text: Get Crawl Result
+            style:
+              variant: h4
+        9ajrz12ik7esfk1z:
+          value:
+            list:
+              - id: item-1759185456428-p8i1jjk33
+                type: text
+                text: Check the status and get the data from a previously submitted asynchronous
+                  job.
+                style:
+                  color: ""
+                  fontSize: 16px
+                  variant: body1
+        v5utpm7bu9yvdpnq:
+          value: flex-start
+        kyg0hdy5uqq4gc1o:
+          value: flex-start
+  3c3e71fd841cde39:
+    en:
+      properties:
+        a7frn5jmx5vpxpt3:
+          value: >-
+            curl --request GET \
+              --url 'https://snap.createblocklet.dev/api/crawl?jobId=YOUR-JOB-ID' \
+              --header 'Authorization: Bearer YOUR-ACCESS-KEY'
+        b2jrz12ik7esf93z:
+          value: bash
+        d8hvf7cxz93jk5p:
+          value: 1rem
+        qvxiyadgn5bj6oq8:
+          value: false
+  398ec5af12f41a0d:
     en:
       properties:
         gs1rn5jmxfvpxptx:
           value:
             text: Frequently Asked Questions
             style:
-              variant: h2
+              variant: h1
         v5utpm7bu9yvdpnq:
           value: center
         kyg0hdy5uqq4gc1o:
@@ -1719,27 +1612,35 @@ dataSource:
         9ajrz12ik7esfk1z:
           value:
             list: []
-  1df34b028214a1af:
+  cbfad43f428da109:
     en:
       properties:
         4221qi1bxy322mf4:
           value:
+            - title: What is Snap Kit?
+              answer: Snap Kit is a powerful, Puppeteer-based service that makes web
+                automation a blast! You can use its simple API to capture
+                high-quality webpage screenshots, scrape web content for data,
+                and even generate beautiful images of your code.
+            - title: How does authentication work?
+              answer: "It's super easy! All you need is an access key. Just include it in your
+                request header as a Bearer token, like this: `Authorization:
+                Bearer YOUR-ACCESS-KEY`. That's it, you're in!"
             - title: What image formats does /api/snap support?
-              answer: You can generate screenshots in 'png', 'jpeg', or 'webp'. WebP is the
-                default and offers fantastic compression and quality!
-            - title: What about /api/carbon for code screenshots?
-              answer: The carbon endpoint supports 'png' and 'jpeg' for creating beautiful
-                code snapshots. WebP is not supported here, so it will fall back
-                to PNG.
+              answer: You've got options! The `/api/snap` endpoint supports modern `webp` (the
+                default), lossless `png` for crisp graphics, and `jpeg` for when
+                you need to control the file size with the `quality` parameter.
             - title: What's the difference between sync and async requests?
-              answer: "Set 'sync: true' to wait for the job to complete and get the result in
-                the same response. Use 'sync: false' (the default) to get a job
-                ID immediately and fetch the result later. It's perfect for
-                handling long-running tasks without blocking your app!"
-            - title: How do I get my access key?
-              answer: Your access key is provided when you set up Snap Kit. Check out the
-                ArcBlock documentation for more details on authentication and
-                getting everything set up.
+              answer: "Great question! Set `sync: true` if you want to wait for the job to
+                complete and get the result in the same response. If you're
+                firing off a big job or don't want to wait, use `sync: false`
+                (the default) to get a `jobId` instantly. You can then use that
+                ID to check the result later."
+            - title: Can I crawl pages that require a login?
+              answer: Absolutely! You can pass `cookies` and `localStorage` data in your
+                request body. This allows you to simulate an authenticated user
+                session, so you can easily access and automate content that's
+                behind a login wall.
             - title: ""
               answer: ""
             - title: ""
@@ -1750,9 +1651,7 @@ dataSource:
               answer: ""
             - title: ""
               answer: ""
-            - title: ""
-              answer: ""
-  f53d255ff05e9101:
+  2ffa981e214b35d3:
     en:
       properties:
         9ajrz12ik7esfk1z:
@@ -1760,43 +1659,68 @@ dataSource:
             list:
               - id: item-1759121327460-gc8w9kaxt
                 type: text
-                text: Stop wrestling with complex setups. Start using Snap Kit today and get the
-                  reliable, scalable web automation and screenshot API you've
-                  always wanted.
+                text: Jump into the code, explore the documentation, and see how Snap Kit can
+                  supercharge your web automation workflows. Let's build
+                  something amazing together!
                 style:
                   color: ""
                   fontSize: 16px
                   variant: body1
         gs1rn5jmxfvpxptx:
           value:
-            text: Ready to Supercharge Your Automation?
+            text: Ready to Start Automating?
             style:
-              color: ""
               variant: h1
         v5utpm7bu9yvdpnq:
-          value: center
+          value: flex-start
         kyg0hdy5uqq4gc1o:
-          value: center
-  ce8cfaaf77847233:
+          value: flex-start
+  2298867f9d8bf3f8:
     en:
       properties:
         b8x4m3n9kp7qtw5r:
           value:
             - id: btn-default-1
               type: link
-              text: Get Your Access Key
-              url: https://www.arcblock.io/docs/blocklet-developer/en/access-key
+              text: View on GitHub
+              url: https://github.com/blocklet/snap-kit
               variant: contained
               size: large
               target: auto
               needLogin: false
-            - id: btn-1759121436561-6r9xmg35x
-              text: ""
+            - type: link
+              text: Read the Docs
+              url: https://github.com/blocklet/snap-kit/blob/master/blocklets/snap-kit/README.md
+              color: ""
+              borderColor: ""
               variant: outlined
-              borderColor: common.white
               size: large
-              url: ""
+              target: auto
+              startIcon: ""
+              endIcon: ""
+              needLogin: false
+              imageUrl: ""
+              imageUrlDark: ""
+              imageHoverAnimation: true
+              id: btn-1759914246614-j6hez4b0u
         r8t5y6u7i1o2p3a4:
           value: 16
         v5utpm7bu9yvdpnq:
-          value: center
+          value: flex-start
+        v9979xeclpsbvn0n:
+          value: flex-start
+  d544c582ccfc528d:
+    en:
+      properties:
+        7m5pz8nefl5j9hqq:
+          value:
+            url: mediakit://1.jpeg
+            mediaKitUrl: mediakit://1.jpeg
+            width: 2190
+            height: 1488
+        x8beiec3fxx5des1:
+          value: 100%
+        5fjm8opvqth7wk71:
+          value: 100%
+        jjv0hvr8wrixt1f3:
+          value: 1
