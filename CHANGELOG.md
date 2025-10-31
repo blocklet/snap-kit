@@ -1,3 +1,7 @@
+## 1.4.0 (2025-10-30)
+
+- feat: use a more secure signature mechanism
+
 ## 1.3.4 (2025-9-7)
 
 - fix: add error logs for reading file

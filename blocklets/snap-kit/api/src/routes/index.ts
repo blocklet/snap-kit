@@ -5,11 +5,11 @@ import qs from 'querystring';
 
 import { logger } from '../libs/logger';
 
-const middlewares = require('@blocklet/sdk/lib/middlewares');
+const { session, auth } = require('@blocklet/sdk/lib/middlewares');
 
 const router = Router();
 
-router.use(middlewares.session({ accessKey: true }));
+router.use(session({ accessKey: true }));
 
 /**
  * Crawl page html
@@ -23,7 +23,7 @@ const crawlSchema = Joi.object({
   localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
   sync: Joi.boolean().default(false),
 });
-router.post('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+router.post('/crawl', auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlSchema.validateAsync(req.body);
 
   res.setTimeout(params.timeout * 1000, () => {
@@ -71,7 +71,7 @@ const crawlGetSchema = Joi.object({
   url: Joi.string().uri(),
 }).or('jobId', 'url');
 
-router.get('/crawl', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+router.get('/crawl', auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlGetSchema.validateAsync(req.query);
   const snapshot = params.jobId ? await getSnapshot(params.jobId) : await getLatestSnapshot(params.url);
 
@@ -102,7 +102,7 @@ const snapSchema = Joi.object({
   localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
   sync: Joi.boolean().default(false),
 });
-router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+router.post('/snap', auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await snapSchema.validateAsync(req.body);
 
   res.setTimeout(params.timeout * 1000, () => {
@@ -148,7 +148,7 @@ router.post('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, r
 const snapGetSchema = Joi.object({
   jobId: Joi.string().required(),
 });
-router.get('/snap', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+router.get('/snap', auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await snapGetSchema.validateAsync(req.query);
   const snapshot = await getSnapshot(params.jobId);
 
@@ -190,7 +190,7 @@ const carbonSchema = Joi.object({
   timeout: Joi.number().integer().min(0).max(120).default(120),
 });
 
-router.post('/carbon', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+router.post('/carbon', auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await carbonSchema.validateAsync(req.body);
   const { sync, timeout, ...carbonParams } = params;
 
@@ -235,7 +235,7 @@ router.post('/carbon', middlewares.auth({ methods: ['accessKey'] }), async (req,
 const carbonGetSchema = Joi.object({
   jobId: Joi.string().required(),
 });
-router.get('/carbon', middlewares.auth({ methods: ['accessKey'] }), async (req, res) => {
+router.get('/carbon', auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await carbonGetSchema.validateAsync(req.query);
   const snapshot = await getSnapshot(params.jobId);
 

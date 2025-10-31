@@ -1,3 +1,9 @@
 packages:
   - packages/*
   - blocklets/*
+onlyBuiltDependencies:
+  - '@blocklet/puppeteer'
+  - core-js
+  - esbuild
+  - fast-folder-size
+  - sqlite3
