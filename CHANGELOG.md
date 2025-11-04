@@ -1,3 +1,7 @@
+## 1.4.1 (2025-11-4)
+
+- chore: update deps
+
 ## 1.4.0 (2025-10-30)
 
 - feat: use a more secure signature mechanism

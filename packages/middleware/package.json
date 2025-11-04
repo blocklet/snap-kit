@@ -1,6 +1,6 @@
 {
   "name": "@arcblock/crawler-middleware",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/cjs/index.d.ts",
@@ -50,10 +50,10 @@
     ]
   },
   "dependencies": {
-    "@abtnode/cron": "^1.16.54-beta-20251030-060219-f2f1ed96",
+    "@abtnode/cron": "^1.17.0-beta-20251104-112713-e947b159",
     "@arcblock/crawler": "workspace:*",
-    "@blocklet/logger": "^1.16.54-beta-20251030-060219-f2f1ed96",
-    "@blocklet/sdk": "^1.16.54-beta-20251030-060219-f2f1ed96",
+    "@blocklet/logger": "^1.17.0-beta-20251104-112713-e947b159",
+    "@blocklet/sdk": "^1.17.0-beta-20251104-112713-e947b159",
     "@sequelize/core": "7.0.0-alpha.46",
     "@sequelize/sqlite3": "7.0.0-alpha.46",
     "axios": "^1.7.9",

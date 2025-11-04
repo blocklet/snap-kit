@@ -1,7 +1,7 @@
 {
   "name": "crawler",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "scripts": {
     "dev": "pnpm run --filter @arcblock/crawler dev & pnpm run --filter @arcblock/crawler-middleware dev & pnpm run --filter @blocklet/snap-kit dev",
     "build:packages": "pnpm -r build",
