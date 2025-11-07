@@ -42,7 +42,7 @@
     "@arcblock/crawler-middleware": "workspace:*",
     "@arcblock/did-auth": "^1.21.1",
     "@arcblock/did-auth-storage-nedb": "^1.7.1",
-    "@arcblock/validator": "^1.27.3",
+    "@arcblock/validator": "^1.27.4",
     "@blocklet/js-sdk": "^1.17.1",
     "@blocklet/logger": "^1.17.1",
     "@blocklet/sdk": "^1.17.1",
