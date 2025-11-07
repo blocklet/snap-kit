@@ -56,12 +56,12 @@
     ]
   },
   "dependencies": {
-    "@abtnode/cron": "^1.17.0",
-    "@abtnode/models": "^1.17.0",
-    "@abtnode/queue": "^1.17.0",
-    "@blocklet/logger": "^1.17.0",
+    "@abtnode/cron": "^1.17.1",
+    "@abtnode/models": "^1.17.1",
+    "@abtnode/queue": "^1.17.1",
+    "@blocklet/logger": "^1.17.1",
     "@blocklet/puppeteer": "^22.11.3",
-    "@blocklet/sdk": "^1.17.0",
+    "@blocklet/sdk": "^1.17.1",
     "@sequelize/core": "7.0.0-alpha.46",
     "@sequelize/sqlite3": "7.0.0-alpha.46",
     "axios": "^1.7.9",
