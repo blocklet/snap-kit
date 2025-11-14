@@ -56,12 +56,12 @@
     ]
   },
   "dependencies": {
-    "@abtnode/cron": "^1.17.2-beta-20251114-122922-4319f1ac",
-    "@abtnode/models": "^1.17.2-beta-20251114-122922-4319f1ac",
-    "@abtnode/queue": "^1.17.2-beta-20251114-122922-4319f1ac",
-    "@blocklet/logger": "^1.17.2-beta-20251114-122922-4319f1ac",
+    "@abtnode/cron": "^1.17.2",
+    "@abtnode/models": "^1.17.2",
+    "@abtnode/queue": "^1.17.2",
+    "@blocklet/logger": "^1.17.2",
     "@blocklet/puppeteer": "^22.11.3",
-    "@blocklet/sdk": "^1.17.2-beta-20251114-122922-4319f1ac",
+    "@blocklet/sdk": "^1.17.2",
     "@sequelize/core": "7.0.0-alpha.46",
     "@sequelize/sqlite3": "7.0.0-alpha.46",
     "axios": "^1.7.9",
