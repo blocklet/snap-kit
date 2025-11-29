@@ -1,3 +1,7 @@
+## 1.4.6 (2025-11-29)
+
+- chore: update deps
+
 ## 1.4.5 (2025-11-14)
 
 - chore: update deps
