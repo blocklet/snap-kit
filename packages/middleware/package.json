@@ -50,10 +50,10 @@
     ]
   },
   "dependencies": {
-    "@abtnode/cron": "^1.17.3",
+    "@abtnode/cron": "^1.17.5",
     "@arcblock/crawler": "workspace:*",
-    "@blocklet/logger": "^1.17.3",
-    "@blocklet/sdk": "^1.17.3",
+    "@blocklet/logger": "^1.17.5",
+    "@blocklet/sdk": "^1.17.5",
     "@sequelize/core": "7.0.0-alpha.46",
     "@sequelize/sqlite3": "7.0.0-alpha.46",
     "axios": "^1.7.9",
