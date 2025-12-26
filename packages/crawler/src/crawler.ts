@@ -42,8 +42,10 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
   return createQueue({
     store: new SequelizeStore(db, queue),
     concurrency: config.concurrency,
+    enableScheduledJob: true,
     onJob: async (job: JobState) => {
-      logger.info('Starting to execute crawl job', job);
+      const queueSize = await Job.count();
+      logger.info(`Starting to execute ${queue} job`, { ...job, queueSize });
 
       // check robots.txt
       if (!job.ignoreRobots) {
@@ -200,7 +202,7 @@ export const getPageContent = async (
     height = 900,
     quality = 80,
     format = 'webp',
-    timeout = 90 * 1000,
+    timeout = 60 * 1000,
     waitTime = 0,
     fullPage = false,
     headers,
@@ -376,18 +378,26 @@ export async function enqueue(
     return existsJob.id;
   }
 
-  logger.info('enqueue crawl job', params);
-
   const jobId = randomUUID();
-  const job = queue.push({ ...params, id: jobId });
+  const job = queue.push({ job: { ...params, id: jobId }, delay: 2 });
+
+  // Get current queue size for logging
+  const queueSize = await Job.count();
+  logger.info('enqueue crawl job', { ...params, jobId, queueSize });
 
   job.on('finished', async ({ result }) => {
-    logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, { job: params, result });
+    const count = await Job.count();
+    logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, {
+      job: params,
+      result,
+      queueSize: count,
+    });
     callback?.(result ? await formatSnapshot(result) : null);
   });
 
-  job.on('failed', ({ error }) => {
-    logger.error(`Failed to execute job for ${params.url}`, { error, job: params });
+  job.on('failed', async ({ error }) => {
+    const count = await Job.count();
+    logger.error(`Failed to execute job for ${params.url}`, { error, job: params, queueSize: count });
     callback?.(null);
   });
 

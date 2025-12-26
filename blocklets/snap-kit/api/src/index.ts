@@ -61,7 +61,7 @@ export const server = app.listen(port, async (err?: any) => {
 
   try {
     await initCrawler({
-      concurrency: Math.max(1, env.preferences.concurrency || 0),
+      concurrency: Math.max(1, env.preferences.crawlConcurrency || 0),
       siteCron: {
         enabled: !!env.preferences.cronEnabled,
         immediate: !!env.preferences.cronImmediate,

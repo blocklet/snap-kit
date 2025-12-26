@@ -4,12 +4,14 @@ import { Router } from 'express';
 import qs from 'querystring';
 
 import { logger } from '../libs/logger';
+import adminRouter from './admin';
 
 const { session, auth } = require('@blocklet/sdk/lib/middlewares');
 
 const router = Router();
 
 router.use(session({ accessKey: true }));
+router.use('/admin', adminRouter);
 
 /**
  * Crawl page html
@@ -17,7 +19,7 @@ router.use(session({ accessKey: true }));
 const crawlSchema = Joi.object({
   url: Joi.string().uri().required(),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
-  timeout: Joi.number().integer().min(10).max(120).default(120),
+  timeout: Joi.number().integer().min(10).max(120).default(60),
   waitTime: Joi.number().integer().min(0).max(120).default(0),
   cookies: Joi.array().items(Joi.object({ name: Joi.string().required(), value: Joi.string().required() })),
   localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
@@ -94,7 +96,7 @@ const snapSchema = Joi.object({
   height: Joi.number().integer().min(500).default(900),
   quality: Joi.number().integer().min(1).max(100).default(80),
   format: Joi.string().valid('png', 'jpeg', 'webp').default('webp'),
-  timeout: Joi.number().integer().min(0).max(120).default(120),
+  timeout: Joi.number().integer().min(0).max(120).default(60),
   waitTime: Joi.number().integer().min(0).max(120).default(0),
   fullPage: Joi.boolean().default(false),
   headers: Joi.object().pattern(Joi.string(), Joi.string()).max(30),
@@ -187,7 +189,7 @@ const carbonSchema = Joi.object({
   code: Joi.string().required(),
   format: Joi.string().valid('png', 'jpeg', 'webp').default('png'),
   sync: Joi.boolean().default(false),
-  timeout: Joi.number().integer().min(0).max(120).default(120),
+  timeout: Joi.number().integer().min(0).max(120).default(60),
 });
 
 router.post('/carbon', auth({ methods: ['accessKey'] }), async (req, res) => {

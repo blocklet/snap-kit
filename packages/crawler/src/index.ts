@@ -9,6 +9,7 @@ import { migrate } from './store/migrate';
 
 export * from './crawler';
 export * from './services/snapshot';
+export * from './store/job';
 export * as utils from './utils';
 
 export async function initCrawler(

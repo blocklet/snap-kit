@@ -4,7 +4,7 @@ import { SitemapItem } from 'sitemap';
 
 import { Site, config, logger } from './config';
 import { cronQueue } from './crawler';
-import { Snapshot } from './store';
+import { Job, Snapshot } from './store';
 import { formatUrl, getSitemapList } from './utils';
 
 const crawlBlockletRunningMap = new Map();
@@ -88,11 +88,15 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
       { concurrency: config.siteCron?.concurrency || 30 },
     );
 
+    // Get current queue size for logging
+    const queueSize = await Job.count();
+
     logger.info('Enqueued jobs from sitemap finished', {
       url,
       pathname,
       processCount,
       crawlCount,
+      queueSize,
     });
 
     return jobIds;

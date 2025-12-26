@@ -43,9 +43,9 @@ export class Job extends Model<JobModel> implements JobModel {
 
   public retryCount!: JobModel['retryCount'];
 
-  public willRunAt!: JobModel['willRunAt'];
-
   public delay!: JobModel['delay'];
+
+  public willRunAt!: JobModel['willRunAt'];
 
   public cancelled!: JobModel['cancelled'];
 
@@ -132,5 +132,61 @@ export class Job extends Model<JobModel> implements JobModel {
     });
 
     return existsJob?.get();
+  }
+
+  static async paginate({
+    page = 1,
+    pageSize = 20,
+    queue,
+  }: {
+    page?: number;
+    pageSize?: number;
+    queue?: string;
+  } = {}) {
+    const where = queue ? { queue } : {};
+    const offset = (page - 1) * pageSize;
+
+    const { count, rows } = await Job.findAndCountAll({
+      where,
+      order: [['createdAt', 'DESC']],
+      limit: pageSize,
+      offset,
+    });
+
+    return {
+      total: count,
+      page,
+      pageSize,
+      totalPages: Math.ceil(count / pageSize),
+      data: rows.map((row) => row.toJSON()),
+    };
+  }
+
+  static async stats() {
+    const results = (await Job.findAll({
+      attributes: ['queue', [sequelize.fn('COUNT', sequelize.col('id')), 'count']],
+      group: ['queue'],
+      raw: true,
+    })) as unknown as Array<{ queue: string; count: number }>;
+
+    const total = results.reduce((sum, item) => sum + Number(item.count), 0);
+
+    return {
+      total,
+      queues: results.map((item) => ({
+        queue: item.queue,
+        count: Number(item.count),
+      })),
+    };
+  }
+
+  static async deleteByQueue(queue: string) {
+    const count = await Job.destroy({ where: { queue } });
+    return { deleted: count };
+  }
+
+  static async deleteByIds(ids: string[]) {
+    const count = await Job.destroy({ where: { id: ids } });
+    return { deleted: count };
   }
 }
