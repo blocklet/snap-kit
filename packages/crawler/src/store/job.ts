@@ -32,6 +32,8 @@ export interface JobModel {
   willRunAt: number;
   delay: number;
   cancelled: boolean;
+  processingBy: string | null;
+  processingAt: number | null;
 }
 
 export class Job extends Model<JobModel> implements JobModel {
@@ -48,6 +50,10 @@ export class Job extends Model<JobModel> implements JobModel {
   public willRunAt!: JobModel['willRunAt'];
 
   public cancelled!: JobModel['cancelled'];
+
+  public processingBy!: JobModel['processingBy'];
+
+  public processingAt!: JobModel['processingAt'];
 
   static initModel(sequelize: Sequelize) {
     return Job.init(
@@ -76,6 +82,14 @@ export class Job extends Model<JobModel> implements JobModel {
         cancelled: {
           type: DataTypes.BOOLEAN,
           defaultValue: false,
+        },
+        processingBy: {
+          type: DataTypes.STRING(32),
+          allowNull: true,
+        },
+        processingAt: {
+          type: DataTypes.INTEGER,
+          allowNull: true,
         },
         createdAt: {
           type: DataTypes.DATE,

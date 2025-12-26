@@ -41,8 +41,10 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
 
   return createQueue({
     store: new SequelizeStore(db, queue),
-    concurrency: config.concurrency,
-    enableScheduledJob: true,
+    options: {
+      concurrency: config.concurrency,
+      enableScheduledJob: true,
+    },
     onJob: async (job: JobState) => {
       const queueSize = await Job.count();
       logger.info(`Starting to execute ${queue} job`, { ...job, queueSize });
@@ -379,26 +381,36 @@ export async function enqueue(
   }
 
   const jobId = randomUUID();
-  const job = queue.push({ job: { ...params, id: jobId }, delay: 2 });
+  const job = queue.push({ job: { ...params, id: jobId }, jobId });
 
   // Get current queue size for logging
   const queueSize = await Job.count();
   logger.info('enqueue crawl job', { ...params, jobId, queueSize });
 
   job.on('finished', async ({ result }) => {
-    const count = await Job.count();
-    logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, {
-      job: params,
-      result,
-      queueSize: count,
-    });
-    callback?.(result ? await formatSnapshot(result) : null);
+    try {
+      const count = await Job.count();
+      logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, {
+        job: params,
+        result,
+        queueSize: count,
+      });
+      callback?.(result ? await formatSnapshot(result) : null);
+    } catch (error) {
+      logger.error(`Error in finished event handler for ${params.url}`, { error });
+      callback?.(null);
+    }
   });
 
   job.on('failed', async ({ error }) => {
-    const count = await Job.count();
-    logger.error(`Failed to execute job for ${params.url}`, { error, job: params, queueSize: count });
-    callback?.(null);
+    try {
+      const count = await Job.count();
+      logger.error(`Failed to execute job for ${params.url}`, { error, job: params, queueSize: count });
+      callback?.(null);
+    } catch (err) {
+      logger.error(`Error in failed event handler for ${params.url}`, { error: err });
+      callback?.(null);
+    }
   });
 
   return jobId;

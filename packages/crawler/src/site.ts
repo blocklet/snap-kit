@@ -75,12 +75,16 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
         const jobId = randomUUID();
 
         cronQueue.push({
-          id: jobId,
-          url,
-          lastModified: sitemapItem.lastmod,
-          includeScreenshot: false,
-          includeHtml: true,
-          replace: true,
+          job: {
+            id: jobId,
+            url,
+            lastModified: sitemapItem.lastmod,
+            includeScreenshot: false,
+            includeHtml: true,
+            replace: true,
+          },
+          jobId,
+          delay: 5,
         });
 
         return jobId;
