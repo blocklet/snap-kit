@@ -11,6 +11,7 @@ export * from './crawler';
 export * from './services/snapshot';
 export * from './store/job';
 export * as utils from './utils';
+export * from './metrics';
 
 export async function initCrawler(
   params: Pick<Config, 'puppeteerPath' | 'siteCron' | 'cookies' | 'localStorage' | 'concurrency'>,

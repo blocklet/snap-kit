@@ -1,17 +1,16 @@
 import { Job } from '@arcblock/crawler';
 import { Joi } from '@arcblock/validator';
+import { auth, session } from '@blocklet/sdk/lib/middlewares';
 import { Router } from 'express';
 
 import { logger } from '../libs/logger';
-
-const { auth } = require('@blocklet/sdk/lib/middlewares');
 
 const router = Router();
 
 /**
  * Admin API: Get job queue stats
  */
-router.get('/jobs/stats', auth({ roles: ['admin', 'owner'] }), async (_, res) => {
+router.get('/jobs/stats', session({ accessKey: true }), auth({ roles: ['admin', 'owner'] }), async (_, res) => {
   const result = await Job.stats();
 
   logger.info('GET /admin/jobs/stats', result);
@@ -30,7 +29,7 @@ const jobsSchema = Joi.object({
   pageSize: Joi.number().integer().min(1).max(100).default(20),
   queue: Joi.string(),
 });
-router.get('/jobs', auth({ roles: ['admin', 'owner'] }), async (req, res) => {
+router.get('/jobs', session({ accessKey: true }), auth({ roles: ['admin', 'owner'] }), async (req, res) => {
   const params = await jobsSchema.validateAsync(req.query);
   const result = await Job.paginate(params);
 
@@ -49,7 +48,7 @@ const deleteJobsSchema = Joi.object({
   queue: Joi.string(),
   ids: Joi.array().items(Joi.string()),
 }).or('queue', 'ids');
-router.delete('/jobs', auth({ roles: ['admin', 'owner'] }), async (req, res) => {
+router.delete('/jobs', session({ accessKey: true }), auth({ roles: ['admin', 'owner'] }), async (req, res) => {
   const params = await deleteJobsSchema.validateAsync(req.body);
 
   let result;

@@ -65,6 +65,7 @@ export function createSnapshotMiddleware({
 
     const fullUrl = getFullUrl(req);
 
+    // @ts-ignore
     if (!isSpider(req) || isSelfCrawler(req) || isStaticFile(req)) {
       return next();
     }

@@ -19,6 +19,7 @@ export interface JobState {
   replace?: boolean;
   sync?: boolean;
   ignoreRobots?: boolean;
+  enqueuedAt?: number;
   headers?: Record<string, string>;
   cookies?: CookieParam[];
   localStorage?: { key: string; value: string }[];

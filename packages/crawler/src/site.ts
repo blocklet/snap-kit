@@ -3,7 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { SitemapItem } from 'sitemap';
 
 import { Site, config, logger } from './config';
-import { cronQueue } from './crawler';
+import { queueMap } from './crawler';
+import { jobsEnqueuedTotal } from './metrics';
 import { Job, Snapshot } from './store';
 import { formatUrl, getSitemapList } from './utils';
 
@@ -74,7 +75,7 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
 
         const jobId = randomUUID();
 
-        cronQueue.push({
+        queueMap.cronJobs.push({
           job: {
             id: jobId,
             url,
@@ -82,10 +83,12 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
             includeScreenshot: false,
             includeHtml: true,
             replace: true,
+            enqueuedAt: Date.now(),
           },
           jobId,
           delay: 5,
         });
+        jobsEnqueuedTotal.inc({ queue: 'cronJobs' });
 
         return jobId;
       },

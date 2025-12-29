@@ -10,12 +10,12 @@ import path from 'path';
 import env from './libs/env';
 import { logger } from './libs/logger';
 import routes from './routes';
+import adminRoutes from './routes/admin';
+import metricsRoutes from './routes/metrics';
 
 const { name, version } = require('../../package.json');
 
 dotenv.config();
-
-logger.debug('preferences', env.preferences);
 
 export const app = express();
 createLogger.setupAccessLogger(app);
@@ -26,10 +26,10 @@ app.use(express.json({ limit: '1 mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1 mb' }));
 app.use(cors());
 
-const router = express.Router();
-router.use('/api', routes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/metrics', metricsRoutes);
+app.use('/api', routes);
 
-app.use(router);
 app.use('/data', express.static(path.join(env.dataDir, 'data'), { maxAge: '365d', index: false }));
 
 // const isProduction = process.env.NODE_ENV === 'production' || process.env.ABT_NODE_SERVICE_ENV === 'production';
