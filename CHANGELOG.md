@@ -1,3 +1,7 @@
+## 1.5.1 (2025-12-30)
+
+- chore: upgrade node@22 in CI
+
 ## 1.5.0 (2025-12-29)
 
 - feat: add metrics router for prometheus
