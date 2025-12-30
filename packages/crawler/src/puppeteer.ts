@@ -121,21 +121,25 @@ export async function launchBrowser() {
         '--no-sandbox',
         '--no-zygote',
         '--disable-setuid-sandbox',
-        '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-site-isolation-trials',
-        '--disable-accelerated-2d-canvas',
         '--disable-extensions',
         '--js-flags=--max_old_space_size=768', // 限制V8内存
         '--disable-background-networking',
         '--disable-default-apps',
         // '--disable-web-security', // 允许跨域请求
-        '--disable-software-rasterizer',
         '--disable-crash-reporter',
         '--disable-service-workers',
         '--disable-notifications',
         '--disable-infobars',
         '--font-render-hinting=none',
+        // WebGL: use software GL fallback for servers without GPU
+        '--enable-webgl',
+        '--ignore-gpu-blocklist',
+        '--use-gl=swiftshader',
+        '--use-angle=swiftshader',
+        '--enable-unsafe-swiftshader',
+        '--disable-gpu-sandbox',
       ],
     });
     logger.info('Launch browser');
