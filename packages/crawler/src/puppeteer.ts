@@ -4,6 +4,7 @@ import path from 'path';
 import { clearInterval, setInterval } from 'timers';
 
 import { config, logger } from './config';
+import { Job } from './store';
 import { CRAWLER_FLAG, sleep } from './utils';
 
 const BrowserStatus = {
@@ -120,21 +121,25 @@ export async function launchBrowser() {
         '--no-sandbox',
         '--no-zygote',
         '--disable-setuid-sandbox',
-        '--disable-gpu',
         '--disable-dev-shm-usage',
         '--disable-site-isolation-trials',
-        '--disable-accelerated-2d-canvas',
         '--disable-extensions',
-        '--js-flags=--max_old_space_size=512', // 限制V8内存
+        '--js-flags=--max_old_space_size=768', // 限制V8内存
         '--disable-background-networking',
         '--disable-default-apps',
         // '--disable-web-security', // 允许跨域请求
-        '--disable-software-rasterizer',
         '--disable-crash-reporter',
         '--disable-service-workers',
         '--disable-notifications',
         '--disable-infobars',
         '--font-render-hinting=none',
+        // WebGL: use software GL fallback for servers without GPU
+        '--enable-webgl',
+        '--ignore-gpu-blocklist',
+        '--use-gl=swiftshader',
+        '--use-angle=swiftshader',
+        '--enable-unsafe-swiftshader',
+        '--disable-gpu-sandbox',
       ],
     });
     logger.info('Launch browser');
@@ -160,12 +165,21 @@ function checkBrowserActivated() {
   browserActivatedTimer = setInterval(async () => {
     if (browser) {
       const pages = await browser.pages().catch(() => [] as Page[]);
-      if (pages.length === 1 && pages[0]?.url() === 'about:blank') {
+      const jobCount = await Job.count().catch(() => 0);
+
+      // Check if browser is inactive: only blank page AND no pending jobs
+      const isInactive = pages.length === 1 && pages[0]?.url() === 'about:blank' && jobCount === 0;
+
+      if (isInactive) {
         count++;
         logger.debug(`Browser inactive count: ${count}/3`);
       } else {
-        count = 0; // 重置计数器！
+        count = 0;
+        if (jobCount > 0) {
+          logger.debug(`Browser has ${jobCount} pending jobs, keeping active`);
+        }
       }
+
       if (count >= 3) {
         logger.info('Browser inactive for 3 minutes, closing...');
         await closeBrowser({

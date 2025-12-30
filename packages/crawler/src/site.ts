@@ -3,8 +3,9 @@ import { randomUUID } from 'node:crypto';
 import { SitemapItem } from 'sitemap';
 
 import { Site, config, logger } from './config';
-import { cronQueue } from './crawler';
-import { Snapshot } from './store';
+import { queueMap } from './crawler';
+import { jobsEnqueuedTotal } from './metrics';
+import { Job, Snapshot } from './store';
 import { formatUrl, getSitemapList } from './utils';
 
 const crawlBlockletRunningMap = new Map();
@@ -74,25 +75,35 @@ export const crawlSite = async ({ url, pathname, interval = 0 }: Site) => {
 
         const jobId = randomUUID();
 
-        cronQueue.push({
-          id: jobId,
-          url,
-          lastModified: sitemapItem.lastmod,
-          includeScreenshot: false,
-          includeHtml: true,
-          replace: true,
+        queueMap.cronJobs.push({
+          job: {
+            id: jobId,
+            url,
+            lastModified: sitemapItem.lastmod,
+            includeScreenshot: false,
+            includeHtml: true,
+            replace: true,
+            enqueuedAt: Date.now(),
+          },
+          jobId,
+          delay: 5,
         });
+        jobsEnqueuedTotal.inc({ queue: 'cronJobs' });
 
         return jobId;
       },
       { concurrency: config.siteCron?.concurrency || 30 },
     );
 
+    // Get current queue size for logging
+    const queueSize = await Job.count();
+
     logger.info('Enqueued jobs from sitemap finished', {
       url,
       pathname,
       processCount,
       crawlCount,
+      queueSize,
     });
 
     return jobIds;

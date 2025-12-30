@@ -1,3 +1,9 @@
+## 1.5.0 (2025-12-29)
+
+- feat: add metrics router for prometheus
+- feat: add job routes for admin query
+- fix: enhance job handling and logging in crawler
+
 ## 1.4.7 (2025-12-15)
 
 - chore: update deps

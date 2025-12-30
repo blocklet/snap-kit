@@ -7,6 +7,7 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import { config, logger } from './config';
+import { jobDurationSeconds, jobTotalLatencySeconds, jobsEnqueuedTotal, jobsTotal } from './metrics';
 import { initPage } from './puppeteer';
 import { createCarbonImage } from './services/carbon';
 import { convertJobToSnapshot, deleteSnapshots, formatSnapshot } from './services/snapshot';
@@ -15,20 +16,20 @@ import { findMaxScrollHeight, formatUrl, isAcceptCrawler, md5, sleep } from './u
 
 const { BaseState } = require('@abtnode/models');
 
-let crawlQueue;
-let syncQueue;
-let codeQueue;
-let cronQueue;
-
-export { crawlQueue, syncQueue, codeQueue, cronQueue };
+export const queueMap = {
+  urlCrawler: null as any,
+  syncCrawler: null as any,
+  codeCrawler: null as any,
+  cronJobs: null as any,
+};
 
 export function initQueue() {
-  crawlQueue = createCrawlQueue('urlCrawler');
-  syncQueue = createCrawlQueue('syncCrawler');
-  codeQueue = createCrawlQueue('codeCrawler', {
+  queueMap.urlCrawler = createCrawlQueue('urlCrawler');
+  queueMap.syncCrawler = createCrawlQueue('syncCrawler');
+  queueMap.codeCrawler = createCrawlQueue('codeCrawler', {
     handleScreenshot: createCarbonImage,
   });
-  cronQueue = createCrawlQueue('cronJobs');
+  queueMap.cronJobs = createCrawlQueue('cronJobs');
 }
 
 type PageHandler = {
@@ -41,28 +42,15 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
 
   return createQueue({
     store: new SequelizeStore(db, queue),
-    concurrency: config.concurrency,
+    options: {
+      concurrency: config.concurrency,
+      enableScheduledJob: true,
+    },
     onJob: async (job: JobState) => {
-      logger.info('Starting to execute crawl job', job);
+      const startTime = Date.now();
+      let status: 'success' | 'failed' = 'failed';
 
-      // check robots.txt
-      if (!job.ignoreRobots) {
-        const canCrawl = await isAcceptCrawler(job.url);
-        if (!canCrawl) {
-          logger.error(`failed to crawl ${job.url}, denied by robots.txt`, job);
-          const snapshot = convertJobToSnapshot({
-            job,
-            snapshot: {
-              status: 'failed',
-              error: 'Denied by robots.txt',
-            },
-          });
-          await Snapshot.upsert(snapshot);
-          return snapshot;
-        }
-      }
-
-      const formattedJob: JobState = {
+      const formattedJob = {
         ...job,
         cookies: (config.cookies || []).concat(job.cookies || []),
         localStorage: (config.localStorage || []).concat(job.localStorage || []),
@@ -70,6 +58,25 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
       };
 
       try {
+        logger.info(`Starting to execute ${queue} job`, { ...job, queueSize: await Job.count() });
+
+        // check robots.txt
+        if (!job.ignoreRobots) {
+          const canCrawl = await isAcceptCrawler(job.url);
+          if (!canCrawl) {
+            logger.error(`failed to crawl ${job.url}, denied by robots.txt`, job);
+            const snapshot = convertJobToSnapshot({
+              job,
+              snapshot: {
+                status: 'failed',
+                error: 'Denied by robots.txt',
+              },
+            });
+            await Snapshot.upsert(snapshot);
+            return snapshot;
+          }
+        }
+
         // get page content later
         const result = await getPageContent(formattedJob, handler);
 
@@ -86,23 +93,21 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
           await Snapshot.upsert(snapshot);
           return snapshot;
         }
+
         const snapshot = await sequelize.transaction(async (txn) => {
           // delete old snapshot
           if (formattedJob.replace) {
-            try {
-              const deletedJobIds = await deleteSnapshots(
-                {
-                  url: formattedJob.url,
-                  replace: true,
-                },
-                { txn },
-              );
-              if (deletedJobIds) {
-                logger.info('Deleted old snapshot', { deletedJobIds });
-              }
-            } catch (error) {
+            const deletedJobIds = await deleteSnapshots(
+              {
+                url: formattedJob.url,
+                replace: true,
+              },
+              { txn },
+            ).catch((error) => {
               logger.error('Failed to delete old snapshot', { error, formattedJob });
-            }
+            });
+
+            logger.info('Deleted old snapshot', { deletedJobIds });
           }
 
           // save html and screenshot to data dir
@@ -126,9 +131,12 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
           return snapshot;
         });
 
+        status = 'success';
         return snapshot;
       } catch (error) {
         logger.error(`Failed to crawl ${formattedJob.url}`, { error, formattedJob });
+
+        status = 'failed';
 
         const snapshot = convertJobToSnapshot({
           job: formattedJob,
@@ -139,6 +147,13 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
         });
         await Snapshot.upsert(snapshot);
         return snapshot;
+      } finally {
+        const now = Date.now();
+        jobsTotal.inc({ queue, status });
+        jobDurationSeconds.observe({ queue, status }, (now - startTime) / 1000);
+        if (job.enqueuedAt) {
+          jobTotalLatencySeconds.observe({ queue, status }, (now - job.enqueuedAt) / 1000);
+        }
       }
     },
   });
@@ -200,7 +215,7 @@ export const getPageContent = async (
     height = 900,
     quality = 80,
     format = 'webp',
-    timeout = 90 * 1000,
+    timeout = 60 * 1000,
     waitTime = 0,
     fullPage = false,
     headers,
@@ -365,10 +380,15 @@ export const getPageContent = async (
  */
 // eslint-disable-next-line require-await
 export async function enqueue(
-  queue,
+  queueName: keyof typeof queueMap,
   params: Omit<JobState, 'jobId'>,
   callback?: (snapshot: SnapshotModel | null) => void,
 ) {
+  const queue = queueMap[queueName];
+  if (!queue) {
+    throw new Error(`Queue ${queueName} not found`);
+  }
+
   // skip duplicate job
   const existsJob = await Job.isExists(params);
   if (existsJob && !params.sync) {
@@ -376,28 +396,55 @@ export async function enqueue(
     return existsJob.id;
   }
 
-  logger.info('enqueue crawl job', params);
-
   const jobId = randomUUID();
-  const job = queue.push({ ...params, id: jobId });
+  const enqueuedAt = Date.now();
+  const job = queue.push({ job: { ...params, id: jobId, enqueuedAt }, jobId });
+  jobsEnqueuedTotal.inc({ queue: queueName });
+
+  // Get current queue size for logging
+  const queueSize = await Job.count();
+  logger.info('enqueue crawl job', { ...params, jobId, queueSize });
 
   job.on('finished', async ({ result }) => {
-    logger.info(`Crawl completed ${params.url}, status: ${result ? 'success' : 'failed'}`, { job: params, result });
-    callback?.(result ? await formatSnapshot(result) : null);
+    try {
+      const isSuccess = result?.status === 'success';
+      const queueSize = await Job.count();
+
+      logger.info(`Crawl completed ${params.url}, status: ${isSuccess ? 'success' : 'failed'}`, {
+        job: params,
+        result,
+        queueSize,
+      });
+
+      callback?.(result ? await formatSnapshot(result) : null);
+    } catch (error) {
+      logger.error(`Error in finished event handler for ${params.url}`, { error });
+      callback?.(null);
+    }
   });
 
-  job.on('failed', ({ error }) => {
-    logger.error(`Failed to execute job for ${params.url}`, { error, job: params });
-    callback?.(null);
+  job.on('failed', async ({ error }) => {
+    try {
+      const queueSize = await Job.count();
+      logger.error(`Failed to execute job for ${params.url}`, { error, job: params, queueSize });
+    } catch (err) {
+      logger.error(`Error in failed event handler for ${params.url}`, { error: err });
+    } finally {
+      callback?.(null);
+    }
   });
 
   return jobId;
 }
 
 export function crawlUrl(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
-  return enqueue(params.sync ? syncQueue : crawlQueue, params, callback);
+  return enqueue(params.sync ? 'syncCrawler' : 'urlCrawler', params, callback);
 }
 
 export function crawlCode(params: Omit<JobState, 'jobId'>, callback?: (snapshot: SnapshotModel | null) => void) {
-  return enqueue(codeQueue, { ignoreRobots: true, includeHtml: false, includeScreenshot: true, ...params }, callback);
+  return enqueue(
+    'codeCrawler',
+    { ignoreRobots: true, includeHtml: false, includeScreenshot: true, ...params },
+    callback,
+  );
 }
