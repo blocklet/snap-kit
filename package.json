@@ -1,7 +1,7 @@
 {
   "name": "crawler",
   "private": true,
-  "version": "1.5.1",
+  "version": "1.5.2",
   "scripts": {
     "dev": "pnpm run --filter @arcblock/crawler dev & pnpm run --filter @arcblock/crawler-middleware dev & pnpm run --filter @blocklet/snap-kit dev",
     "build:packages": "pnpm -r build",
@@ -9,7 +9,8 @@
     "lint:fix": "pnpm -r lint:fix",
     "bundle": "pnpm -r bundle",
     "bump-version": "zx scripts/bump-version.mjs",
-    "update:deps": "npx -y taze -r -w -f -n '/@abtnode|@aigne|@arcblock|@blocklet|@did-connect|@did-pay|@did-space|@nft-store|@nft-studio|@ocap/' && pnpm install && pnpm dedupe"
+    "update:deps": "npx -y taze -r -w -f -n '/@abtnode|@aigne|@arcblock|@blocklet|@did-connect|@did-pay|@did-space|@nft-store|@nft-studio|@ocap|vite-plugin-blocklet/' && pnpm install && pnpm dedupe",
+    "verify": "npm run build:packages && npm run lint && npm run bundle"
   },
   "lint-staged": {
     "*.{mjs,js,jsx,ts,tsx}": [

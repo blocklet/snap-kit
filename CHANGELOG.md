@@ -1,3 +1,7 @@
+## 1.5.2 (2026-1-5)
+
+- chore: update deps
+
 ## 1.5.1 (2025-12-30)
 
 - chore: upgrade node@22 in CI
