@@ -19,6 +19,7 @@ const crawlSchema = Joi.object({
   cookies: Joi.array().items(Joi.object({ name: Joi.string().required(), value: Joi.string().required() })),
   localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
   sync: Joi.boolean().default(false),
+  ignoreRobots: Joi.boolean().default(true),
 });
 router.post('/crawl', session({ accessKey: true }), auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await crawlSchema.validateAsync(req.body);
@@ -98,6 +99,7 @@ const snapSchema = Joi.object({
   cookies: Joi.array().items(Joi.object({ name: Joi.string().required(), value: Joi.string().required() })),
   localStorage: Joi.array().items(Joi.object({ key: Joi.string().required(), value: Joi.string().required() })),
   sync: Joi.boolean().default(false),
+  ignoreRobots: Joi.boolean().default(true),
 });
 router.post('/snap', session({ accessKey: true }), auth({ methods: ['accessKey'] }), async (req, res) => {
   const params = await snapSchema.validateAsync(req.body);

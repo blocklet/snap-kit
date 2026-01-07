@@ -8,7 +8,7 @@ import path from 'path';
 
 import { config, logger } from './config';
 import { jobDurationSeconds, jobTotalLatencySeconds, jobsEnqueuedTotal, jobsTotal } from './metrics';
-import { initPage } from './puppeteer';
+import { closeBrowser, initPage, isBrowserConnectionError } from './puppeteer';
 import { createCarbonImage } from './services/carbon';
 import { convertJobToSnapshot, deleteSnapshots, formatSnapshot } from './services/snapshot';
 import { Job, JobState, Snapshot, SnapshotModel, sequelize } from './store';
@@ -45,6 +45,7 @@ export function createCrawlQueue(queue: string, handler?: PageHandler) {
     options: {
       concurrency: config.concurrency,
       enableScheduledJob: true,
+      maxRetries: 3,
     },
     onJob: async (job: JobState) => {
       const startTime = Date.now();
@@ -260,6 +261,21 @@ export const getPageContent = async (
   let screenshot: Uint8Array | null = null;
   const meta: { title?: string; description?: string } = {};
 
+  const closePageSafely = async () => {
+    try {
+      await page.close();
+    } catch (error) {
+      if (isBrowserConnectionError(error)) {
+        try {
+          await closeBrowser({ trimCache: false });
+        } catch (closeError) {
+          logger.warn('Failed to close browser after page close error', { error: closeError });
+        }
+      }
+      logger.warn('Failed to close page:', { error });
+    }
+  };
+
   try {
     const response = await page.goto(url, { timeout });
 
@@ -359,11 +375,20 @@ export const getPageContent = async (
       logger.error('Failed to get html:', err);
       throw err;
     }
+
+    await closePageSafely();
   } catch (error) {
+    if (isBrowserConnectionError(error)) {
+      try {
+        await closeBrowser({ trimCache: false });
+      } catch (closeError) {
+        logger.warn('Failed to close browser after page error', { error: closeError });
+      }
+    } else {
+      await closePageSafely();
+    }
     logger.error('Failed to get page content:', error);
     throw error;
-  } finally {
-    await page.close();
   }
 
   return {

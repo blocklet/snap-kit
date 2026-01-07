@@ -54,6 +54,8 @@ export async function collectMetrics() {
   try {
     // 收集队列大小
     const jobStats = await Job.stats();
+    // Reset first to clear queues that no longer have jobs
+    queueSize.reset();
     jobStats.queues.forEach((q) => {
       queueSize.set({ queue: q.queue }, q.count);
     });
