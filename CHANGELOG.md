@@ -1,3 +1,9 @@
+## 1.5.3 (2026-1-7)
+
+- fix: enhance snapshot handling and file deletion logic
+- fix: improved browser management in the crawler
+- fix: add ignoreRobots params for skip robots detect
+
 ## 1.5.2 (2026-1-5)
 
 - chore: update deps

@@ -1,6 +1,6 @@
 {
   "name": "@arcblock/crawler-middleware",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "types": "lib/cjs/index.d.ts",
