@@ -1,24 +1,21 @@
-import puppeteer, { Browser, Page, ResourceType } from '@blocklet/puppeteer';
+import puppeteer, { Browser, ResourceType } from '@blocklet/puppeteer';
 import fs from 'fs-extra';
 import path from 'path';
-import { clearInterval, setInterval } from 'timers';
 
 import { config, logger } from './config';
-import { Job } from './store';
 import { CRAWLER_FLAG, sleep } from './utils';
 
-const BrowserStatus = {
-  None: 'None',
-  Launching: 'Launching',
-  Ready: 'Ready',
-};
-let browserStatus = BrowserStatus.None;
-
-/** Chromium WebSocket endpoint that allows puppeteer browser instance to connect to the browser */
-let browserEndpoint = '';
-
 let browser: Browser | null;
-let browserActivatedTimer: NodeJS.Timeout | null;
+let browserInitInFlight: Promise<Browser> | null;
+let closingBrowser: Promise<void> | null;
+
+const BROWSER_CONNECTION_ERROR_PATTERNS = [
+  /protocol error/i,
+  /target closed/i,
+  /browser disconnected/i,
+  /session closed/i,
+  /target crashed/i,
+];
 
 export { puppeteer };
 
@@ -72,7 +69,7 @@ export async function ensureBrowser() {
 
   // try to launch browser
   if (config.isProd) {
-    const browser = await launchBrowser();
+    const browser = await getBrowser();
     if (!browser) {
       throw new Error('Failed to launch browser');
     }
@@ -82,35 +79,7 @@ export async function ensureBrowser() {
   logger.info('Puppeteer is ready');
 }
 
-export async function connectBrowser() {
-  if (!browserEndpoint) {
-    return null;
-  }
-
-  // retry if browser is launching
-  if (browserStatus === BrowserStatus.Launching) {
-    await sleep(Math.floor(Math.random() * 1000));
-    return connectBrowser();
-  }
-
-  try {
-    browser = await puppeteer.connect({
-      browserWSEndpoint: browserEndpoint,
-    });
-    logger.info('Connect browser success');
-  } catch (err) {
-    logger.warn('Connect browser failed, clear endpoint', err);
-    browserEndpoint = '';
-    return null;
-  }
-
-  return browser;
-}
-
 export async function launchBrowser() {
-  browserEndpoint = '';
-  browserStatus = BrowserStatus.Launching;
-
   try {
     browser = await puppeteer.launch({
       headless: true,
@@ -142,137 +111,153 @@ export async function launchBrowser() {
         '--disable-gpu-sandbox',
       ],
     });
+    attachBrowserListeners(browser);
     logger.info('Launch browser');
   } catch (error) {
     logger.error('launch browser failed: ', error);
-    browserStatus = BrowserStatus.None;
-    browserEndpoint = '';
     throw error;
   }
-
-  // save browserWSEndpoint to cache
-  browserEndpoint = await browser!.wsEndpoint();
-  browserStatus = BrowserStatus.Ready;
 
   return browser;
 }
 
-function checkBrowserActivated() {
-  clearBrowserActivatedTimer();
-
-  let count = 0;
-
-  browserActivatedTimer = setInterval(async () => {
-    if (browser) {
-      const pages = await browser.pages().catch(() => [] as Page[]);
-      const jobCount = await Job.count().catch(() => 0);
-
-      // Check if browser is inactive: only blank page AND no pending jobs
-      const isInactive = pages.length === 1 && pages[0]?.url() === 'about:blank' && jobCount === 0;
-
-      if (isInactive) {
-        count++;
-        logger.debug(`Browser inactive count: ${count}/3`);
-      } else {
-        count = 0;
-        if (jobCount > 0) {
-          logger.debug(`Browser has ${jobCount} pending jobs, keeping active`);
-        }
-      }
-
-      if (count >= 3) {
-        logger.info('Browser inactive for 3 minutes, closing...');
-        await closeBrowser({
-          trimCache: true,
-        });
-      }
-    }
-  }, 1000 * 60);
-}
-
-function clearBrowserActivatedTimer() {
-  if (browserActivatedTimer) {
-    clearInterval(browserActivatedTimer);
-    browserActivatedTimer = null;
+function resetBrowserState(reason?: string) {
+  if (reason) {
+    logger.warn('Reset browser state', { reason });
   }
+  browser = null;
+  browserInitInFlight = null;
 }
 
-export const getBrowser = async () => {
-  if (browser) return browser;
+export function isBrowserConnectionError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || '');
+  return BROWSER_CONNECTION_ERROR_PATTERNS.some((pattern) => pattern.test(message));
+}
 
+function attachBrowserListeners(target: Browser) {
+  target.on('disconnected', () => {
+    if (browser !== target) {
+      return;
+    }
+
+    logger.warn('Browser disconnected');
+    resetBrowserState('disconnected');
+  });
+}
+
+async function initBrowser() {
   // sleep random time (0 ~ 5s),to avoid concurrent blocklet
   await sleep(Math.floor(Math.random() * 1000 * 5));
 
-  // try to connect browser
-  const connectedBrowser = await connectBrowser();
-  if (connectedBrowser) {
-    logger.debug('getBrowser.connectedBrowser');
-    browser = connectedBrowser;
-    checkBrowserActivated();
-    return browser;
-  }
-
-  // try to launch browser
   const launchedBrowser = await launchBrowser();
   if (launchedBrowser) {
     logger.debug('getBrowser.launchedBrowser');
     browser = launchedBrowser;
-    checkBrowserActivated();
     return browser;
   }
 
   throw new Error('No browser to use, should install redis or browser');
+}
+
+export const getBrowser = async () => {
+  // Wait for any ongoing browser close operation to complete
+  if (closingBrowser) {
+    await closingBrowser;
+  }
+
+  if (browser) {
+    if (browser.isConnected()) {
+      return browser;
+    }
+    logger.warn('Browser instance is disconnected, resetting');
+    resetBrowserState('disconnected');
+  }
+
+  if (browserInitInFlight) {
+    return browserInitInFlight;
+  }
+
+  const initPromise = initBrowser();
+
+  browserInitInFlight = initPromise;
+
+  return initPromise.finally(() => {
+    if (browserInitInFlight === initPromise) {
+      browserInitInFlight = null;
+    }
+  });
 };
 
-export const closeBrowser = async ({ trimCache = true }: { trimCache?: boolean } = {}) => {
+export const closeBrowser = ({ trimCache = true }: { trimCache?: boolean } = {}) => {
+  // Return existing close operation if already in progress
+  if (closingBrowser) {
+    return closingBrowser;
+  }
+
   if (!browser) return;
 
-  // close all pages
-  try {
-    const pages = await browser.pages();
-    await Promise.all(pages.map((page) => page.close()));
-  } catch (err) {
-    logger.warn('Failed to close all pages:', err);
-  }
-
-  // close browser
-  try {
-    await browser.close();
-  } catch (err) {
-    logger.warn('Failed to close browser:', err);
-  }
-
-  // clear cache
-  try {
-    if (trimCache) {
-      await puppeteer.trimCache();
-      logger.debug('Trim cache success');
-    }
-
-    // try to clear temporary directory
-    // if (puppeteerConfig) {
-    //   await fs.emptyDir(puppeteerConfig.temporaryDirectory);
-    // }
-
-    if (global.gc) {
-      global.gc();
-    }
-  } catch (err) {
-    logger.warn('Failed to clear browser cache:', err);
-  }
-
+  const target = browser;
   browser = null;
+  browserInitInFlight = null;
 
-  clearBrowserActivatedTimer();
-  browserEndpoint = '';
-  browserStatus = BrowserStatus.None;
+  const doClose = async () => {
+    // close all pages
+    try {
+      const pages = await target.pages();
+      await Promise.all(pages.map((page) => page.close().catch(() => {})));
+    } catch (err) {
+      logger.warn('Failed to close all pages:', err);
+    }
 
-  logger.info('Close browser success');
+    // close browser
+    try {
+      await target.close();
+    } catch (err) {
+      logger.warn('Failed to close browser:', err);
+    }
+
+    // clear cache
+    try {
+      if (trimCache) {
+        await puppeteer.trimCache();
+        logger.debug('Trim cache success');
+      }
+
+      if (global.gc) {
+        global.gc();
+      }
+    } catch (err) {
+      logger.warn('Failed to clear browser cache:', err);
+    }
+
+    logger.info('Close browser success');
+  };
+
+  closingBrowser = doClose().finally(() => {
+    closingBrowser = null;
+  });
+
+  return closingBrowser;
 };
 
 export async function initPage({ abortResourceTypes = [] }: { abortResourceTypes?: ResourceType[] } = {}) {
-  const browser = await getBrowser();
-  const page = await browser.newPage();
+  const currentBrowser = await getBrowser();
+
+  let page;
+  try {
+    page = await currentBrowser.newPage();
+  } catch (error) {
+    // If newPage fails due to connection error, close browser and retry once
+    if (isBrowserConnectionError(error)) {
+      logger.warn('Failed to create new page due to connection error, restarting browser');
+      await closeBrowser({ trimCache: false });
+      const newBrowser = await getBrowser();
+      page = await newBrowser.newPage();
+    } else {
+      throw error;
+    }
+  }
+
   await page.setViewport({ width: 1440, height: 900 });
 
   // page setting

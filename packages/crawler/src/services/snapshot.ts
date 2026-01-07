@@ -39,12 +39,20 @@ export async function formatSnapshot(snapshot: SnapshotModel, columns?: Array<ke
     try {
       const html = await fs.readFile(path.join(config.dataDir, data.html));
       data.html = html.toString();
-    } catch (err) {
+    } catch (err: any) {
       logger.error('Failed to read html', {
         err,
         dataDir: config.dataDir,
         snapshot,
       });
+
+      // If the file is missing, delete the invalid snapshot record
+      if (err?.code === 'ENOENT') {
+        logger.warn('HTML file missing, deleting invalid snapshot record', { jobId: snapshot.jobId });
+        await Snapshot.destroy({ where: { jobId: snapshot.jobId } });
+        return null;
+      }
+
       data.html = '';
     }
   }
@@ -109,13 +117,28 @@ export async function deleteSnapshots(where: WhereOptions<SnapshotModel>, { txn 
   const jobIds = await Promise.all(
     snapshots.map(async (snapshot) => {
       try {
+        // Check reference count before deleting files
+        // Only delete file if no other snapshots reference it
+        const deleteFilePromises: Promise<void>[] = [];
+
+        if (snapshot.html) {
+          const htmlRefCount = await Snapshot.count({ where: { html: snapshot.html } });
+          if (htmlRefCount <= 1) {
+            deleteFilePromises.push(fs.unlink(path.join(config.dataDir, snapshot.html)).catch(() => {}));
+          }
+        }
+
+        if (snapshot.screenshot) {
+          const screenshotRefCount = await Snapshot.count({ where: { screenshot: snapshot.screenshot } });
+          if (screenshotRefCount <= 1) {
+            deleteFilePromises.push(fs.unlink(path.join(config.dataDir, snapshot.screenshot)).catch(() => {}));
+          }
+        }
+
         try {
-          await Promise.all([
-            snapshot.html && fs.unlink(path.join(config.dataDir, snapshot.html)),
-            snapshot.screenshot && fs.unlink(path.join(config.dataDir, snapshot.screenshot)),
-          ]);
+          await Promise.all(deleteFilePromises);
         } catch (err) {
-          logger.error('Failed to delete snapshot', { err, snapshot, dataDir: config.dataDir });
+          logger.error('Failed to delete snapshot files', { err, snapshot, dataDir: config.dataDir });
         }
 
         await snapshot.destroy({ transaction: txn });
