@@ -52,7 +52,7 @@
     "dotenv-flow": "^4.1.0",
     "express": "^4.21.2",
     "express-async-errors": "^3.1.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "ufo": "^1.5.4"
   },
   "devDependencies": {
