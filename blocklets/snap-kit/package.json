@@ -46,7 +46,7 @@
     "@blocklet/js-sdk": "^1.17.7",
     "@blocklet/logger": "^1.17.7",
     "@blocklet/sdk": "^1.17.7",
-    "axios": "^1.7.9",
+    "axios": "^1.13.5",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv-flow": "^4.1.0",
